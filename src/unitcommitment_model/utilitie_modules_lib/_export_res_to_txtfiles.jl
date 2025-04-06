@@ -151,8 +151,9 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 		# 	((s - 1) * ND2 + 1):(s * ND2), ((iter - 1) * iter_block + 1):(iter * iter_block)])) .*
 		# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
 
+        sub_output_dir = joinpath(pwd(), "output/data_centra/")
 		for (filename, data) in data_to_write
-			filepath = joinpath(output_dir, filename)
+			filepath = joinpath(sub_output_dir, filename)
 			try
 				CSV.write(filepath, DataFrame(data, :auto))
 				println("Successfully wrote to $filepath")
