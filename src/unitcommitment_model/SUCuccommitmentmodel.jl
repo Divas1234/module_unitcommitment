@@ -113,7 +113,7 @@ function SUC_scucmodel(
 	# --- Solve and Extract Results ---
 	# Solve the optimization model and extract the results
 	try
-		results = solve_and_extract_results(scuc, NT, NG, ND, NC, NW, NS, ND2, config_param)
+		results = solve_and_extract_results(scuc, NT, NG, ND, NC, NW, NS, ND2, scenarios_prob,eachslope, refcost, config_param)
 
 		# --- Return Results ---
 		# Return the optimization results

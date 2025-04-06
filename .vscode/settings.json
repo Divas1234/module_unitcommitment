@@ -1,0 +1,5 @@
+{
+    "editor.guides.bracketPairs": "active",
+    "BracketHighlighter.activeInDebugMode": false,
+    "prettier.bracketSameLine": true
+}

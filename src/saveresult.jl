@@ -124,7 +124,7 @@ function savebalance_result(
 			filepath = "D:/ieee_tpws/code/littlecase//output/enhance_pros/"
 		end
 	else
-        filepath = "/Users/yuanyiping/Documents/GitHub/Module_UnitCommitment_REPO/output"
+        filepath = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
 	end
 	open(filepath * "res_thermalunits.txt", "w") do io
 		# writedlm(io, [" "])

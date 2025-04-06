@@ -5,7 +5,7 @@ function readxlssheet()
 	filepath = pwd()
 	# df = XLSX.readxlsx(filepath * "\\master-2\\case1\\data\\data.xlsx")
     if Sys.isapple()
-        df = XLSX.readxlsx("/Users/yuanyiping/Documents/GitHub/Module_UnitCommitment_REPO/data/data.xlsx")
+        df = XLSX.readxlsx("/Users/yuanyiping/Documents/GitHub/module_unitcommitment/data/data.xlsx")
     elseif Sys.iswindows()
         df = XLSX.readxlsx("D:/GithubClonefiles/datacentra_unitcommitment/data/data.xlsx")
     end
