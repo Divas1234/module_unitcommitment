@@ -1,12 +1,12 @@
 using Pkg
 
 # Activate the project environment
-Pkg.activate("./.pkg")
+Pkg.activate("./.pkg");
 # Include necessary modules
-include("src/environment_config.jl")
-include("src/read_inputdata_modules/readdatas.jl")
-include("src/renewableresource_modules/stochasticsimulation.jl")
-include("src/unitcommitment_model_modules/SUCuccommitmentmodel.jl")
+include("src/environment_config.jl");
+include("src/renewableresource_modules/stochasticsimulation.jl");
+include("src/read_inputdata_modules/readdatas.jl");
+include("src/unitcommitment_model_modules/SUCuccommitmentmodel.jl");
 
 # Destructure directly from function call for clarity
 # Read data from Excel sheet

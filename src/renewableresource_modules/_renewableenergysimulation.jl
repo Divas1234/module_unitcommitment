@@ -47,7 +47,7 @@ scenarios_prob = 1 / scenarios_nums
 # scenarios_curve = zeros(scenarios_nums, NT)
 NT = 24
 # assum the capacity of each wind is same and reforced as 0.5 p.u.
-cap = [0.5] * 5
+cap = [0.5] * 10
 p_max = cap .* ones(NW, 1)
 p_max = p_max[:, 1]
 scenarios_curve = zeros(scenarios_nums, NT)
