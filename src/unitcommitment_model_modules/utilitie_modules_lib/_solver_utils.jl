@@ -34,9 +34,8 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		# β       = JuMP.value.(β)
 
 		# Storage results (check if NC > 0)
-		pss_charge_p⁺, pss_charge_p⁻, pss_charge_state⁺, pss_charge_state⁻, pss_charge_cycle⁺, pss_charge_cycle⁻, pss_Qc = ntuple(
-			_ -> nothing, 7)
-		if NC > 0
+		pss_charge_p⁺, pss_charge_p⁻, pss_charge_state⁺, pss_charge_state⁻, pss_charge_cycle⁺, pss_charge_cycle⁻, pss_Qc = ntuple(_ -> nothing, 7)
+		if NC > 0 && config_param.is_ConsiderBESS == 1
 			pss_charge_p⁺     = JuMP.value.(scuc[:pc⁺])
 			pss_charge_p⁻     = JuMP.value.(scuc[:pc⁻])
 			pss_charge_state⁺ = JuMP.value.(scuc[:κ⁺])
@@ -45,12 +44,6 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 			pss_charge_cycle⁻ = JuMP.value.(scuc[:β])
 			pss_Qc            = JuMP.value.(scuc[:qc])
 		end
-
-		# Note: Calculating individual cost components (prod_cost, cr+, cr-) here from solved variables
-		# requires passing parameters like eachslope, refcost, ρ⁺, ρ⁻ to this function.
-		# The total cost is available via objective_value(scuc).
-		# Removed the direct calculation here to fix syntax errors and avoid complexity.
-		# These can be recalculated outside if needed, using the returned solved variables.
 
 		# Data centra results
 		dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res = ntuple(_ -> nothing, 6) # Initialize as nothing
@@ -69,47 +62,50 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		# Note: Original function returned specific variables directly.
 		# Adjust the return statement based on what the caller function `mainfun.jl` expects.
 		# Returning a dictionary or a custom struct might be cleaner.
-		results = Dict(
-			"x₀"                => x₀,
-			"u₀"                => u₀,
-			"v₀"                => v₀,
-			"p₀"                => pg₀,
-			"pₖ"                => pgₖ,
-			"su_cost"           => su_cost,
-			"sd_cost"           => sd_cost,
-			"seq_sr⁺"           => seq_sr⁺,
-			"seq_sr⁻"           => seq_sr⁻,
-			"pᵨ"                => pᵨ,
-			"pᵩ"                => pᵩ,
-			"pss_charge_p⁺"     => pss_charge_p⁺,
-			"pss_charge_p⁻"     => pss_charge_p⁻,
-			"pss_charge_state⁺" => pss_charge_state⁺,
-			"pss_charge_state⁻" => pss_charge_state⁻,
-			"pss_charge_cycle⁺" => pss_charge_cycle⁺,
-			"pss_charge_cycle⁻" => pss_charge_cycle⁻,
-			"pss_Qc"            => pss_Qc,
+		results = Dict("objective_value" => objective_value(scuc),
+					   "solve_time" => solve_time(scuc),
+					   "status" => status)
 
-			# "prod_cost" => prod_cost,
-			# "cr⁺"       => cr⁺,
-			# "cr⁻"       => cr⁻,       # Removed as they are not calculated here anymore
+		results = Dict("x₀"      => x₀,
+					   "u₀"      => u₀,
+					   "v₀"      => v₀,
+					   "p₀"      => pg₀,
+					   "pₖ"      => pgₖ,
+					   "su_cost" => su_cost,
+					   "sd_cost" => sd_cost,
+					   "seq_sr⁺" => seq_sr⁺,
+					   "seq_sr⁻" => seq_sr⁻,
+					   "pᵨ"      => pᵨ,
+					   "pᵩ"      => pᵩ)
 
-			"objective_value" => objective_value(scuc),
-			"solve_time"      => solve_time(scuc),
-			"status"          => status,
+		if NC > 0 && config_param.is_ConsiderBESS == 1
+			results = Dict("pss_charge_p⁺"     => pss_charge_p⁺,
+						   "pss_charge_p⁻"     => pss_charge_p⁻,
+						   "pss_charge_state⁺" => pss_charge_state⁺,
+						   "pss_charge_state⁻" => pss_charge_state⁻,
+						   "pss_charge_cycle⁺" => pss_charge_cycle⁺,
+						   "pss_charge_cycle⁻" => pss_charge_cycle⁻,
+						   "pss_Qc"            => pss_Qc)
+		end
 
-			# Add data centra results to dictionary
-			"dc_p"   => dc_p_res,
-			"dc_f"   => dc_f_res,
-			"dc_v²"  => dc_v²_res,
-			"dc_λ"   => dc_λ_res,
-			"dc_Δu1" => dc_Δu1_res,
-			"dc_Δu2" => dc_Δu2_res
-		)
+		# Add data centra results to dictionary
+		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
+			results = Dict("dc_p"   => dc_p_res,
+						   "dc_f"   => dc_f_res,
+						   "dc_v²"  => dc_v²_res,
+						   "dc_λ"   => dc_λ_res,
+						   "dc_Δu1" => dc_Δu1_res,
+						   "dc_Δu2" => dc_Δu2_res)
+		end
+
+		# "prod_cost" => prod_cost,
+		# "cr⁺"       => cr⁺,
+		# "cr⁻"       => cr⁻,       # Removed as they are not calculated here anymore
 
 		exported_scheduling_cost(NS, NT, NB, NG, ND, NC, ND2, units, loads,
-			winds, lines, DataCentras, config_param, su_cost, sd_cost, pgₖ, pg₀, x₀,
-			seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
-			dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res, eachslope, refcost)
+								 winds, lines, DataCentras, config_param, su_cost, sd_cost, pgₖ, pg₀, x₀,
+								 seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
+								 dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res, eachslope, refcost)
 
 		return results
 

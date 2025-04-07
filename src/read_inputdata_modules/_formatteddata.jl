@@ -18,6 +18,7 @@ struct config
 	is_CalculPrecision::Float64
 	is_ConsiderDataCentra::Int64
 	is_ConsiderFrequencyControl::Int64
+    is_ConsiderBESS::Int64
 	# function config(is_NetWorkCon::Int64,
 	# 		is_ThermalUnitCon::Int64,
 	# 		is_WindUnitCon::Int64,

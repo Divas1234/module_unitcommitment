@@ -143,5 +143,6 @@
         },
         "comments": "",
         "textMateRules": []
-    }
+    },
+    "editor.fontFamily": "Droid Sans Mono, Consolas, 'Courier New', monospace"
 }

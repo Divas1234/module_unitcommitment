@@ -13,7 +13,7 @@ end
 
 function calculate_initial_unit_status(units, NG)
 	onoffinit = zeros(NG, 1)
-	if isdefined(units, :x_0) && size(units.x_0, 1) == NG
+	if !isempty(units.x_0) && size(units.x_0, 1) == NG
 		for i in 1:NG
 			onoffinit[i] = ((units.x_0[i, 1] > 0.5) ? 1 : 0)
 		end

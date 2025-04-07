@@ -42,12 +42,12 @@ end
 index = [1; 2]
 locatebus = [1; 1]
 NW = length(index)
-scenarios_nums = 5
+scenarios_nums = 10
 scenarios_prob = 1 / scenarios_nums
 # scenarios_curve = zeros(scenarios_nums, NT)
 NT = 24
 # assum the capacity of each wind is same and reforced as 0.5 p.u.
-cap = [0.5] * 10
+cap = [0.5] * 5
 p_max = cap .* ones(NW, 1)
 p_max = p_max[:, 1]
 scenarios_curve = zeros(scenarios_nums, NT)

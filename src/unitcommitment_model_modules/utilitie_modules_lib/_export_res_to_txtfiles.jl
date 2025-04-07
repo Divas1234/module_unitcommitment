@@ -1,8 +1,7 @@
 function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, units::unit, loads::load,
-		winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, su_cost, sd_cost, pgₖ, pg₀, x₀,
-		seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
-		dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res, eachslope, refcost
-)
+								  winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, su_cost, sd_cost, pgₖ, pg₀, x₀,
+								  seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
+								  dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res, eachslope, refcost)
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
 
@@ -21,8 +20,8 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 	𝜟pd       = pₛ * sum(sum(sum(pᵨ[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS)
 	𝜟pw       = pₛ * sum(sum(sum(pᵩ[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
 	str       = zeros(1, 7)
-	str[1, 1] = sum(su_cost) * 10
-	str[1, 2] = sum(sd_cost) * 10
+	str[1, 1] = sum(su_cost) * 1.0
+	str[1, 2] = sum(sd_cost) * 1.0
 	str[1, 3] = prod_cost
 	str[1, 4] = cr⁺
 	str[1, 5] = cr⁻
@@ -31,8 +30,11 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 
 	# Set output directory for results
 	# output_dir = joinpath(pwd(), "output")
-	output_dir = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
-
+	if Sys.iswindows()
+		output_dir = "D:/GithubClonefiles/module_unitcommitment/output/"
+	elseif Sys.isapple()
+		output_dir = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
+	end
 	# Create directory if it doesn't exist
 	try
 		if !isdir(output_dir)
@@ -78,7 +80,7 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 			writedlm(io, [" "])
 			writedlm(io, ["list 11: sr⁻"])
 			writedlm(io, seq_sr⁻[1:NG, 1:NT], '\t')
-			writedlm(io, [" "])
+			return writedlm(io, [" "])
 			# writedlm(io, ["list 12: α"])
 			# writedlm(io, α[1:NC, 1:NT], '\t')
 			# writedlm(io, [" "])
@@ -107,7 +109,7 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 			writedlm(io, dc_Δu1_res[1:(ND2), 1:NT], '\t')
 			writedlm(io, [" "])
 			writedlm(io, ["list 6: dc_Δu2"])
-			writedlm(io, dc_Δu2_res[1:(ND2), 1:NT], '\t')
+			return writedlm(io, dc_Δu2_res[1:(ND2), 1:NT], '\t')
 		end
 		println("PART2: [data-centra] calculation result has been saved to: $output_file")
 		println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -120,26 +122,24 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 		iter_block = Int64(round(NT / iter_num))
 
 		s = 1
-		data_to_write = [
-			("dc_Δu2.csv", (dc_Δu2_res[1:(ND2), 1:NT])),
-			("dc_Δu1.csv", (dc_Δu1_res[1:(ND2), 1:NT])),
-			("dc_v².csv", (dc_v²_res[1:(ND2), 1:NT])),
-			("dc_λ.csv", (dc_λ_res[1:(ND2), 1:NT])),
-			("dc_f.csv", (dc_f_res[1:(ND2), 1:NT])),
-			("dc_p.csv", (dc_p_res[1:(ND2), 1:NT])),
-			("dc_debug_tasks_1.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((1 - 1) * iter_block + 1):(1 * iter_block)]))),
-			("dc_debug_tasks_2.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((2 - 1) * iter_block + 1):(2 * iter_block)]))),
-			("dc_debug_tasks_3.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((3 - 1) * iter_block + 1):(3 * iter_block)]))),
-			("dc_debug_tasks_4.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((4 - 1) * iter_block + 1):(4 * iter_block)]))),
-			("dc_debug_tasks_5.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((5 - 1) * iter_block + 1):(5 * iter_block)]))),
-			("dc_debug_tasks_6.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((6 - 1) * iter_block + 1):(6 * iter_block)])))
-		]
+		data_to_write = [("dc_Δu2.csv", (dc_Δu2_res[1:(ND2), 1:NT])),
+						 ("dc_Δu1.csv", (dc_Δu1_res[1:(ND2), 1:NT])),
+						 ("dc_v².csv", (dc_v²_res[1:(ND2), 1:NT])),
+						 ("dc_λ.csv", (dc_λ_res[1:(ND2), 1:NT])),
+						 ("dc_f.csv", (dc_f_res[1:(ND2), 1:NT])),
+						 ("dc_p.csv", (dc_p_res[1:(ND2), 1:NT])),
+						 ("dc_debug_tasks_1.csv",
+						  ((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((1 - 1) * iter_block + 1):(1 * iter_block)]))),
+						 ("dc_debug_tasks_2.csv",
+						  ((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((2 - 1) * iter_block + 1):(2 * iter_block)]))),
+						 ("dc_debug_tasks_3.csv",
+						  ((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((3 - 1) * iter_block + 1):(3 * iter_block)]))),
+						 ("dc_debug_tasks_4.csv",
+						  ((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((4 - 1) * iter_block + 1):(4 * iter_block)]))),
+						 ("dc_debug_tasks_5.csv",
+						  ((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((5 - 1) * iter_block + 1):(5 * iter_block)]))),
+						 ("dc_debug_tasks_6.csv",
+						  ((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((6 - 1) * iter_block + 1):(6 * iter_block)])))]
 
 		# iter = 1
 		# println("===============================================================================")
@@ -158,7 +158,7 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 				CSV.write(filepath, DataFrame(data, :auto))
 				println("Successfully wrote to $filepath")
 			catch e
-				@error "Failed to write to $filepath" exception=(e, catch_backtrace())
+				@error "Failed to write to $filepath" exception = (e, catch_backtrace())
 			end
 		end
 
