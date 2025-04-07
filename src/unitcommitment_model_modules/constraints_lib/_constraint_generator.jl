@@ -11,24 +11,43 @@ function add_unit_operation_constraints!(scuc::Model, NT, NG, units, onoffinit)
 	su₀ = scuc[:su₀]
 	sd₀ = scuc[:sd₀]
 
+	onoffinit = zeros(NG, 1)
 	Lupmin = zeros(NG, 1)     # Minimum startup time
 	Ldownmin = zeros(NG, 1)   # Minimum shutdown time
+	# for i in 1:NG
+	# 	Lupmin[i] = min(NT, get(units.min_shutup_time, i, 0) * onoffinit[i]) # Use get for safety if field might be missing
+	# 	Ldownmin[i] = min(NT, get(units.min_shutdown_time, i, 0) * (1 - onoffinit[i])) # Use get for safety
+	# end
+
 	for i in 1:NG
-		Lupmin[i] = min(NT, get(units.min_shutup_time, i, 0) * onoffinit[i]) # Use get for safety if field might be missing
-		Ldownmin[i] = min(NT, get(units.min_shutdown_time, i, 0) * (1 - onoffinit[i])) # Use get for safety
+		# Uncomment if initial status is provided
+		# onoffinit[i] = ((units.x_0[i, 1] > 0.5) ? 1 : 0)
+		# Calculate minimum up/down time limits
+		Lupmin[i] = min(NT, units.min_shutup_time[i] * onoffinit[i])
+		Ldownmin[i] = min(NT, (units.min_shutdown_time[i, 1]) * (1 - onoffinit[i]))
 	end
 
 	# Min up/down time
+	# for i in 1:NG
+	# 	min_shutup = get(units.min_shutup_time, i, 1) # Default to 1 if missing
+	# 	min_shutdown = get(units.min_shutdown_time, i, 1) # Default to 1 if missing
+	# 	for t in Int64(max(1, Lupmin[i])):NT
+	# 		LB = Int64(max(t - min_shutup + 1, 1))
+	# 		@constraint(scuc, sum(u[i, r] for r in LB:t)<=x[i, t])
+	# 	end
+	# 	for t in Int64(max(1, Ldownmin[i])):NT
+	# 		LB_down = Int64(max(t - min_shutdown + 1, 1))
+	# 		@constraint(scuc, sum(v[i, r] for r in LB_down:t)<=(1 - x[i, t]))
+	# 	end
+	# end
 	for i in 1:NG
-		min_shutup = get(units.min_shutup_time, i, 1) # Default to 1 if missing
-		min_shutdown = get(units.min_shutdown_time, i, 1) # Default to 1 if missing
 		for t in Int64(max(1, Lupmin[i])):NT
-			LB = Int64(max(t - min_shutup + 1, 1))
+			LB = Int64(max(t - units.min_shutup_time[i, 1] + 1, 1))
 			@constraint(scuc, sum(u[i, r] for r in LB:t)<=x[i, t])
 		end
 		for t in Int64(max(1, Ldownmin[i])):NT
-			LB_down = Int64(max(t - min_shutdown + 1, 1))
-			@constraint(scuc, sum(v[i, r] for r in LB_down:t)<=(1 - x[i, t]))
+			LB = Int64(max(t - units.min_shutup_time[i, 1] + 1, 1))
+			@constraint(scuc, sum(v[i, r] for r in LB:t)<=(1 - x[i, t]))
 		end
 	end
 	println("\t constraints: 1) minimum shutup/shutdown time limits\t\t\t done")
@@ -38,6 +57,7 @@ function add_unit_operation_constraints!(scuc::Model, NT, NG, units, onoffinit)
 		[i = 1:NG, t = 1:NT],
 		u[i, t] - v[i, t]==x[i, t] - ((t == 1) ? onoffinit[i] : x[i, t - 1]))
 	@constraint(scuc, [i = 1:NG, t = 1:NT], u[i, t] + v[i, t]<=1)
+
 	println("\t constraints: 2) binary variable logic\t\t\t\t\t done")
 
 	# Startup/shutdown cost
@@ -102,6 +122,24 @@ function add_ramp_constraints!(scuc::Model, NT, NG, NS, units, onoffinit)
 		ramp_down[:, 1] .* x[:, t] +
 		shut_down[:, 1] .* v[:, t] +
 		p_max[:, 1] .* (x[:, t]))
+
+	# @constraint(scuc,
+	# 	[s = 1:NS, t = 1:NT],
+	# 	pg₀[(1 + (s - 1) * NG):(s * NG), t] -
+	# 	((t == 1) ? units.p_0[:, 1] :
+	# 	 pg₀[(1 + (s - 1) * NG):(s * NG),
+	# 		t - 1]).<=
+	# 	units.ramp_up[:, 1] .* ((t == 1) ? onoffinit[:, 1] : x[:, t - 1]) +
+	# 	units.shut_up[:, 1] .* ((t == 1) ? ones(NG, 1) : u[:, t - 1]) +
+	# 	units.p_max[:, 1] .* (ones(NG, 1) - ((t == 1) ? onoffinit[:, 1] : x[:, t - 1])))
+	# @constraint(scuc,
+	# 	[s = 1:NS, t = 1:NT],
+	# 	((t == 1) ? units.p_0[:, 1] : pg₀[(1 + (s - 1) * NG):(s * NG), t - 1]) -
+	# 	pg₀[(1 + (s - 1) * NG):(s * NG), t].<=
+	# 	units.ramp_down[:, 1] .* x[:, t] +
+	# 	units.shut_down[:, 1] .* v[:, t] +
+	# 	units.p_max[:, 1] .* (x[:, t]))
+
 	println("\t constraints: 8) ramp-up/ramp-down constraints\t\t\t\t done")
 end
 
@@ -132,5 +170,6 @@ function add_pwl_constraints!(scuc::Model, NT, NG, NS, units)
 	@constraint(scuc, # Ensure segments are non-negative
 		[s = 1:NS, t = 1:NT, i = 1:NG, k = 1:num_segments],
 		pgₖ[i + (s - 1) * NG, t, k]>=0)
+
 	println("\t constraints: 9) piece linearization constraints\t\t\t done")
 end

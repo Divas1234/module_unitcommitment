@@ -19,17 +19,6 @@ function add_storage_constraints!(scuc::Model, NT, NC, NS, stroges)
 	β = scuc[:β]
 
 	# Use get with defaults for robustness against missing fields in stroges struct
-	# p_plus = get(stroges, :p⁺, fill(Inf, NC))
-	# p_minus = get(stroges, :p⁻, fill(Inf, NC))
-	# gamma_plus = get(stroges, :γ⁺, fill(Inf, NC))
-	# gamma_minus = get(stroges, :γ⁻, fill(Inf, NC))
-	# Q_max = get(stroges, :Q_max, fill(Inf, NC))
-	# Q_min = get(stroges, :Q_min, fill(0.0, NC))
-	# Q_initial = get(stroges, :Q₀, zeros(NC)) # Assuming Q₀ is initial SoC
-	# P_initial = get(stroges, :P₀, zeros(NC)) # Assuming P₀ is initial power
-	# eta_plus = get(stroges, :η⁺, ones(NC))
-	# eta_minus = get(stroges, :η⁻, ones(NC))
-
 	p_plus = stroges.p⁺
 	p_minus = stroges.p⁻
 	gamma_plus = stroges.γ⁺
@@ -37,7 +26,7 @@ function add_storage_constraints!(scuc::Model, NT, NC, NS, stroges)
 	Q_max = stroges.Q_max
 	Q_min = stroges.Q_min
 	Q_initial = stroges.P₀
-    # stroges.Q₀
+	# stroges.Q₀
 	P_initial = stroges.P₀
 	eta_plus = stroges.η⁺
 	eta_minus = stroges.η⁻
@@ -86,9 +75,9 @@ function add_storage_constraints!(scuc::Model, NT, NC, NS, stroges)
 	# Initial-time and end-time equality (SoC target relative to initial SoC Q₀)
 	@constraint(scuc,
 		[s = 1:NS],
-		0.95*Q_initial[:, 1].<=
+		0.99*Q_initial[:, 1].<=
 		qc[((s - 1) * NC + 1):(s * NC), NT].<=
-		1.1*Q_initial[:, 1])
+		1.01*Q_initial[:, 1])
 
 	# Constraints on charging cycles (α, β logic)
 	@constraint(scuc,
@@ -102,10 +91,10 @@ function add_storage_constraints!(scuc::Model, NT, NC, NS, stroges)
 
 	@constraint(scuc,
 		[s = 1:NS, c = 1:NC],
-		sum(α[(s - 1) * NC + c, t] for t in 1:NT)<=2) # Limit number of charge starts?
+		sum(α[(s - 1) * NC + c, t] for t in 1:NT)<=5)
 	@constraint(scuc,
 		[s = 1:NS, c = 1:NC],
-		sum(β[(s - 1) * NC + c, t] for t in 1:NT)<=2) # Limit number of charge stops?
+		sum(β[(s - 1) * NC + c, t] for t in 1:NT)<=5)
 
 	println("\t constraints: 11) stroges system constraints limits\t\t\t done")
 end

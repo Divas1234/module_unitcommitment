@@ -4,12 +4,11 @@ function readxlssheet()
 	println("Step-1: Pkgs and functions are loaded")
 	filepath = pwd()
 	# df = XLSX.readxlsx(filepath * "\\master-2\\case1\\data\\data.xlsx")
-    if Sys.isapple()
-        df = XLSX.readxlsx("/Users/yuanyiping/Documents/GitHub/module_unitcommitment/data/data.xlsx")
-    elseif Sys.iswindows()
-        df = XLSX.readxlsx("D:/GithubClonefiles/datacentra_unitcommitment/data/data.xlsx")
-    end
-
+	if Sys.isapple()
+		df = XLSX.readxlsx("/Users/yuanyiping/Documents/GitHub/module_unitcommitment/data/data.xlsx")
+	elseif Sys.iswindows()
+		df = XLSX.readxlsx("D:/GithubClonefiles/datacentra_unitcommitment/data/data.xlsx")
+	end
 
 	# part-1: read frequency data
 	unitsfreqparam = df["units_frequencyparam"]
@@ -164,7 +163,8 @@ function forminputdata(DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsF
 
 	ND2 = size(dc_index)[1]
 
-	datacentra_data = data_centra(dc_index, dc_locatebus, dc_pmax, dc_pmin, dc_voltage_regulation, dc_idale, dc_sv_constent, dc_λ, dc_μ, dc_computational_power_tasks)
+	datacentra_data = data_centra(
+		dc_index, dc_locatebus, dc_pmax, dc_pmin, dc_voltage_regulation, dc_idale, dc_sv_constent, dc_λ, dc_μ, dc_computational_power_tasks)
 
 	println("Step-2: imput data are loaded")
 

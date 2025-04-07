@@ -4,16 +4,9 @@ using Pkg
 Pkg.activate("./.pkg")
 # Include necessary modules
 include("src/environment_config.jl")
-include("src/formatteddata.jl")
-include("src/renewableenergysimulation.jl")
-include("src/showboundrycase.jl")
-include("src/readdatafromexcel.jl")
-include("src/unitcommitment_model/SUCuccommitmentmodel.jl")
-# include("src/casesploting.jl")
-include("src/saveresult.jl")
-include("src/generatefittingparameters.jl")
-include("src/draw_onlineactivepowerbalance.jl")
-include("src/draw_addditionalpower.jl")
+include("src/read_inputdata_modules/readdatas.jl")
+include("src/renewableresource_modules/stochasticsimulation.jl")
+include("src/unitcommitment_model_modules/SUCuccommitmentmodel.jl")
 
 # Destructure directly from function call for clarity
 # Read data from Excel sheet
