@@ -1,10 +1,10 @@
 using Pkg
 Pkg.activate("./.pkg")
-Pkg.add([
-	"Revise", "JuMP", "Gurobi", "Test", "DelimitedFiles", "PlotlyJS",
-	"LaTeXStrings", "Plots", "JLD", "DataFrames", "Clustering",
-	"StatsPlots", "Distributions"
-])
+# Pkg.add([
+# 	"Revise", "JuMP", "Gurobi", "Test", "DelimitedFiles", "PlotlyJS",
+# 	"LaTeXStrings", "Plots", "JLD", "DataFrames", "Clustering",
+# 	"StatsPlots", "Distributions"
+# ])
 
 using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, DataFrames,
 	  Clustering, StatsPlots, CSV
