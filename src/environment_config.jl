@@ -3,7 +3,7 @@ Pkg.activate("./.pkg")
 Pkg.add([
 	"Revise", "JuMP", "Gurobi", "Test", "DelimitedFiles", "PlotlyJS",
 	"LaTeXStrings", "Plots", "JLD", "DataFrames", "Clustering",
-	"StatsPlots","Distributions"
+	"StatsPlots", "Distributions"
 ])
 
 using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, DataFrames,
@@ -11,7 +11,6 @@ using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, DataFrame
 gr()
 using Random
 Random.seed!(1234)
-
 
 # files_to_include = [
 # 	"formatteddata.jl",
