@@ -79,7 +79,8 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 			"pᵩ"      => pᵩ)
 
 		if NC > 0 && config_param.is_ConsiderBESS == 1
-			results = Dict("pss_charge_p⁺"     => pss_charge_p⁺,
+			push!(results,
+				"pss_charge_p⁺"     => pss_charge_p⁺,
 				"pss_charge_p⁻"     => pss_charge_p⁻,
 				"pss_charge_state⁺" => pss_charge_state⁺,
 				"pss_charge_state⁻" => pss_charge_state⁻,
@@ -90,7 +91,8 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 
 		# Add data centra results to dictionary
 		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
-			results = Dict("dc_p"   => dc_p_res,
+			push!(results,
+				"dc_p"   => dc_p_res,
 				"dc_f"   => dc_f_res,
 				"dc_v²"  => dc_v²_res,
 				"dc_λ"   => dc_λ_res,
@@ -104,8 +106,8 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 
 		exported_scheduling_cost(NS, NT, NB, NG, ND, NC, ND2, units, loads,
 			winds, lines, DataCentras, config_param, su_cost, sd_cost, pgₖ, pg₀, x₀,
-			seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
-			dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res, eachslope, refcost)
+			seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
+			dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res)
 
 		return results
 

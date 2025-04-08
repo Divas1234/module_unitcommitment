@@ -124,7 +124,7 @@ function savebalance_result(
 			filepath = "D:/GithubClonefiles/module_unitcommitment/output/"
 		end
 	else
-        filepath = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
+		filepath = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/details_schedule_results/"
 	end
 	open(filepath * "res_thermalunits.txt", "w") do io
 		# writedlm(io, [" "])
@@ -146,4 +146,5 @@ function savebalance_result(
 		# writedlm(io, [" "])
 		writedlm(io, BESSdischarging_output, '\t')
 	end
+	return println("details [unit_commtiemnt] scheduling results have been saved!")
 end

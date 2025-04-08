@@ -1,7 +1,9 @@
 function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, units::unit, loads::load,
 		winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, su_cost, sd_cost, pgₖ, pg₀, x₀,
-		seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
-		dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res, eachslope, refcost)
+		seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost,
+		pss_charge_state⁺ = nothing, pss_charge_state⁻ = nothing,
+		pss_charge_p⁺ = nothing, pss_charge_p⁻ = nothing, pss_Qc = nothing,
+		dc_p_res = nothing, dc_f_res = nothing, dc_v²_res = nothing, dc_λ_res = nothing, dc_Δu1_res = nothing, dc_Δu2_res = nothing)
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
 
@@ -90,75 +92,112 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 
 		println("PART1: [unit-commitment] calculation result has been saved to: $output_file")
 
-		output_file = joinpath(output_dir, "Bench_datacentra_result.txt")
-		open(output_file, "w") do io
-			writedlm(io, [" "])
-			writedlm(io, ["list 1: dc_p"], '\t')
-			writedlm(io, dc_p_res[1:(ND2), 1:NT], '\t')
-			writedlm(io, [" "])
-			writedlm(io, ["list 2: dc_f"])
-			writedlm(io, dc_f_res[1:(ND2), 1:NT], '\t')
-			writedlm(io, [" "])
-			writedlm(io, ["list 3: dc_v²"])
-			writedlm(io, dc_v²_res[1:(ND2), 1:NT], '\t')
-			writedlm(io, [" "])
-			writedlm(io, ["list 4: dc_λ"])
-			writedlm(io, dc_λ_res[1:(ND2), 1:NT], '\t')
-			writedlm(io, [" "])
-			writedlm(io, ["list 5: dc_Δu1"])
-			writedlm(io, dc_Δu1_res[1:(ND2), 1:NT], '\t')
-			writedlm(io, [" "])
-			writedlm(io, ["list 6: dc_Δu2"])
-			return writedlm(io, dc_Δu2_res[1:(ND2), 1:NT], '\t')
+		if config_param.is_ConsiderBESS == 1 && NC > 0
+			# Open output file for writing results
+			output_file = joinpath(output_dir, "Bench_bess_scheduling_result.txt")
+			open(output_file, "w") do io
+				writedlm(io, [" "])
+				writedlm(io, ["list 5: pss charge state"])
+				writedlm(io, pss_charge_state⁺[1:NC, 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 6: pss discharge state"])
+				writedlm(io, pss_charge_state⁻[1:NC, 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 7: pss charge power"])
+				writedlm(io, pss_charge_p⁺[1:NC, 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 8: pss discharge power"])
+				writedlm(io, pss_charge_p⁻[1:NC, 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 9: pss strored energy"])
+				writedlm(io, pss_Qc[1:NC, 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 10: sr⁺"])
+				writedlm(io, seq_sr⁺[1:NG, 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 11: sr⁻"])
+				writedlm(io, seq_sr⁻[1:NG, 1:NT], '\t')
+				return writedlm(io, [" "])
+				# writedlm(io, ["list 12: α"])
+				# writedlm(io, α[1:NC, 1:NT], '\t')
+				# writedlm(io, [" "])
+				# writedlm(io, ["list 13: β"])
+				# writedlm(io, β[1:NC, 1:NT], '\t')
+			end
+			println("PART2: [BESS] calculation result has been saved to: $output_file")
 		end
-		println("PART2: [data-centra] calculation result has been saved to: $output_file")
-		println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-		# Open output file for csv writing results
-		# output_dir = "D:/GithubClonefiles/datacentra_unitcommitment/output/data_centra/"
+		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
+			output_file = joinpath(output_dir, "Bench_datacentra_result.txt")
+			open(output_file, "w") do io
+				writedlm(io, [" "])
+				writedlm(io, ["list 1: dc_p"], '\t')
+				writedlm(io, dc_p_res[1:(ND2), 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 2: dc_f"])
+				writedlm(io, dc_f_res[1:(ND2), 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 3: dc_v²"])
+				writedlm(io, dc_v²_res[1:(ND2), 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 4: dc_λ"])
+				writedlm(io, dc_λ_res[1:(ND2), 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 5: dc_Δu1"])
+				writedlm(io, dc_Δu1_res[1:(ND2), 1:NT], '\t')
+				writedlm(io, [" "])
+				writedlm(io, ["list 6: dc_Δu2"])
+				return writedlm(io, dc_Δu2_res[1:(ND2), 1:NT], '\t')
+			end
+			println("PART2: [data-centra] calculation result has been saved to: $output_file")
+			println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-		iter_num = 6
-		coeff = 0.05
-		iter_block = Int64(round(NT / iter_num))
+			# Open output file for csv writing results
+			# output_dir = "D:/GithubClonefiles/datacentra_unitcommitment/output/data_centra/"
 
-		s = 1
-		data_to_write = [("dc_Δu2.csv", (dc_Δu2_res[1:(ND2), 1:NT])),
-			("dc_Δu1.csv", (dc_Δu1_res[1:(ND2), 1:NT])),
-			("dc_v².csv", (dc_v²_res[1:(ND2), 1:NT])),
-			("dc_λ.csv", (dc_λ_res[1:(ND2), 1:NT])),
-			("dc_f.csv", (dc_f_res[1:(ND2), 1:NT])),
-			("dc_p.csv", (dc_p_res[1:(ND2), 1:NT])),
-			("dc_debug_tasks_1.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((1 - 1) * iter_block + 1):(1 * iter_block)]))),
-			("dc_debug_tasks_2.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((2 - 1) * iter_block + 1):(2 * iter_block)]))),
-			("dc_debug_tasks_3.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((3 - 1) * iter_block + 1):(3 * iter_block)]))),
-			("dc_debug_tasks_4.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((4 - 1) * iter_block + 1):(4 * iter_block)]))),
-			("dc_debug_tasks_5.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((5 - 1) * iter_block + 1):(5 * iter_block)]))),
-			("dc_debug_tasks_6.csv",
-				((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((6 - 1) * iter_block + 1):(6 * iter_block)])))]
+			iter_num = 6
+			coeff = 0.05
+			iter_block = Int64(round(NT / iter_num))
 
-		# iter = 1
-		# println("===============================================================================")
-		# @show (1 + coeff) * sum(DataCentras.λ) * iter_block .*
-		# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
-		# @show (1 - coeff) * sum(DataCentras.λ) * iter_block .*
-		# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
-		# @show sum(JuMP.value.(dc_λ[
-		# 	((s - 1) * ND2 + 1):(s * ND2), ((iter - 1) * iter_block + 1):(iter * iter_block)])) .*
-		# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
+			s = 1
+			data_to_write = [("dc_Δu2.csv", (dc_Δu2_res[1:(ND2), 1:NT])),
+				("dc_Δu1.csv", (dc_Δu1_res[1:(ND2), 1:NT])),
+				("dc_v².csv", (dc_v²_res[1:(ND2), 1:NT])),
+				("dc_λ.csv", (dc_λ_res[1:(ND2), 1:NT])),
+				("dc_f.csv", (dc_f_res[1:(ND2), 1:NT])),
+				("dc_p.csv", (dc_p_res[1:(ND2), 1:NT])),
+				("dc_debug_tasks_1.csv",
+					((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((1 - 1) * iter_block + 1):(1 * iter_block)]))),
+				("dc_debug_tasks_2.csv",
+					((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((2 - 1) * iter_block + 1):(2 * iter_block)]))),
+				("dc_debug_tasks_3.csv",
+					((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((3 - 1) * iter_block + 1):(3 * iter_block)]))),
+				("dc_debug_tasks_4.csv",
+					((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((4 - 1) * iter_block + 1):(4 * iter_block)]))),
+				("dc_debug_tasks_5.csv",
+					((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((5 - 1) * iter_block + 1):(5 * iter_block)]))),
+				("dc_debug_tasks_6.csv",
+					((dc_λ_res[((s - 1) * ND2 + 1):(s * ND2), ((6 - 1) * iter_block + 1):(6 * iter_block)])))]
 
-		sub_output_dir = joinpath(pwd(), "output/data_centra/")
-		for (filename, data) in data_to_write
-			filepath = joinpath(sub_output_dir, filename)
-			try
-				CSV.write(filepath, DataFrame(data, :auto))
-				println("Successfully wrote to $filepath")
-			catch e
-				@error "Failed to write to $filepath" exception=(e, catch_backtrace())
+			# iter = 1
+			# println("===============================================================================")
+			# @show (1 + coeff) * sum(DataCentras.λ) * iter_block .*
+			# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
+			# @show (1 - coeff) * sum(DataCentras.λ) * iter_block .*
+			# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
+			# @show sum(JuMP.value.(dc_λ[
+			# 	((s - 1) * ND2 + 1):(s * ND2), ((iter - 1) * iter_block + 1):(iter * iter_block)])) .*
+			# 	  sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)])
+
+			sub_output_dir = joinpath(pwd(), "output/data_centra/")
+			for (filename, data) in data_to_write
+				filepath = joinpath(sub_output_dir, filename)
+				try
+					CSV.write(filepath, DataFrame(data, :auto))
+					println("Successfully wrote to $filepath")
+				catch e
+					@error "Failed to write to $filepath" exception=(e, catch_backtrace())
+				end
 			end
 		end
 
