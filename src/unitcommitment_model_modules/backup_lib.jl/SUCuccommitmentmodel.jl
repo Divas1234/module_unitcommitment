@@ -67,7 +67,7 @@ function SUC_scucmodel(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND
 	define_decision_variables!(scuc, NT, NG, ND, NC, ND2, NS, NW, config_param)
 
 	# --- Set Objective ---
-	# Set the objective function to be minimized
+	# Define the objective function to be minimized
 	set_objective!(scuc, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope)
 
 	println("subject to.") # Indicate the start of constraint definitions
@@ -89,20 +89,18 @@ function SUC_scucmodel(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND
 	# --- Solve and Extract Results ---
 	# Solve the optimization model and extract the results
 	try
-		# Attempt to solve the SCUC model
 		results = solve_and_extract_results(scuc, NT, NG, ND, NC, NW, NS, ND2, scenarios_prob, eachslope, refcost, config_param)
 
 		# --- Return Results ---
-		# Check if the optimization was successful
+		# Return the optimization results
 		if results !== nothing
-			return results # Return the dictionary containing the optimization results
+			return results # Return the dictionary
 		else
 			# Handle optimization failure
 			println("Optimization failed, returning nothing.")
 			return nothing
 		end
 	catch e
-		# Catch any errors that occur during the optimization process
 		println("An error occurred during optimization: ", e)
 		return nothing
 	end
