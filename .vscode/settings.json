@@ -144,8 +144,8 @@
         "comments": "",
         "textMateRules": []
     },
-    "editor.fontFamily": "Fira Code, Droid Sans Mono, Consolas, 'Courier New', monospace",
-    "workbench.tree.indent": 15,
+    "editor.fontFamily": "Droid Sans Mono, Geist Mono, JetBrains Mono, Fira Code, Consolas, 'Courier New', monospace",
+    "workbench.tree.indent": 20,
     "material-icon-theme.hidesExplorerArrows": true,
     "workbench.tree.renderIndentGuides": "onHover",
     "github.copilot.nextEditSuggestions.enabled": true
