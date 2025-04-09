@@ -147,5 +147,6 @@
     "editor.fontFamily": "Fira Code, Droid Sans Mono, Consolas, 'Courier New', monospace",
     "workbench.tree.indent": 15,
     "material-icon-theme.hidesExplorerArrows": true,
-    "workbench.tree.renderIndentGuides": "onHover"
+    "workbench.tree.renderIndentGuides": "onHover",
+    "github.copilot.nextEditSuggestions.enabled": true
 }

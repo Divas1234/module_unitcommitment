@@ -1,17 +1,15 @@
 using Printf
 
-function boundrycondition(
-		NB::Int64,
-		NL::Int64,
-		NG::Int64,
-		NT::Int64,
-		ND::Int64,
-		units::unit,
-		loads::load,
-		lines::transmissionline,
-		winds::wind,
-		stroges::pss
-)
+function boundrycondition(NB::Int64,
+						  NL::Int64,
+						  NG::Int64,
+						  NT::Int64,
+						  ND::Int64,
+						  units::unit,
+						  loads::load,
+						  lines::transmissionline,
+						  winds::wind,
+						  stroges::pss)
 	# (Assuming this code is inside a function, e.g., showboundrycase)
 	# Consider defining Base.show methods for custom structs (units, loads, etc.)
 	# for better encapsulation and reusability of display logic.
@@ -112,5 +110,5 @@ function boundrycondition(
 	println("  γ⁻ (discharging cost coeff):", stroges.γ⁻) # Guessed meaning
 	println("  η⁺ (charging efficiency):  ", stroges.η⁺)
 	println("  η⁻ (discharging efficiency):", stroges.η⁻)
-	println("  δₛ (self-discharge rate?): ", stroges.δₛ) # Guessed meaning
+	return println("  δₛ (self-discharge rate?): ", stroges.δₛ) # Guessed meaning
 end
