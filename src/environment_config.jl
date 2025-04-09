@@ -1,29 +1,24 @@
 using Pkg
 Pkg.activate("./.pkg")
-# Pkg.add([
-# 	"Revise", "JuMP", "Gurobi", "Test", "DelimitedFiles", "PlotlyJS",
-# 	"LaTeXStrings", "Plots", "JLD", "DataFrames", "Clustering",
-# 	"StatsPlots", "Distributions"
-# ])
 
-using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, DataFrames,
-	  Clustering, StatsPlots, CSV
+neededPackages = [
+	:Revise, :JuMP, :Gurobi, :Test, :DelimitedFiles,
+	:LaTeXStrings, :Plots, "JLD", :DataFrames, :Clustering,
+	:StatsPlots, :Distributions, :CSV, :Random, :DataFrames, :MultivariateStats
+]
+
+# Make sure all needed Pkg's are ready to go
+for neededpackage in neededPackages
+	(String(neededpackage) in keys(Pkg.project().dependencies)) || Pkg.add(String(neededpackage))
+	# @eval using $neededpackage
+end
+
+using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, JLD, DataFrames, Clustering, StatsPlots, Distributions, CSV, Random, DataFrames, MultivariateStats
+
+
 gr()
-using Random
+
 Random.seed!(1234)
 
-# files_to_include = [
-# 	"formatteddata.jl",
-# 	"renewableenergysimulation.jl",
-# 	"showboundrycase.jl",
-# 	"readdatafromexcel.jl",
-# 	"SUCuccommitmentmodel.jl",
-# 	"casesploting.jl",
-# 	"saveresult.jl",
-# 	"generatefittingparameters.jl",
-# 	"draw_onlineactivepowerbalance.jl",
-# 	"draw_addditionalpower.jl"
-# ]
-# for file in files_to_include
-# 	include(file)
-# end
+println("The [JULIA] environment_config has been loaded")
+# println("\n\n\n")
