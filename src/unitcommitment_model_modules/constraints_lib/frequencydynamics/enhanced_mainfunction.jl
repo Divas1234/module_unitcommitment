@@ -1,4 +1,4 @@
-include("src/automatic_workflow.jl")
+include("_automatic_workflow.jl")
 
 # Define droop parameters. Consider moving this to a separate configuration file or a dedicated section.
 const DROOP_PARAMETERS = collect(range(33, 40, length = 20))

@@ -1,4 +1,5 @@
-include("environment_config.jl")
+include("frequencyparameters_bindings/h_d_lowerupper_bindings/h_d_utils.jl")
+include("frequencyparameters_bindings/h_d_visulazations/h_d_vismodule.jl")
 
 # --- sudmodule Script Execution ---
 
@@ -19,44 +20,39 @@ function get_inertiatodamping_functions(droop_parameters)
 
 	# Calculate inertia parameters
 
-	inertia_updown_bindings, extreme_inertia, nadir_vector, inertia_vector, selected_ids = calculate_inertia_parameters(
-		initial_inertia, factorial_coefficient, time_constant, droop, power_deviation,
-		DAMPING_RANGE, converter_vsm_parameters, converter_droop_parameters, flag_converter)
+	inertia_updown_bindings, extreme_inertia, nadir_vector, inertia_vector, selected_ids = calculate_inertia_parameters(initial_inertia, factorial_coefficient, time_constant, droop, power_deviation,
+																														DAMPING_RANGE, converter_vsm_parameters, converter_droop_parameters,
+																														flag_converter)
 
 	# Estimate inertia limits
-	min_inertia, max_inertia = estimate_inertia_limits(
-		ROCOF_threshold, power_deviation, DAMPING_RANGE, factorial_coefficient, time_constant, droop,
-	)
+	min_inertia, max_inertia = estimate_inertia_limits(ROCOF_threshold, power_deviation, DAMPING_RANGE, factorial_coefficient, time_constant, droop)
 
 	min_damping, max_damping = 2.5, 12
 
 	# NOTE type functions: c + b * damping a * damping^2
 	fittingparameters = calculate_fittingparameters(extreme_inertia, DAMPING_RANGE)
 
-	p1 = sub_data_visualization(
-		DAMPING_RANGE, min_inertia, max_inertia, inertia_updown_bindings,
-		extreme_inertia, nadir_vector, inertia_vector, selected_ids, min_damping, max_damping, droop, fittingparameters)
+	p1 = sub_data_visualization(DAMPING_RANGE, min_inertia, max_inertia, inertia_updown_bindings,
+								extreme_inertia, nadir_vector, inertia_vector, selected_ids, min_damping, max_damping, droop, fittingparameters)
 
 	# p1 = data_visualization(DAMPING_RANGE, inertia_updown_bindings, extreme_inertia,
 	# 	nadir_vector, inertia_vector, selected_ids)
 
 	vertexs = calculate_vertex(DAMPING_RANGE, inertia_updown_bindings, fittingparameters,
-		min_inertia, max_inertia, min_damping, max_damping, droop)
-
+							   min_inertia, max_inertia, min_damping, max_damping, droop)
 
 	return p1, vertexs
 end
 
-function sub_data_visualization(
-	damping, min_inertia, max_inertia, inertia_updown_bindings,
-	extreme_inertia, nadir_vector, inertia_vector, selected_ids, min_damping, max_damping, droop, fittingparameters)
+function sub_data_visualization(damping, min_inertia, max_inertia, inertia_updown_bindings,
+								extreme_inertia, nadir_vector, inertia_vector, selected_ids, min_damping, max_damping, droop, fittingparameters)
 
 	# fittingparameters = calculate_fittingparameters(extreme_inertia, damping)
 
 	fillarea = zeros(length(damping))
 	for i in eachindex(damping)
 		str = fittingparameters[1] .+ fittingparameters[2] .* damping[i] .+
-			  fittingparameters[3] .* damping[i] .^ 2
+			  fittingparameters[3] .* (damping[i] .^ 2)
 		if str > min_inertia
 			fillarea[i] = str
 		else
@@ -73,13 +69,11 @@ function sub_data_visualization(
 	# 	interaction_point = findfirst(x -> x > 0, seq)[1]
 	# end
 
-	sy1 = Plots.plot(
-		damping, inertia_updown_bindings[:, 1], framestyle = :box,
-		ylims = (0, maximum(inertia_updown_bindings[:, 1])),
-		xlabel = "damping / p.u.", ylabel = "max inertia / p.u.", lw = 3, label = "upper_bound_1",        # title = "Inertia Bounds", legend = true
-	)
-	sy1 = Plots.plot!(damping, inertia_updown_bindings[:, 2], lw = 3,
-		label = "lower_bound_2", color = :forestgreen)
+	sy1 = Plots.plot(damping, inertia_updown_bindings[:, 1]; framestyle = :box,
+					 ylims = (0, maximum(inertia_updown_bindings[:, 1])),
+					 xlabel = "damping / p.u.", ylabel = "max inertia / p.u.", lw = 3, label = "upper_bound_1")
+	sy1 = Plots.plot!(damping, inertia_updown_bindings[:, 2]; lw = 3,
+					  label = "lower_bound_2", color = :forestgreen)
 
 	# sy1 = Plots.plot!(damping, inertia_updown_bindings[:, 1], fillrange = fillarea,
 	# fillalpha = 0.3, label = "", color = :skyblue)
@@ -89,16 +83,20 @@ function sub_data_visualization(
 	# 	fillrange = fillarea[interaction_point:end],
 	# 	fillalpha = 0.5, label = "Interaction", color = :red)
 	# sy1 = Plots.plot(damping, extreme_inertia, lw = 2, label = "extreme_inertia");
+# FIXME - add the following line to the plot
+    @show fittingparameters[1]
+    @show fittingparameters[2] .* damping
+    @show fittingparameters[3] .* damping .^ 2
 
-	sy1 = Plots.plot!(damping, lw = 3,
-		fittingparameters[1] .+ fittingparameters[2] .* damping .+
-		fittingparameters[3] .* damping .^ 2)
-	sy1 = Plots.hline!([min_inertia], lw = 3, label = "min_inertia")
-	sy1 = Plots.plot!(damping, max_inertia, lw = 3, label = "max_inertia")
+	# sy1 = Plots.plot!(damping; lw = 3,
+	# 				  fittingparameters[1] .+ fittingparameters[2] .* damping .+
+	# 				  fittingparameters[3] .* damping .^ 2)
+	sy1 = Plots.hline!([min_inertia]; lw = 3, label = "min_inertia")
+	sy1 = Plots.plot!(damping, max_inertia; lw = 3, label = "max_inertia")
 
 	# add additional information
-	sy1 = Plots.vline!([12.0], lw = 3, label = "damping_min_binding")
-	sy1 = Plots.vline!([2.5], lw = 3, label = "damping_max_binding")
+	sy1 = Plots.vline!([12.0]; lw = 3, label = "damping_min_binding")
+	sy1 = Plots.vline!([2.5]; lw = 3, label = "damping_max_binding")
 
 	# vertexs = calculate_vertex(DAMPING_RANGE, inertia_updown_bindings, fittingparameters,
 	# 	min_inertia, max_inertia, min_damping, max_damping, droop)
@@ -107,7 +105,7 @@ function sub_data_visualization(
 end
 
 function calculate_vertex(DAMPING_RANGE, inertia_updown_bindings, fittingparameters,
-	min_inertia, max_inertia, min_damping, max_damping, droop)
+						  min_inertia, max_inertia, min_damping, max_damping, droop)
 
 	# --- Input Validation ---
 	if length(fittingparameters) < 3
@@ -147,16 +145,13 @@ function calculate_vertex(DAMPING_RANGE, inertia_updown_bindings, fittingparamet
 
 	# Calculate vertices related to max and min damping
 	vertex_max_damping_min_inertia = create_vertex(droop, max_damping_value, min_inertia)
-	vertex_max_damping_max_inertia = create_vertex(
-		droop, max_damping_value, max_inertia[max_damping_index])
-	vertex_min_damping_max_inertia = create_vertex(
-		droop, min_damping_value, max_inertia[min_damping_index])
+	vertex_max_damping_max_inertia = create_vertex(droop, max_damping_value, max_inertia[max_damping_index])
+	vertex_min_damping_max_inertia = create_vertex(droop, min_damping_value, max_inertia[min_damping_index])
 	vertex_min_damping_min_inertia = create_vertex(droop, min_damping_value, min_inertia)
 
 	# Calculate the temporary sequence
 	tem_sequence = calculate_tem_sequence(fittingparameters, DAMPING_RANGE)
-	vertex_min_damping_tem_sequence = create_vertex(
-		droop, min_damping_value, tem_sequence[min_damping_index])
+	vertex_min_damping_tem_sequence = create_vertex(droop, min_damping_value, tem_sequence[min_damping_index])
 
 	# Determine the result based on vertex comparisons
 	if vertex_min_damping_min_inertia > vertex_min_damping_tem_sequence
@@ -180,8 +175,7 @@ function calculate_vertex(DAMPING_RANGE, inertia_updown_bindings, fittingparamet
 			min_inertia_index -= 1
 		end
 
-		vertex_min_inertia = create_vertex(
-			droop, DAMPING_RANGE[min_inertia_index], min_inertia)
+		vertex_min_inertia = create_vertex(droop, DAMPING_RANGE[min_inertia_index], min_inertia)
 
 		if vertex_min_damping_max_inertia > vertex_min_damping_tem_sequence
 			# Initialize with known type and size
@@ -205,9 +199,8 @@ function calculate_vertex(DAMPING_RANGE, inertia_updown_bindings, fittingparamet
 				max_inertia_diff_index = max_inertia_diff_index[1] - 1
 			end
 
-			vertex_tem_sequence = create_vertex(
-				droop, DAMPING_RANGE[max_inertia_diff_index],
-				tem_sequence[max_inertia_diff_index])
+			vertex_tem_sequence = create_vertex(droop, DAMPING_RANGE[max_inertia_diff_index],
+												tem_sequence[max_inertia_diff_index])
 			# Initialize with known type and size
 			res = Vector{typeof(vertex_min_damping_min_inertia)}(undef, 4)
 			res[1] = vertex_max_damping_max_inertia
@@ -267,7 +260,7 @@ function vertices_to_matrix(vertices::AbstractVector)
 	for sub_vertices in vertices
 		num_rows = length(sub_vertices)
 		for (i, vertex) in enumerate(sub_vertices)
-			matrix[current_row+i-1, :] = collect(vertex)
+			matrix[current_row + i - 1, :] = collect(vertex)
 		end
 		current_row += num_rows
 	end

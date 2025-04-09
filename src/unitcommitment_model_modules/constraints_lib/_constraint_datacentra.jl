@@ -27,51 +27,50 @@ function add_datacentra_constraints!(scuc::Model, NT, NS, config_param, ND2 = no
 		mu_dc = DataCentras.μ
 
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_p[((s - 1) * ND2 + 1):(s * ND2), t].<=p_max_dc)
+					dc_p[((s - 1) * ND2 + 1):(s * ND2), t] .<= p_max_dc)
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_p[((s - 1) * ND2 + 1):(s * ND2), t].>=p_min_dc)
+					dc_p[((s - 1) * ND2 + 1):(s * ND2), t] .>= p_min_dc)
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_p[((s - 1) * ND2 + 1):(s * ND2), t]
-			.==
-			idale_dc .+
-			sv_const_dc .* dc_Δu2[((s - 1) * ND2 + 1):(s * ND2), t] ./
-			mu_dc)
+					dc_p[((s - 1) * ND2 + 1):(s * ND2), t]
+					.==
+					idale_dc .+
+					sv_const_dc .* dc_Δu2[((s - 1) * ND2 + 1):(s * ND2), t] ./
+					mu_dc)
 
 		# McCormick envelopes for bilinear terms (approximated by binary logic here)
 		# v² * f = Δu1
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t].<=dc_v²[((s - 1) * ND2 + 1):(s * ND2), t])
+					dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t] .<= dc_v²[((s - 1) * ND2 + 1):(s * ND2), t])
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t].<=dc_f[((s - 1) * ND2 + 1):(s * ND2), t])
+					dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t] .<= dc_f[((s - 1) * ND2 + 1):(s * ND2), t])
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_Δu1[
-				((s - 1) * ND2 + 1):(s * ND2), t]
-			.>=
-			dc_v²[((s - 1) * ND2 + 1):(s * ND2), t] .+
-			dc_f[((s - 1) * ND2 + 1):(s * ND2), t] .- ones(ND2, 1)) # Assuming v², f are binary [0,1]
+					dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t]
+					.>=
+					dc_v²[((s - 1) * ND2 + 1):(s * ND2), t] .+
+					dc_f[((s - 1) * ND2 + 1):(s * ND2), t] .- ones(ND2, 1)) # Assuming v², f are binary [0,1]
 
 		# Δu1 * λ = Δu2
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_Δu2[((s - 1) * ND2 + 1):(s * ND2), t].<=dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t])
+					dc_Δu2[((s - 1) * ND2 + 1):(s * ND2), t] .<= dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t])
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_Δu2[((s - 1) * ND2 + 1):(s * ND2), t].<=dc_λ[((s - 1) * ND2 + 1):(s * ND2), t])
+					dc_Δu2[((s - 1) * ND2 + 1):(s * ND2), t] .<= dc_λ[((s - 1) * ND2 + 1):(s * ND2), t])
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_Δu2[((s - 1) * ND2 + 1):(s * ND2),
-				t]
-			.>=
-			dc_λ[((s - 1) * ND2 + 1):(s * ND2), t] .+
-			dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t] .- ones(ND2, 1)) # Assuming Δu1, λ are binary [0,1]
+					dc_Δu2[((s - 1) * ND2 + 1):(s * ND2),
+						   t]
+					.>=
+					dc_λ[((s - 1) * ND2 + 1):(s * ND2), t] .+
+					dc_Δu1[((s - 1) * ND2 + 1):(s * ND2), t] .- ones(ND2, 1)) # Assuming Δu1, λ are binary [0,1]
 
 		# Assuming computational task constraints
 		iter_num = 6
 		coeff = 0.05
 		iter_block = Int64(round(NT / iter_num))
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_λ[((s - 1) * ND2 + 1):(s * ND2), t].<=ones(ND2, 1))
+					dc_λ[((s - 1) * ND2 + 1):(s * ND2), t] .<= ones(ND2, 1))
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_f[((s - 1) * ND2 + 1):(s * ND2), t].<=ones(ND2, 1))
+					dc_f[((s - 1) * ND2 + 1):(s * ND2), t] .<= ones(ND2, 1))
 		@constraint(scuc, [s = 1:NS, t = 1:NT],
-			dc_v²[((s - 1) * ND2 + 1):(s * ND2), t].<=ones(ND2, 1)) # Assuming v² represents a binary/normalized value
+					dc_v²[((s - 1) * ND2 + 1):(s * ND2), t] .<= ones(ND2, 1)) # Assuming v² represents a binary/normalized value
 
 		# Check dimensions and logic for computational_power_tasks
 		# Ensure DataCentras.λ is defined and has appropriate dimensions (e.g., scalar or vector of length ND2)
@@ -84,21 +83,21 @@ function add_datacentra_constraints!(scuc::Model, NT, NS, config_param, ND2 = no
 
 		if comp_tasks !== nothing && length(comp_tasks) == NT
 			@constraint(scuc, [s = 1:NS, iter = 1:iter_num],
-				sum(dc_λ[((s - 1) * ND2 + 1):(s * ND2),
-					((iter - 1) * iter_block + 1):(iter * iter_block)])
-				.<=
-				(1 + coeff) *
-				sum(DataCentras.λ) *
-				iter_block .*
-				sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)]))
+						sum(dc_λ[((s - 1) * ND2 + 1):(s * ND2),
+								 ((iter - 1) * iter_block + 1):(iter * iter_block)])
+						.<=
+						(1 + coeff) *
+						sum(DataCentras.λ) *
+						iter_block .*
+						sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)]))
 			@constraint(scuc, [s = 1:NS, iter = 1:iter_num],
-				sum(dc_λ[((s - 1) * ND2 + 1):(s * ND2),
-					((iter - 1) * iter_block + 1):(iter * iter_block)])
-				.>=
-				(1 - coeff) *
-				sum(DataCentras.λ) *
-				iter_block .*
-				sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)]))
+						sum(dc_λ[((s - 1) * ND2 + 1):(s * ND2),
+								 ((iter - 1) * iter_block + 1):(iter * iter_block)])
+						.>=
+						(1 - coeff) *
+						sum(DataCentras.λ) *
+						iter_block .*
+						sum(DataCentras.computational_power_tasks[((iter - 1) * iter_block + 1):(iter * iter_block)]))
 		else
 			println("Warning: DataCentras.computational_power_tasks or DataCentras.λ not suitable for constraints. Skipping related constraints.")
 		end

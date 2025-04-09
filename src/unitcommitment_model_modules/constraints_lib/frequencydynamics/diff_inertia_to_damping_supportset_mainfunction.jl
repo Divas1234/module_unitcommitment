@@ -1,5 +1,4 @@
-include("frequencyparameters_bindings/automatic_workflow.jl")
-include("frequencyparameters_bindings/inertia_damping_interaction_figures.jl")
+include("_automatic_workflow.jl")
 
 const DROOP_PARAMETERS = collect(range(33, 40, length = 20))
 
