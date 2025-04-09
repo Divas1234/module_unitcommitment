@@ -167,7 +167,7 @@ function savebalance_result(
 	filepath = pwd()
 	if Sys.iswindows()
 		if flag == 1
-			filepath = "D:/GithubClonefiles/module_unitcommitment/output/bench/"
+			filepath = "D:/GithubClonefiles/module_unitcommitment/output/details_schedule_results/"
 		elseif flag == 2
 			filepath = "D:/GithubClonefiles/module_unitcommitment/output/"
 		else
