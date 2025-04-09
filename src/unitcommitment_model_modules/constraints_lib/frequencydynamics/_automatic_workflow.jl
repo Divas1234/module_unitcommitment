@@ -83,14 +83,15 @@ function sub_data_visualization(damping, min_inertia, max_inertia, inertia_updow
 	# 	fillrange = fillarea[interaction_point:end],
 	# 	fillalpha = 0.5, label = "Interaction", color = :red)
 	# sy1 = Plots.plot(damping, extreme_inertia, lw = 2, label = "extreme_inertia");
-# FIXME - add the following line to the plot
-    @show fittingparameters[1]
-    @show fittingparameters[2] .* damping
-    @show fittingparameters[3] .* damping .^ 2
+	# FIXME - add the following line to the plot, solved!
+	# println("==================================================================================")
+	# @show size(fittingparameters[1] * ones(length(damping)))
+	# @show size(fittingparameters[2] .* damping)
+	# @show size(fittingparameters[1] .+ fittingparameters[2] .* damping .+ fittingparameters[3] .* damping .^ 2)
+	# println("==================================================================================")
 
-	# sy1 = Plots.plot!(damping; lw = 3,
-	# 				  fittingparameters[1] .+ fittingparameters[2] .* damping .+
-	# 				  fittingparameters[3] .* damping .^ 2)
+	sy1 = Plots.plot!(damping,
+					  fittingparameters[1] .+ fittingparameters[2] .* damping .+ fittingparameters[3] .* damping .^ 2, ; lw = 3)
 	sy1 = Plots.hline!([min_inertia]; lw = 3, label = "min_inertia")
 	sy1 = Plots.plot!(damping, max_inertia; lw = 3, label = "max_inertia")
 
