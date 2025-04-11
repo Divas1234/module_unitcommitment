@@ -145,7 +145,10 @@
         "textMateRules": []
     },
     "editor.fontFamily": "Droid Sans Mono, Geist Mono, JetBrains Mono, Fira Code, Consolas, 'Courier New', monospace",
-    "workbench.tree.indent": 20,
+    "workbench.tree.indent": 18,
     "material-icon-theme.hidesExplorerArrows": true,
-    "workbench.tree.renderIndentGuides": "onHover"
+    "workbench.tree.renderIndentGuides": "onHover",
+    "html.format.indentHandlebars": true,
+    "html.format.indentInnerHtml": true,
+    "indenticator.inner.showIndentGuide": true
 }
