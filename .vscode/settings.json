@@ -141,11 +141,32 @@
                 }
             ]
         },
-        "textMateRules": []
+        "textMateRules": [],
+        "comments": ""
     },
-    "editor.fontFamily": "Droid Sans Mono, Geist Mono, JetBrains Mono, Fira Code, Consolas, 'Courier New', monospace",
+    "editor.fontFamily": "FJetBrains Mono, Maple Mono, ira Code, Droid Sans Mono, Geist Mono, Consolas, 'Courier New', monospace",
     "workbench.tree.indent": 18,
     "material-icon-theme.hidesExplorerArrows": true,
     "workbench.tree.renderIndentGuides": "onHover",
-    "github.copilot.nextEditSuggestions.enabled": true
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "path-intellisense.autoTriggerNextSuggestion": true,
+    "editor.inlineSuggest.suppressSuggestions": true,
+    "debug.console.acceptSuggestionOnEnter": "on",
+    "editor.autoIndent": "advanced",
+    "indenticator.inner.showIndentGuide": true,
+    "markdown.extension.tableFormatter.normalizeIndentation": true,
+    "guides.overrideDefault": true,
+    "gitlens.views.scm.grouped.views": {
+        "repositories": true,
+        "searchAndCompare": true,
+        "launchpad": true
+    },
+    "guides.active.width": 0.25,
+    "guides.limit.maximum": -1,
+    "guides.stack.style": "dotted",
+    "guides.normal.width": 0.25,
+    "guides.stack.width": 0.5,
+    "editor.fontSize": 15,
+    "todo-tree.highlights.useColourScheme": true,
+    "vim.highlightedyank.enable": true
 }

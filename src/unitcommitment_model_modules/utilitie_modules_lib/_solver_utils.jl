@@ -8,9 +8,12 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 	println("Step-4: starting Gurobi solver")
 	optimize!(scuc)
 	println("Step-5: Gurobi solver finished")
-	println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
 	# Check termination status
+	@show assert_is_solved_and_feasible(scuc)
+	@show solution_summary(scuc)
+	println("\n")
 	status = termination_status(scuc)
 	println("Termination Status: ", status)
 
@@ -63,41 +66,41 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		# Adjust the return statement based on what the caller function `mainfun.jl` expects.
 		# Returning a dictionary or a custom struct might be cleaner.
 		results = Dict("objective_value" => objective_value(scuc),
-					   "solve_time" => solve_time(scuc),
-					   "status" => status)
+			"solve_time" => solve_time(scuc),
+			"status" => status)
 
 		results = Dict("x₀"      => x₀,
-					   "u₀"      => u₀,
-					   "v₀"      => v₀,
-					   "p₀"      => pg₀,
-					   "pₖ"      => pgₖ,
-					   "su_cost" => su_cost,
-					   "sd_cost" => sd_cost,
-					   "seq_sr⁺" => seq_sr⁺,
-					   "seq_sr⁻" => seq_sr⁻,
-					   "pᵨ"      => pᵨ,
-					   "pᵩ"      => pᵩ)
+			"u₀"      => u₀,
+			"v₀"      => v₀,
+			"p₀"      => pg₀,
+			"pₖ"      => pgₖ,
+			"su_cost" => su_cost,
+			"sd_cost" => sd_cost,
+			"seq_sr⁺" => seq_sr⁺,
+			"seq_sr⁻" => seq_sr⁻,
+			"pᵨ"      => pᵨ,
+			"pᵩ"      => pᵩ)
 
 		if NC > 0 && config_param.is_ConsiderBESS == 1
 			push!(results,
-				  "pss_charge_p⁺"     => pss_charge_p⁺,
-				  "pss_charge_p⁻"     => pss_charge_p⁻,
-				  "pss_charge_state⁺" => pss_charge_state⁺,
-				  "pss_charge_state⁻" => pss_charge_state⁻,
-				  "pss_charge_cycle⁺" => pss_charge_cycle⁺,
-				  "pss_charge_cycle⁻" => pss_charge_cycle⁻,
-				  "pss_Qc"            => pss_Qc)
+				"pss_charge_p⁺"     => pss_charge_p⁺,
+				"pss_charge_p⁻"     => pss_charge_p⁻,
+				"pss_charge_state⁺" => pss_charge_state⁺,
+				"pss_charge_state⁻" => pss_charge_state⁻,
+				"pss_charge_cycle⁺" => pss_charge_cycle⁺,
+				"pss_charge_cycle⁻" => pss_charge_cycle⁻,
+				"pss_Qc"            => pss_Qc)
 		end
 
 		# Add data centra results to dictionary
 		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
 			push!(results,
-				  "dc_p"   => dc_p_res,
-				  "dc_f"   => dc_f_res,
-				  "dc_v²"  => dc_v²_res,
-				  "dc_λ"   => dc_λ_res,
-				  "dc_Δu1" => dc_Δu1_res,
-				  "dc_Δu2" => dc_Δu2_res)
+				"dc_p"   => dc_p_res,
+				"dc_f"   => dc_f_res,
+				"dc_v²"  => dc_v²_res,
+				"dc_λ"   => dc_λ_res,
+				"dc_Δu1" => dc_Δu1_res,
+				"dc_Δu2" => dc_Δu2_res)
 		end
 
 		# "prod_cost" => prod_cost,
@@ -105,9 +108,9 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		# "cr⁻"       => cr⁻,       # Removed as they are not calculated here anymore
 
 		exported_scheduling_cost(NS, NT, NB, NG, ND, NC, ND2, units, loads,
-								 winds, lines, DataCentras, config_param, su_cost, sd_cost, pgₖ, pg₀, x₀,
-								 seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
-								 dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res)
+			winds, lines, DataCentras, config_param, su_cost, sd_cost, pgₖ, pg₀, x₀,
+			seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
+			dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res)
 
 		return results
 

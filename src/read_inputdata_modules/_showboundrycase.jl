@@ -1,15 +1,16 @@
 using Printf
+using UnicodePlots
 
 function boundrycondition(NB::Int64,
-						  NL::Int64,
-						  NG::Int64,
-						  NT::Int64,
-						  ND::Int64,
-						  units::unit,
-						  loads::load,
-						  lines::transmissionline,
-						  winds::wind,
-						  stroges::pss)
+		NL::Int64,
+		NG::Int64,
+		NT::Int64,
+		ND::Int64,
+		units::unit,
+		loads::load,
+		lines::transmissionline,
+		winds::wind,
+		stroges::pss)
 	# (Assuming this code is inside a function, e.g., showboundrycase)
 	# Consider defining Base.show methods for custom structs (units, loads, etc.)
 	# for better encapsulation and reusability of display logic.
@@ -95,7 +96,7 @@ function boundrycondition(NB::Int64,
 	println("  scenarios_prob:            ", winds.scenarios_prob)
 	println("  scenarios_nums:            ", winds.scenarios_nums) # Same as NS above
 	println("  p_max (installed capacity):", winds.p_max)
-	println("  scenarios_curve:           ", winds.scenarios_curve) # Consider better display for multi-dim array
+	# println("  scenarios_curve:           ", winds.scenarios_curve) # Consider better display for multi-dim array
 
 	println("\n--- Storage Info (stroges) ---") # Typo in original: stroges -> storages?
 	# Consider implementing Base.show for YourStorageType
@@ -110,5 +111,31 @@ function boundrycondition(NB::Int64,
 	println("  γ⁻ (discharging cost coeff):", stroges.γ⁻) # Guessed meaning
 	println("  η⁺ (charging efficiency):  ", stroges.η⁺)
 	println("  η⁻ (discharging efficiency):", stroges.η⁻)
-	return println("  δₛ (self-discharge rate?): ", stroges.δₛ) # Guessed meaning
+	println("  δₛ (self-discharge rate): ", stroges.δₛ) # Guessed meaning
+
+	println("\n--- Wind Scenario Curves ---\n")
+	plt = plt_unicodeplot(winds, loads, 0)
+	@show plt
+	println("\n-- Demand Scenario Curves --\n")
+	plt = plt_unicodeplot(winds, loads, 1)
+	@show plt
+	println("\n----------------------------\n")
+	return nothing
+end
+
+function plt_unicodeplot(winds = nothing, loads = nothing, flag = 0)
+	xdata = collect(1:1:24)
+	if flag == 0
+		NS = size(winds.scenarios_curve, 1)
+		plt = lineplot(xdata, winds.scenarios_curve[1, :], height = 10, xlim = (0, 25), title = "stochastic realization of renewable resource",
+			name = "wind farms", xlabel = "t / h", ylabel = "output / p.u.")
+		for i in 2:NS
+			lineplot!(plt, xdata, winds.scenarios_curve[i, :])
+		end
+	else
+		# ND = size( loads.load_curve,1)
+		plt = lineplot(xdata, loads.load_curve[1, :], height = 10, xlim = (0, 25), title = "sequential demand curve",
+			name = "loads", xlabel = "t / h", ylabel = "output / p.u.")
+	end
+	return plt
 end

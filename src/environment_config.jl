@@ -1,9 +1,8 @@
 using Pkg
-Pkg.activate("./.pkg")
 
 neededPackages = [:Revise, :JuMP, :Gurobi, :Test, :DelimitedFiles,
-				  :LaTeXStrings, :Plots, "JLD", :DataFrames, :Clustering,
-				  :StatsPlots, :Distributions, :CSV, :Random, :DataFrames, :MultivariateStats]
+	:LaTeXStrings, :Plots, "JLD", :DataFrames, :Clustering, :XLSX,
+	:StatsPlots, :Distributions, :CSV, :Random, :DataFrames, :MultivariateStats, :UnicodePlots]
 
 # Make sure all needed Pkg's are ready to go
 for neededpackage in neededPackages
@@ -11,7 +10,8 @@ for neededpackage in neededPackages
 	# @eval using $neededpackage
 end
 
-using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, JLD, DataFrames, Clustering, StatsPlots, Distributions, CSV, Random, DataFrames, MultivariateStats
+using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, JLD, DataFrames, Clustering, StatsPlots, Distributions, CSV, Random,
+	  DataFrames, MultivariateStats
 
 gr()
 

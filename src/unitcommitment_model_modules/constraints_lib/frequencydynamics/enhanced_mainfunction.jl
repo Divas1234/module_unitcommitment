@@ -57,9 +57,9 @@ function _plot_inertia_damping(droop_parameters::AbstractVector)
 	end
 
 	p1 = Plots.plot(plots...;
-					legend = false, size = (1000, 1000),
-					xlabel = "Damping", ylabel = "Inertia",
-					label = permutedims(labels)) # Correct label orientation
+		legend = false, size = (1000, 1000),
+		xlabel = "Damping", ylabel = "Inertia",
+		label = permutedims(labels)) # Correct label orientation
 
 	vertices_matrix = vertices_to_matrix(all_vertices::AbstractVector)
 
