@@ -1,12 +1,10 @@
-function linearpowerflow(
-		units::unit,
-		lines::transmissionline,
-		loads::load,
-		NG::Int64,
-		NB::Int64,
-		ND::Int64,
-		NL::Int64
-)
+function linearpowerflow(units::unit,
+						 lines::transmissionline,
+						 loads::load,
+						 NG::Int64,
+						 NB::Int64,
+						 ND::Int64,
+						 NL::Int64)
 	B = zeros(NB, NB)
 	M = zeros(NB, NL)
 

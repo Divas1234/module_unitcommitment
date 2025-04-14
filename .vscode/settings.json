@@ -166,7 +166,10 @@
     "guides.stack.style": "dotted",
     "guides.normal.width": 0.25,
     "guides.stack.width": 0.5,
-    "editor.fontSize": 15,
+    "editor.fontSize": 18,
     "todo-tree.highlights.useColourScheme": true,
-    "vim.highlightedyank.enable": true
+    "vim.highlightedyank.enable": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true
 }
