@@ -14,7 +14,6 @@ using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, JLD, Data
 	  DataFrames, MultivariateStats
 
 gr()
-
 Random.seed!(1234)
 
 println("The [JULIA] environment_config has been loaded")

@@ -19,7 +19,7 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	onoffinit = calculate_initial_unit_status(units, NG)
 	# --- Add Constraints ---
 	# Add the constraints to the optimization model
-	add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
+	return add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
 	# add_curtailment_constraints!(scuc_masterproblem, NT, ND, NW, NS, loads, winds)
 	# add_generator_power_constraints!(scuc_masterproblem, NT, NG, NS, units)
 	# add_reserve_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, loads, winds, config_param)
@@ -31,9 +31,7 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# add_datacentra_constraints!(scuc_masterproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, stroges, config_param, Δp_contingency)
 
-	# @show model_summary(scuc_masterproblem)
-
-	return scuc_masterproblem
+	@show model_summary(scuc_masterproblem)
 end
 
 # Helper function to define model variables

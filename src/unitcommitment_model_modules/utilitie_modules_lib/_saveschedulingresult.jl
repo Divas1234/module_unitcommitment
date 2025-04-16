@@ -41,7 +41,7 @@ function save_details_scheduled_results(config_param, results)
 	# Save the balance results (only if optimization succeeded)
 	if results !== nothing && bench_p₀ !== nothing # Check if variables are valid
 		savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺,
-						   bench_pss_charge_p⁻, 1)
+			bench_pss_charge_p⁻, 1)
 	else
 		println("Skipping saving results due to optimization failure.")
 	end
@@ -49,45 +49,45 @@ end
 
 #LINK -  save the main results as .txt file
 function save_UCresults(x₀, bench_x₀, p₀, pᵨ, pᵩ, seq_sr⁺, seq_sr⁻, pss_charge_p⁺,
-						pss_charge_p⁻, su_cost, sd_cost, prod_cost, cost_sr⁺,
-						cost_sr⁻, bench_p₀, bench_pᵨ, bench_pᵩ, bench_seq_sr⁺,
-						bench_seq_sr⁻, bench_pss_charge_p⁺, bench_pss_charge_p⁻,
-						bench_su_cost, bench_sd_cost, bench_prod_cost, bench_cost_sr⁺,
-						bench_cost_sr⁻, NT, NG, ND, NW, units, winds)
+		pss_charge_p⁻, su_cost, sd_cost, prod_cost, cost_sr⁺,
+		cost_sr⁻, bench_p₀, bench_pᵨ, bench_pᵩ, bench_seq_sr⁺,
+		bench_seq_sr⁻, bench_pss_charge_p⁺, bench_pss_charge_p⁻,
+		bench_su_cost, bench_sd_cost, bench_prod_cost, bench_cost_sr⁺,
+		bench_cost_sr⁻, NT, NG, ND, NW, units, winds)
 	# filepath = pwd()
 	return save("D:/ieee_tpws/code/littlecase//output/bench/" * "mydata_1.jld",
-				"x₀", x₀,
-				"p₀", p₀,
-				"pᵨ", pᵨ,
-				"pᵩ", pᵩ,
-				"seq_sr⁺", seq_sr⁺,
-				"seq_sr⁻", seq_sr⁻,
-				"pss_charge_p⁺", pss_charge_p⁺,
-				"pss_charge_p⁻", pss_charge_p⁻,
-				"su_cost", su_cost,
-				"sd_cost", sd_cost,
-				"prod_cost", prod_cost,
-				"cost_sr⁺", cost_sr⁺,
-				"cost_sr⁻", cost_sr⁻,
-				"NT", NT,
-				"NG", NG,
-				"ND", ND,
-				"NW", NW,
-				"winds", winds,
-				"units", units,
-				"bench_x₀", bench_x₀,
-				"bench_p₀", bench_p₀,
-				"bench_pᵨ", bench_pᵨ,
-				"bench_pᵩ", bench_pᵩ,
-				"bench_seq_sr⁺", bench_seq_sr⁺,
-				"bench_seq_sr⁻", bench_seq_sr⁻,
-				"bench_pss_charge_p⁺", bench_pss_charge_p⁺,
-				"bench_pss_charge_p⁻", bench_pss_charge_p⁻,
-				"bench_su_cost", bench_su_cost,
-				"bench_sd_cost", bench_sd_cost,
-				"bench_prod_cost", bench_prod_cost,
-				"bench_cost_sr⁺", bench_cost_sr⁺,
-				"bench_cost_sr⁻", bench_cost_sr⁻)
+		"x₀", x₀,
+		"p₀", p₀,
+		"pᵨ", pᵨ,
+		"pᵩ", pᵩ,
+		"seq_sr⁺", seq_sr⁺,
+		"seq_sr⁻", seq_sr⁻,
+		"pss_charge_p⁺", pss_charge_p⁺,
+		"pss_charge_p⁻", pss_charge_p⁻,
+		"su_cost", su_cost,
+		"sd_cost", sd_cost,
+		"prod_cost", prod_cost,
+		"cost_sr⁺", cost_sr⁺,
+		"cost_sr⁻", cost_sr⁻,
+		"NT", NT,
+		"NG", NG,
+		"ND", ND,
+		"NW", NW,
+		"winds", winds,
+		"units", units,
+		"bench_x₀", bench_x₀,
+		"bench_p₀", bench_p₀,
+		"bench_pᵨ", bench_pᵨ,
+		"bench_pᵩ", bench_pᵩ,
+		"bench_seq_sr⁺", bench_seq_sr⁺,
+		"bench_seq_sr⁻", bench_seq_sr⁻,
+		"bench_pss_charge_p⁺", bench_pss_charge_p⁺,
+		"bench_pss_charge_p⁻", bench_pss_charge_p⁻,
+		"bench_su_cost", bench_su_cost,
+		"bench_sd_cost", bench_sd_cost,
+		"bench_prod_cost", bench_prod_cost,
+		"bench_cost_sr⁺", bench_cost_sr⁺,
+		"bench_cost_sr⁻", bench_cost_sr⁻)
 end
 
 #LINK -  sub exported modelue for saving results as .txt file
@@ -128,9 +128,9 @@ function read_UCresults()
 		return write(file, "bench_cost_sr⁻", bench_cost_sr⁻)
 	end
 	return x₀, bench_x₀, p₀, pᵨ, pᵩ, seq_sr⁺, seq_sr⁻, pss_charge_p⁺, pss_charge_p⁻, su_cost,
-		   sd_cost, prod_cost, cost_sr⁺, cost_sr⁻, bench_p₀, bench_pᵨ, bench_pᵩ, bench_seq_sr⁺,
-		   bench_seq_sr⁻, bench_pss_charge_p⁺, bench_pss_charge_p⁻, bench_su_cost, bench_sd_cost,
-		   bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, NT, NG, ND, NW, units, winds
+	sd_cost, prod_cost, cost_sr⁺, cost_sr⁻, bench_p₀, bench_pᵨ, bench_pᵩ, bench_seq_sr⁺,
+	bench_seq_sr⁻, bench_pss_charge_p⁺, bench_pss_charge_p⁻, bench_su_cost, bench_sd_cost,
+	bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, NT, NG, ND, NW, units, winds
 end
 
 function savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺, bench_pss_charge_p⁻, flag)

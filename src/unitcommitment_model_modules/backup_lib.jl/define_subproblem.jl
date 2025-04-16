@@ -1,50 +1,16 @@
-"""
-	bd_subfunction(NT, NB, NG, ND, NC, ND2, NS, NW, units, config_param)
-
-This function defines the subproblem for the Bender's decomposition algorithm.
-
-# Arguments
-- `NT::Int64`: Number of time periods.
-- `NB::Int64`: Number of buses.
-- `NG::Int64`: Number of generators.
-- `ND::Int64`: Number of loads.
-- `NC::Int64`: Number of storage units.
-- `ND2::Int64`: Number of data centers.
-- `NS::Int64`: Number of scenarios.
-- `NW::Int64`: Number of wind power plants.
-- `units::unit`: Unit data structure.
-- `config_param::config`: Configuration parameters.
-
-# Returns
-- `scuc_subproblem::Model`: The JuMP model for the subproblem.
-"""
-function bd_subfunction(
-	NT::Int64,
-	NB::Int64,
-	NG::Int64,
-	ND::Int64,
-	NC::Int64,
-	ND2::Int64,
-	NS::Int64,
-	NW::Int64,
-	units::unit,
-	config_param::config
-)::Model
+function bd_subfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64, units::unit, config_param::config)
 	# println("this is the sub function of the bender decomposition process")
 	# Δp_contingency = define_contingency_size(units, NG)
 	scuc_subproblem = Model(Gurobi.Optimizer)
 	# set_silent(scuc_subproblem)
 	# --- Define Variables ---
 	# Define decision variables for the optimization model
-	define_subproblem_decision_variables!(
-		scuc_subproblem::Model, NT, NG, ND, NC, ND2, NS, NW, config_param
-	)
+	define_subproblem_decision_variables!(scuc_subproblem::Model, NT, NG, ND, NC, ND2, NS, NW, config_param)
 
 	# --- Set Objective ---
 	# Set the objective function to be minimized
 	set_subproblem_objective_economic!(
-		scuc_subproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope
-	)
+		scuc_subproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope)
 
 	# NS = winds.scenarios_nums
 	# NW = length(winds.index)
@@ -71,17 +37,7 @@ function bd_subfunction(
 	return scuc_subproblem
 end
 
-function define_subproblem_decision_variables!(
-	scuc_subproblem::Model,
-	NT::Int64,
-	NG::Int64,
-	ND::Int64,
-	NC::Int64,
-	ND2::Int64,
-	NS::Int64,
-	NW::Int64,
-	config_param::config
-)
+function define_subproblem_decision_variables!(scuc_subproblem::Model, NT, NG, ND, NC, ND2, NS, NW, config_param)
 	# binary variables
 	@variable(scuc_subproblem, x[1:NG, 1:NT])
 	@variable(scuc_subproblem, u[1:NG, 1:NT])
@@ -137,31 +93,17 @@ function define_subproblem_decision_variables!(
 end
 
 function set_subproblem_objective_economic!(
-	scuc_subproblem::Model,
-	NT::Int64,
-	NG::Int64,
-	ND::Int64,
-	NW::Int64,
-	NS::Int64,
-	units::unit,
-	config_param::config,
-	scenarios_prob,
-	refcost,
-	eachslope
-)
+	scuc_subproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope)
 	# Cost parameters
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
+
 	# Penalty coefficients for load and wind curtailment
 	load_curtailment_penalty = config_param.is_LoadsCuttingCoefficient * 1e10
 	wind_curtailment_penalty = config_param.is_WindsCuttingCoefficient * 1e0
 
-	# Constants for reserve cost (can be adjusted based on market conditions)
-	RESERVE_COST_POSITIVE = 2 * c₀
-	RESERVE_COST_NEGATIVE = 2 * c₀
-
-	ρ⁺ = RESERVE_COST_POSITIVE
-	ρ⁻ = RESERVE_COST_NEGATIVE
+	ρ⁺ = c₀ * 2
+	ρ⁻ = c₀ * 2
 
 	x = scuc_subproblem[:x]
 	su₀ = scuc_subproblem[:su₀]
@@ -175,11 +117,12 @@ function set_subproblem_objective_economic!(
 	# Linearize fuel cost curve (assuming function is in linearization.jl)
 	refcost, eachslope = linearizationfuelcurve(units, NG)
 
-	@objective(
-		scuc_subproblem,
+	@objective(scuc_subproblem,
 		Min,
-		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT) +
-			pₛ * c₀ *
+		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT)
+			+
+			pₛ *
+			c₀ *
 			(
 				sum(
 					sum(
@@ -187,7 +130,7 @@ function set_subproblem_objective_economic!(
 						for s in 1:NS
 					) for i in 1:NG
 				) +
-				sum(sum(sum(x[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS) +  # Assumes x is accessible
+				sum(sum(sum(x[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS) + # Assumes x is accessible
 				sum(
 					sum(
 						sum(
@@ -197,9 +140,12 @@ function set_subproblem_objective_economic!(
 					) for s in 1:NS
 				)
 			) +
-			pₛ * load_curtailment_penalty * sum(sum(sum(Δpd[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS) +
-			pₛ * wind_curtailment_penalty * sum(sum(sum(Δpw[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
-	)
+			pₛ *
+			load_curtailment_penalty *
+			sum(sum(sum(Δpd[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS) +
+			pₛ *
+			wind_curtailment_penalty *
+			sum(sum(sum(Δpw[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS))
 	# println("objective_function")
 	return println("\t MILP_type define_subproblem objective_function \t\t\t\t\t\t done")
 end

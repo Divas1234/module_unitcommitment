@@ -1,175 +1,204 @@
 {
-    "editor.guides.bracketPairs": "active",
-    "BracketHighlighter.activeInDebugMode": false,
-    "prettier.bracketSameLine": true,
-    "txtsyntax.enableAutoImport": true,
-    "txtsyntax.enableHighlightLine": true,
-    "txtsyntax.showHighlightSidebar": true,
-    "editor.tokenColorCustomizations": {
-        "[GitHub Light Colorblind (Beta)]": {
-            "textMateRules": [
-                {
-                    "scope": "keyword",
-                    "settings": {
-                        "foreground": "#d73a49",
-                        "fontStyle": "italic"
-                    }
-                },
-                {
-                    "scope": "comment",
-                    "settings": {
-                        "foreground": "#b4c3d2",
-                        "fontStyle": "italic"
-                    }
-                },
-                {
-                    "scope": "string",
-                    "settings": {
-                        "foreground": "#144989"
-                    }
-                },
-                {
-                    "scope": "type",
-                    "settings": {
-                        "foreground": "#618dbf",
-                        "fontStyle": "bold"
-                    }
-                },
-                {
-                    "scope": "function",
-                    "settings": {
-                        "foreground": "#0a0ae5",
-                        "fontStyle": "bold underline"
-                    }
-                },
-                {
-                    "scope": "number",
-                    "settings": {
-                        "foreground": "#c4570e",
-                        "fontStyle": "bold"
-                    }
-                }
-            ]
+  "editor.guides.bracketPairs": "active",
+  "BracketHighlighter.activeInDebugMode": false,
+  "prettier.bracketSameLine": true,
+  "txtsyntax.enableAutoImport": true,
+  "txtsyntax.enableHighlightLine": true,
+  "txtsyntax.showHighlightSidebar": true,
+  "editor.tokenColorCustomizations": {
+    "[GitHub Light Colorblind (Beta)]": {
+      "textMateRules": [
+        {
+          "scope": "keyword",
+          "settings": {
+            "foreground": "#d73a49",
+            "fontStyle": "italic"
+          }
         },
-        "[Dainty – City Lights]": {
-            "textMateRules": [
-                {
-                    "scope": "keyword",
-                    "settings": {
-                        "foreground": "#d73a49",
-                        "fontStyle": "italic"
-                    }
-                },
-                {
-                    "scope": "comment",
-                    "settings": {
-                        "foreground": "#213c56",
-                        "fontStyle": "italic"
-                    }
-                },
-                {
-                    "scope": "string",
-                    "settings": {
-                        "foreground": "#59708a"
-                    }
-                },
-                {
-                    "scope": "entity.name.type",
-                    "settings": {
-                        "foreground": "#618dbf",
-                        "fontStyle": "bold"
-                    }
-                },
-                {
-                    "scope": "entity.name.function",
-                    "settings": {
-                        "foreground": "#0a0ae5",
-                        "fontStyle": "bold underline"
-                    }
-                },
-                {
-                    "scope": "number",
-                    "settings": {
-                        "foreground": "#c4570e",
-                        "fontStyle": "bold"
-                    }
-                }
-            ]
+        {
+          "scope": "comment",
+          "settings": {
+            "foreground": "#b4c3d2",
+            "fontStyle": "italic"
+          }
         },
-        "[Dainty – Dark+]": {
-            "textMateRules": [
-                {
-                    "scope": "keyword",
-                    "settings": {
-                        "foreground": "#d73a49",
-                        "fontStyle": "italic"
-                    }
-                },
-                {
-                    "scope": "comment",
-                    "settings": {
-                        "foreground": "#213c56",
-                        "fontStyle": "italic"
-                    }
-                },
-                {
-                    "scope": "string",
-                    "settings": {
-                        "foreground": "#59708a"
-                    }
-                },
-                {
-                    "scope": "entity.name.type",
-                    "settings": {
-                        "foreground": "#618dbf",
-                        "fontStyle": "bold"
-                    }
-                },
-                {
-                    "scope": "entity.name.function",
-                    "settings": {
-                        "foreground": "#2c679b",
-                        "fontStyle": "bold underline"
-                    }
-                },
-                {
-                    "scope": "number",
-                    "settings": {
-                        "foreground": "#c4570e",
-                        "fontStyle": "bold"
-                    }
-                }
-            ]
+        {
+          "scope": "string",
+          "settings": {
+            "foreground": "#144989"
+          }
         },
-        "textMateRules": [],
-        "comments": ""
+        {
+          "scope": "type",
+          "settings": {
+            "foreground": "#618dbf",
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "function",
+          "settings": {
+            "foreground": "#0a0ae5",
+            "fontStyle": "bold underline"
+          }
+        },
+        {
+          "scope": "number",
+          "settings": {
+            "foreground": "#c4570e",
+            "fontStyle": "bold"
+          }
+        }
+      ]
     },
-    "editor.fontFamily": "FJetBrains Mono, Maple Mono, ira Code, Droid Sans Mono, Geist Mono, Consolas, 'Courier New', monospace",
-    "workbench.tree.indent": 18,
-    "material-icon-theme.hidesExplorerArrows": true,
-    "workbench.tree.renderIndentGuides": "onHover",
-    "github.copilot.nextEditSuggestions.enabled": true,
-    "path-intellisense.autoTriggerNextSuggestion": true,
-    "editor.inlineSuggest.suppressSuggestions": true,
-    "debug.console.acceptSuggestionOnEnter": "on",
-    "editor.autoIndent": "advanced",
-    "indenticator.inner.showIndentGuide": true,
-    "markdown.extension.tableFormatter.normalizeIndentation": true,
-    "guides.overrideDefault": true,
-    "gitlens.views.scm.grouped.views": {
-        "repositories": true,
-        "searchAndCompare": true,
-        "launchpad": true
+    "[Dainty – City Lights]": {
+      "textMateRules": [
+        {
+          "scope": "keyword",
+          "settings": {
+            "foreground": "#d73a49",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "comment",
+          "settings": {
+            "foreground": "#213c56",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "string",
+          "settings": {
+            "foreground": "#59708a"
+          }
+        },
+        {
+          "scope": "entity.name.type",
+          "settings": {
+            "foreground": "#618dbf",
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "entity.name.function",
+          "settings": {
+            "foreground": "#0a0ae5",
+            "fontStyle": "bold underline"
+          }
+        },
+        {
+          "scope": "number",
+          "settings": {
+            "foreground": "#c4570e",
+            "fontStyle": "bold"
+          }
+        }
+      ]
     },
-    "guides.active.width": 0.25,
-    "guides.limit.maximum": -1,
-    "guides.stack.style": "dotted",
-    "guides.normal.width": 0.25,
-    "guides.stack.width": 0.5,
-    "editor.fontSize": 18,
-    "todo-tree.highlights.useColourScheme": true,
-    "vim.highlightedyank.enable": true,
-    "editor.formatOnPaste": true,
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true
+    "[Dainty – Dark+]": {
+      "textMateRules": [
+        {
+          "scope": "keyword",
+          "settings": {
+            "foreground": "#d73a49",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "comment",
+          "settings": {
+            "foreground": "#213c56",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "string",
+          "settings": {
+            "foreground": "#59708a"
+          }
+        },
+        {
+          "scope": "entity.name.type",
+          "settings": {
+            "foreground": "#618dbf",
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "entity.name.function",
+          "settings": {
+            "foreground": "#2c679b",
+            "fontStyle": "bold underline"
+          }
+        },
+        {
+          "scope": "number",
+          "settings": {
+            "foreground": "#c4570e",
+            "fontStyle": "bold"
+          }
+        }
+      ]
+    },
+    "textMateRules": [],
+    "comments": ""
+  },
+  "editor.fontFamily": "Maple Mono, Droid Sans Mono, Fira Code, JetBrains Mono, Maple Mono, Geist Mono, Consolas, 'Courier New', monospace",
+  "workbench.tree.indent": 18,
+  "material-icon-theme.hidesExplorerArrows": true,
+  "workbench.tree.renderIndentGuides": "onHover",
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "path-intellisense.autoTriggerNextSuggestion": true,
+  "editor.inlineSuggest.suppressSuggestions": true,
+  "debug.console.acceptSuggestionOnEnter": "on",
+  "editor.autoIndent": "advanced",
+  "indenticator.inner.showIndentGuide": true,
+  "markdown.extension.tableFormatter.normalizeIndentation": true,
+  "guides.overrideDefault": true,
+  "gitlens.views.scm.grouped.views": {
+    "repositories": true,
+    "searchAndCompare": true,
+    "launchpad": true
+  },
+  "guides.active.width": 0.25,
+  "guides.limit.maximum": -1,
+  "guides.stack.style": "dotted",
+  "guides.normal.width": 0.25,
+  "guides.stack.width": 0.5,
+  "editor.fontSize": 16,
+  "todo-tree.highlights.useColourScheme": true,
+  "vim.highlightedyank.enable": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.fontFamily": "Maple Mono, Hack Nerd Font",
+  "terminal.integrated.fontSize": 16,
+  "git.terminalGitEditor": true,
+  "terminal.integrated.suggest.enabled": true,
+  "terminal.integrated.smoothScrolling": true,
+  "terminal.integrated.stickyScroll.enabled": true,
+  "terminal.integrated.enableImages": true,
+  "terminal.integrated.enableVisualBell": true,
+  "terminal.integrated.mouseWheelZoom": true,
+  "editor.mouseWheelZoom": true,
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminalAllInOne.terminalTheme": "Atelier Cave",
+  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
+  "julia.execution.inlineResultsForCellEvaluation": true,
+  "julia.execution.codeInREPL": true,
+  "vim.autoSwitchInputMethod.enable": true,
+  "vim.camelCaseMotion.enable": true,
+  "vim.changeWordIncludesWhitespace": true,
+  "vim.easymotion": true,
+  "vim.statusBarColorControl": true,
+  "vim.enableNeovim": true,
+  "vim.sneak": true,
+  "vim.smartRelativeLine": true,
+  "vim.targets.enable": true,
+  "vim.useSystemClipboard": true,
+  "powershell.buttons.showPanelMovementButtons": true,
+  "powershell.codeFormatting.autoCorrectAliases": true,
+  "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true
 }
