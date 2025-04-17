@@ -21,6 +21,7 @@ This function defines the subproblem for the Bender's decomposition algorithm.
 function bd_subfunction(
 	NT::Int64,
 	NB::Int64,
+	NL::Int64,
 	NG::Int64,
 	ND::Int64,
 	NC::Int64,
@@ -28,11 +29,18 @@ function bd_subfunction(
 	NS::Int64,
 	NW::Int64,
 	units::unit,
+	winds::wind,
+	loads::load,
+	lines::transmissionline,
+	DataCentras::data_centra,
+	psses::pss,
+	scenarios_prob::Float64,
 	config_param::config
 )::Model
 	# println("this is the sub function of the bender decomposition process")
 	# Δp_contingency = define_contingency_size(units, NG)
 	scuc_subproblem = Model(Gurobi.Optimizer)
+    set_silent(scuc_subproblem)
 	# set_silent(scuc_subproblem)
 	# --- Define Variables ---
 	# Define decision variables for the optimization model
@@ -43,7 +51,7 @@ function bd_subfunction(
 	# --- Set Objective ---
 	# Set the objective function to be minimized
 	set_subproblem_objective_economic!(
-		scuc_subproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope
+		scuc_subproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob
 	)
 
 	# NS = winds.scenarios_nums
@@ -63,10 +71,11 @@ function bd_subfunction(
 	add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
 	add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)
 	add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)
-	add_transmission_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2, DataCentras)
-	add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, stroges)
-	add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
-	add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, stroges, config_param, Δp_contingency)
+	# add_transmission_constraints!(
+	# 	scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, Gsdf, config_param, ND2, DataCentras)
+	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
+	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
+	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, Δp_contingency)
 	# @show model_summary(scuc_subproblem)
 	return scuc_subproblem
 end
@@ -145,10 +154,7 @@ function set_subproblem_objective_economic!(
 	NS::Int64,
 	units::unit,
 	config_param::config,
-	scenarios_prob,
-	refcost,
-	eachslope
-)
+	scenarios_prob)
 	# Cost parameters
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
@@ -175,8 +181,7 @@ function set_subproblem_objective_economic!(
 	# Linearize fuel cost curve (assuming function is in linearization.jl)
 	refcost, eachslope = linearizationfuelcurve(units, NG)
 
-	@objective(
-		scuc_subproblem,
+	@objective(scuc_subproblem,
 		Min,
 		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT) +
 			pₛ * c₀ *
@@ -198,8 +203,7 @@ function set_subproblem_objective_economic!(
 				)
 			) +
 			pₛ * load_curtailment_penalty * sum(sum(sum(Δpd[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS) +
-			pₛ * wind_curtailment_penalty * sum(sum(sum(Δpw[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
-	)
+			pₛ * wind_curtailment_penalty * sum(sum(sum(Δpw[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS))
 	# println("objective_function")
 	return println("\t MILP_type define_subproblem objective_function \t\t\t\t\t\t done")
 end

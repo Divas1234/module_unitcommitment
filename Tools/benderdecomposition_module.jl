@@ -16,6 +16,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 	# Constants
 	MAXIMUM_ITERATIONS = 100 # Maximum number of iterations for Bender's decomposition
 	ABSOLUTE_OPTIMIZATION_GAP = 1e-3 # Absolute gap for optimality
+	@assert !is_mixed_integer_problem(scuc_subproblem)
 
 	# Iteration loop
 	for iteration in 1:MAXIMUM_ITERATIONS
@@ -26,7 +27,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 		assert_is_solved_and_feasible(scuc_masterproblem)
 
 		# Get lower bound from master problem
-		lower_bound = objective_function(scuc_masterproblem)
+		lower_bound = objective_value(scuc_masterproblem)
 
 		# Extract solution from master problem
 		x⁽⁰⁾ = value.(scuc_masterproblem[:x]) # Commitment decisions
@@ -39,7 +40,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 		# Check if subproblem is feasible
 		if ret.is_feasible
 			# Bender optimality cut
-			upper_bound = (objective_value(scuc_masterproblem) - value(scuc_masterproblem[:θ])) + ret.θ
+			upper_bound = sum(objective_value(scuc_masterproblem) .- JuMP.value.(scuc_masterproblem[:θ])) + ret.θ[1]
 			gap = abs(upper_bound - lower_bound) / abs(upper_bound)
 
 			# Print iteration results
@@ -53,14 +54,20 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 
 			# Add optimality cut to master problem
 			@constraint(scuc_masterproblem,
-				scuc_masterproblem[:θ]>=ret.θ + sum(ret.ray_x .* (scuc_masterproblem[:x] - x⁽⁰⁾) + ret.ray_u .* (scuc_masterproblem[:u] - u⁽⁰⁾) +
-											ret.ray_v .* (scuc_masterproblem[:v] - v⁽⁰⁾)))
+				scuc_masterproblem[:θ] >=
+					ret.θ + sum(
+					ret.ray_x .* (scuc_masterproblem[:x] - x⁽⁰⁾) + ret.ray_u .* (scuc_masterproblem[:u] - u⁽⁰⁾) +
+					ret.ray_v .* (scuc_masterproblem[:v] - v⁽⁰⁾)
+				))
 		else
 			# Bender feasibility cut
 			cut = @constraint(scuc_masterproblem,
-				scuc_masterproblem[:dual_θ] + sum(ret.ray_x .* (scuc_masterproblem[:x] - x⁽⁰⁾) + ret.ray_u .* (scuc_masterproblem[:u] - u⁽⁰⁾) +
-					ret.ray_v .* (scuc_masterproblem[:v] - v⁽⁰⁾))<=0)
-			@info "Adding the feasibility cut $(cut)"
+				ret.dual_θ + sum(
+					ret.ray_x .* (scuc_masterproblem[:x] - x⁽⁰⁾) + ret.ray_u .* (scuc_masterproblem[:u] - u⁽⁰⁾) +
+					ret.ray_v .* (scuc_masterproblem[:v] - v⁽⁰⁾)
+				) <= 0)
+
+			# @info "Adding the feasibility cut $(cut)"
 		end
 
 		# # Extract the dual variables from the master problem (commented out)
@@ -84,12 +91,14 @@ Solves the subproblem with fixed values for the first-stage variables and return
 """
 function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 	# Fix variables in subproblem
-	fix.(scuc_subproblem[:x], x)
-	fix.(scuc_subproblem[:u], u)
-	fix.(scuc_subproblem[:v], v)
+	fix.(scuc_subproblem[:x], x; force = true)
+	fix.(scuc_subproblem[:u], u; force = true)
+	fix.(scuc_subproblem[:v], v; force = true)
 	# fix.(scuc_subproblem[:relaxed_su₀], su₀) # commented out
 	# fix.(scuc_subproblem[:relaxed_sd₀], sd₀) # commented out
 
+	set_optimizer_attribute(scuc_subproblem, "InfUnbdInfo", 1)
+	set_optimizer_attribute(scuc_subproblem, "DualReductions", 0)
 	# Optimize subproblem
 	optimize!(scuc_subproblem)
 
@@ -98,16 +107,11 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 		# Return solution information
 		return (
 			is_feasible = true,
-			θ = value.(scuc_subproblem[:θ]),
-			# relaxed_x = value.(scuc_subproblem[:relaxed_x]), # commented out
-			# relaxed_u = value.(scuc_subproblem[:relaxed_u]), # commented out
-			# relaxed_v = value.(scuc_subproblem[:relaxed_v]), # commented out
-			# relaxed_su₀ = value.(scuc_subproblem[:relaxed_su₀]), # commented out
-			# relaxed_sd₀ = value.(scuc_subproblem[:relaxed_sd₀]), # commented out
-			sr⁺ = value.(scuc_subproblem[:sr⁺]),
-			sr⁻ = value.(scuc_subproblem[:sr⁻]),
-			Δpd = value.(scuc_subproblem[:Δpd]),
-			Δpw = value.(scuc_subproblem[:Δpw]),
+			θ = objective_value(scuc_subproblem),
+			# sr⁺ = value.(scuc_subproblem[:sr⁺]),
+			# sr⁻ = value.(scuc_subproblem[:sr⁻]),
+			# Δpd = value.(scuc_subproblem[:Δpd]),
+			# Δpw = value.(scuc_subproblem[:Δpw]),
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
 			ray_v = reduced_cost.(scuc_subproblem[:v])
@@ -120,8 +124,7 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 			dual_θ = dual_objective_value(scuc_subproblem),
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
-			ray_v = reduced_cost.(scuc_subproblem[:v])
-		)
+			ray_v = reduced_cost.(scuc_subproblem[:v]))
 	end
 end
 

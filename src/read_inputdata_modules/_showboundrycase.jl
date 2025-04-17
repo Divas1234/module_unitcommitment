@@ -10,7 +10,8 @@ function boundrycondition(NB::Int64,
 		loads::load,
 		lines::transmissionline,
 		winds::wind,
-		stroges::pss)
+		stroges::pss,
+		config_param::config)
 	# (Assuming this code is inside a function, e.g., showboundrycase)
 	# Consider defining Base.show methods for custom structs (units, loads, etc.)
 	# for better encapsulation and reusability of display logic.

@@ -42,3 +42,4 @@ function validate_inputs(NT, NB, NG, ND, NC, ND2, units, loads, winds, lines,
 	# Return true if all checks pass, false otherwise
 	return true
 end
+

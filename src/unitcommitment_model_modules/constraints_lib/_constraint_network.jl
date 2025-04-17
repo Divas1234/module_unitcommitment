@@ -19,8 +19,10 @@ function add_transmission_constraints!(
 		Δpw = scuc[:Δpw]
 
 		# Check if storage variables exist before accessing them
-		pc⁺ = scuc[:pc⁺]
-		pc⁻ = scuc[:pc⁻]
+		# pc⁺ = scuc[:pc⁺]
+		# pc⁻ = scuc[:pc⁻]
+		pc⁺ = check_var_exists(scuc, "pc⁺") ? scuc[:pc⁺] : nothing # Storage might not exist
+		pc⁻ = check_var_exists(scuc, "pc⁻") ? scuc[:pc⁻] : nothing # Storage might not exist
 
 		if config_param.is_NetWorkCon == 1 && Gsdf !== nothing && NL > 0 && DataCentras !== nothing
 			# This function assumes Gsdf is pre-calculated and passed

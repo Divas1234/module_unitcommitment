@@ -109,6 +109,11 @@ end
 is_fixed.(scuc_subproblem[:x])
 
 optimize!(scuc_subproblem)
+
+
+
+
+
 dual(UpperBoundRef(scuc_subproblem[:x]))
 
 # DEBUG - solver settings (only Gurobi for now)
@@ -117,7 +122,6 @@ set_optimizer_attribute(scuc_subproblem, "Method", 2)
 set_optimizer_attribute(scuc_subproblem, "Crossover", 0)
 set_optimizer_attribute(scuc_subproblem, "BarConvTol", opt_gap)
 #set_optimizer_attribute(scuc_subproblem,"NumericFocus",2)
-
 
 is_solved_and_feasible(scuc_subproblem; dual = true)
 JuMP.set_optimizer(scuc_subproblem, Gurobi.Optimizer)

@@ -5,6 +5,8 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	println("this is the master function of the bender decomposition process")
 	Δp_contingency = define_contingency_size(units, NG)
 	scuc_masterproblem = Model(Gurobi.Optimizer)
+	set_silent(scuc_masterproblem)
+
 	# set_silent(scuc_masterproblem)
 	# --- Define Variables ---
 	# Define decision variables for the optimization model
@@ -12,11 +14,13 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 
 	# --- Set Objective ---
 	# Set the objective function to be minimized
-	set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope)
+	set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
 
 	# println("subject to.") # Indicate the start of constraint definitions
 
+	# M = 1e3
 	onoffinit = calculate_initial_unit_status(units, NG)
+	# @constraints(scuc_masterproblem, sec_stage, θ>=M)
 	# --- Add Constraints ---
 	# Add the constraints to the optimization model
 	add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
@@ -49,7 +53,7 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	@variable(scuc_masterproblem, su₀[1:NG, 1:NT] >= 0)
 	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT] >= 0)
 
-	@variable(scuc_masterproblem, θ[1:(NG * NS), 1:NT] >= 0)
+	@variable(scuc_masterproblem, θ >= 0)
 
 	# @variable(scuc_masterproblem, sr⁺[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, sr⁻[1:(NG * NS), 1:NT]>=0)
@@ -90,7 +94,7 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	return scuc_masterproblem # Return model with variables
 end
 
-function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope)
+function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
 	# Cost parameters
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
@@ -112,9 +116,12 @@ function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG
 	# Δpd = scuc_masterproblem[:Δpd]
 	# Δpw = scuc_masterproblem[:Δpw]
 
+	# @objective(scuc_masterproblem,
+	# 	Min,
+	# 	sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT) + pₛ * c₀ * sum(sum(sum(θ[((s - 1) * NG + 1):(s * NG), t] for t in 1:NT) for s in 1:NS)))
 	@objective(scuc_masterproblem,
 		Min,
-		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT) + pₛ * c₀ * sum(sum(sum(θ[((s - 1) * NG + 1):(s * NG), t] for t in 1:NT) for s in 1:NS)))
-
+		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG)
+			for t in 1:NT) + pₛ * c₀ * θ)
 	return println("\t MILP_type objective_function \t\t\t\t\t\t done")
 end

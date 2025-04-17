@@ -36,8 +36,8 @@ function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, win
 	x = scuc[:x]
 	sr⁺ = scuc[:sr⁺]
 	sr⁻ = scuc[:sr⁻]
-	pc⁺ = !isempty(scuc[:pc⁺]) ? scuc[:pc⁺] : nothing # Storage might not exist
-	pc⁻ = !isempty(scuc[:pc⁻]) ? scuc[:pc⁻] : nothing # Storage might not exist
+	pc⁺ = check_var_exists(scuc, "pc⁺") ? scuc[:pc⁺] : nothing # Storage might not exist
+	pc⁻ = check_var_exists(scuc, "pc⁻") ? scuc[:pc⁻] : nothing # Storage might not exist
 
 	wind_pmax = winds.p_max
 	alpha_res = config_param.is_Alpha
@@ -79,8 +79,10 @@ function add_power_balance_constraints!(scuc::Model, NT, NG, ND, NC, NW, NS, loa
 	pg₀ = scuc[:pg₀]
 	Δpd = scuc[:Δpd]
 	Δpw = scuc[:Δpw]
-	pc⁺ = scuc[:pc⁺]
-	pc⁻ = scuc[:pc⁻]
+	pc⁺ = check_var_exists(scuc, "pc⁺") ? scuc[:pc⁺] : nothing # Storage might not exist
+	pc⁻ = check_var_exists(scuc, "pc⁻") ? scuc[:pc⁻] : nothing # Storage might not exist
+	# pc⁺ = scuc[:pc⁺]
+	# pc⁻ = scuc[:pc⁻]
 
 	wind_pmax = winds.p_max
 	load_curve = loads.load_curve
@@ -115,4 +117,8 @@ function add_power_balance_constraints!(scuc::Model, NT, NG, ND, NC, NW, NS, loa
 	end
 
 	return println("\t constraints: 7) power balance constraints\t\t\t\t done")
+end
+
+function check_var_exists(model::Model, name::String)
+	return any(v -> v == name, all_variables(model))
 end

@@ -144,7 +144,7 @@
     "textMateRules": [],
     "comments": ""
   },
-  "editor.fontFamily": "Maple Mono, Droid Sans Mono, Fira Code, JetBrains Mono, Maple Mono, Geist Mono, Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "Geist Mono, Fira Code, Droid Sans Mono, Maple Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
   "workbench.tree.indent": 18,
   "material-icon-theme.hidesExplorerArrows": true,
   "workbench.tree.renderIndentGuides": "onHover",
@@ -173,8 +173,8 @@
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
   "terminal.integrated.fontLigatures.enabled": true,
-  "terminal.integrated.fontFamily": "Maple Mono, Hack Nerd Font",
-  "terminal.integrated.fontSize": 16,
+  "terminal.integrated.fontFamily": "Fira Code, Maple Mono, Hack Nerd Font",
+  "terminal.integrated.fontSize": 14,
   "git.terminalGitEditor": true,
   "terminal.integrated.suggest.enabled": true,
   "terminal.integrated.smoothScrolling": true,
@@ -200,5 +200,9 @@
   "vim.useSystemClipboard": true,
   "powershell.buttons.showPanelMovementButtons": true,
   "powershell.codeFormatting.autoCorrectAliases": true,
-  "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true
+  "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
+  "editor.scrollbar.horizontalScrollbarSize": 88,
+  "editor.scrollbar.verticalScrollbarSize": 5,
+  "editor.wordWrapColumn": 150,
+  "vim.textwidth": 1
 }
