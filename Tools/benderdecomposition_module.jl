@@ -14,7 +14,7 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 """
 function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 	# Constants and parameters
-	MAXIMUM_ITERATIONS = 100 # Maximum number of iterations for Bender's decomposition
+	MAXIMUM_ITERATIONS = 10000 # Maximum number of iterations for Bender's decomposition
 	ABSOLUTE_OPTIMIZATION_GAP = 1e-3 # Absolute gap for optimality
 	NUMERICAL_TOLERANCE = 1e-6 # Numerical tolerance for stability
 	@assert !is_mixed_integer_problem(scuc_subproblem)
@@ -142,10 +142,7 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 			dual_θ = dual_objective_value(scuc_subproblem),
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
-			ray_v = reduced_cost.(scuc_subproblem[:v])
-			# ray_x=scale_duals(farkas_dual[1:length(scuc_subproblem[:x])]),
-			# ray_u=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+1):(length(scuc_subproblem[:x])+length(scuc_subproblem[:u]))]),
-			# ray_v=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+length(scuc_subproblem[:u])+1):end])
+			ray_v = reduced_cost.(scuc_subproblem[:v])            # ray_x=scale_duals(farkas_dual[1:length(scuc_subproblem[:x])]),            # ray_u=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+1):(length(scuc_subproblem[:x])+length(scuc_subproblem[:u]))]),            # ray_v=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+length(scuc_subproblem[:u])+1):end])
 		)
 	end
 end
@@ -167,7 +164,7 @@ function print_iteration(numbers, col_width = 15)
 	for num in numbers
 		print(rpad(@sprintf("%.*g", 6, num), col_width))
 	end
-	println( )
+	println()
 	return nothing
 end
 

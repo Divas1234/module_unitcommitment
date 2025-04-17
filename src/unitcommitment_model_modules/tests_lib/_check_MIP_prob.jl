@@ -16,10 +16,10 @@ A model is considered a MIP if it contains at least one integer or binary variab
 function is_mixed_integer_problem(model::Model)::Bool
     has_integer_variable = any(is_integer(v) || is_binary(v) for v in all_variables(model))
     if has_integer_variable
-        println("The model is a mixed-integer programming (MIP) problem.")
+        # println("The model is a mixed-integer programming (MIP) problem.")
         return true
     else
-        println("The model is a linear programming (LP) problem.")
+        # println("The model is a linear programming (LP) problem.")
         return false
     end
 end

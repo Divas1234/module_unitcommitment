@@ -69,10 +69,10 @@ function bd_subfunction(
 	add_generator_power_constraints!(scuc_subproblem, NT, NG, NS, units)
 	add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS, units, loads, winds, config_param)
 	add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
-	# add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)
+	add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit) # <-- Uncommented
 	add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)
-	# add_transmission_constraints!(
-	# 	scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, Gsdf, config_param, ND2, DataCentras)
+	add_transmission_constraints!( # <-- Uncommented
+		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, Gsdf, config_param, ND2, DataCentras)
 	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
 	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, Δp_contingency)

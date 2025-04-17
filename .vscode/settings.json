@@ -51,6 +51,51 @@
         }
       ]
     },
+    "[Dainty – City Lights]": {
+      "textMateRules": [
+        {
+          "scope": "keyword",
+          "settings": {
+            "foreground": "#d73a49",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "comment",
+          "settings": {
+            "foreground": "#213c56",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "string",
+          "settings": {
+            "foreground": "#59708a"
+          }
+        },
+        {
+          "scope": "entity.name.type",
+          "settings": {
+            "foreground": "#618dbf",
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "entity.name.function",
+          "settings": {
+            "foreground": "#0a0ae5",
+            "fontStyle": "bold underline"
+          }
+        },
+        {
+          "scope": "number",
+          "settings": {
+            "foreground": "#c4570e",
+            "fontStyle": "bold"
+          }
+        }
+      ]
+    },
     "[GitHub Sharp]": {
       "textMateRules": [
         {
@@ -90,51 +135,6 @@
           "settings": {
             "foreground": "#0a0ae5",
             "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "number",
-          "settings": {
-            "foreground": "#c4570e",
-            "fontStyle": "bold"
-          }
-        }
-      ]
-    },
-    "[Dainty – City Lights]": {
-      "textMateRules": [
-        {
-          "scope": "keyword",
-          "settings": {
-            "foreground": "#d73a49",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "comment",
-          "settings": {
-            "foreground": "#213c56",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "string",
-          "settings": {
-            "foreground": "#59708a"
-          }
-        },
-        {
-          "scope": "entity.name.type",
-          "settings": {
-            "foreground": "#618dbf",
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "entity.name.function",
-          "settings": {
-            "foreground": "#0a0ae5",
-            "fontStyle": "bold underline"
           }
         },
         {
@@ -216,7 +216,7 @@
   "guides.stack.style": "dotted",
   "guides.normal.width": 0.25,
   "guides.stack.width": 0.5,
-  "editor.fontSize": 16,
+  "editor.fontSize": 14,
   "todo-tree.highlights.useColourScheme": true,
   "vim.highlightedyank.enable": true,
   "editor.formatOnPaste": true,
@@ -235,7 +235,7 @@
   "editor.mouseWheelZoom": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminalAllInOne.terminalTheme": "Atelier Cave",
-  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
+  "julia.executablePath": "/Applications/Julia-1.11.app/Contents/Resources/julia/bin/julia",
   "julia.execution.inlineResultsForCellEvaluation": true,
   "julia.execution.codeInREPL": true,
   "vim.autoSwitchInputMethod.enable": true,

@@ -61,7 +61,7 @@ scenarios_curvebase = reshape(scenarios_curvebase, 1, NT)
 function genscenario(WindsFreqParam, flag)
 	if flag == 1
 		rand(123)
-		scenarios_nums = 30
+		scenarios_nums = 1
 		sample_sets = rand(Weibull(), scenarios_nums * NT) * 0.01
 		scenarios_curve, scenarios_error = reshape(sample_sets, scenarios_nums, NT),
 		reshape(sample_sets, scenarios_nums, NT)
