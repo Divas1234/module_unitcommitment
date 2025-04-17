@@ -40,7 +40,7 @@ function bd_subfunction(
 	# println("this is the sub function of the bender decomposition process")
 	# Δp_contingency = define_contingency_size(units, NG)
 	scuc_subproblem = Model(Gurobi.Optimizer)
-    set_silent(scuc_subproblem)
+	set_silent(scuc_subproblem)
 	# set_silent(scuc_subproblem)
 	# --- Define Variables ---
 	# Define decision variables for the optimization model
@@ -69,7 +69,7 @@ function bd_subfunction(
 	add_generator_power_constraints!(scuc_subproblem, NT, NG, NS, units)
 	add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS, units, loads, winds, config_param)
 	add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
-	add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)
+	# add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)
 	add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)
 	# add_transmission_constraints!(
 	# 	scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, Gsdf, config_param, ND2, DataCentras)

@@ -19,7 +19,7 @@ function main()
 	winds, NW = genscenario(WindsFreqParam, 1)
 
 	# Apply boundary conditions
-	boundrycondition(NB, NL, NG, NT, ND, units, loads, lines, winds, psses, config_param)
+	# boundrycondition(NB, NL, NG, NT, ND, units, loads, lines, winds, psses, config_param)
 
 	# Run the SUC-SCUC model
 	# Define scenario probability (assuming equal probability)

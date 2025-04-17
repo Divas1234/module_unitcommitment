@@ -51,6 +51,56 @@
         }
       ]
     },
+    "[GitHub Sharp]": {
+      "textMateRules": [
+        {
+          "settings": {
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "keyword",
+          "settings": {
+            "foreground": "#d73a49",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "comment",
+          "settings": {
+            "foreground": "#b4c3d2",
+            "fontStyle": "italic"
+          }
+        },
+        {
+          "scope": "string",
+          "settings": {
+            "foreground": "#144989"
+          }
+        },
+        {
+          "scope": "type",
+          "settings": {
+            "foreground": "#618dbf",
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "function",
+          "settings": {
+            "foreground": "#0a0ae5",
+            "fontStyle": "bold"
+          }
+        },
+        {
+          "scope": "number",
+          "settings": {
+            "foreground": "#c4570e",
+            "fontStyle": "bold"
+          }
+        }
+      ]
+    },
     "[Dainty – City Lights]": {
       "textMateRules": [
         {

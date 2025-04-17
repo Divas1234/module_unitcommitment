@@ -53,7 +53,7 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	@variable(scuc_masterproblem, su₀[1:NG, 1:NT] >= 0)
 	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT] >= 0)
 
-	@variable(scuc_masterproblem, θ >= 0)
+	@variable(scuc_masterproblem, θ >= -1e3)
 
 	# @variable(scuc_masterproblem, sr⁺[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, sr⁻[1:(NG * NS), 1:NT]>=0)
