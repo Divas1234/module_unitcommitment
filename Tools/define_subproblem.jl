@@ -19,24 +19,9 @@ This function defines the subproblem for the Bender's decomposition algorithm.
 - `scuc_subproblem::Model`: The JuMP model for the subproblem.
 """
 function bd_subfunction(
-	NT::Int64,
-	NB::Int64,
-	NL::Int64,
-	NG::Int64,
-	ND::Int64,
-	NC::Int64,
-	ND2::Int64,
-	NS::Int64,
-	NW::Int64,
-	units::unit,
-	winds::wind,
-	loads::load,
-	lines::transmissionline,
-	DataCentras::data_centra,
-	psses::pss,
-	scenarios_prob::Float64,
-	config_param::config
-)::Model
+	NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64, units::unit, winds::wind,
+	loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss, scenarios_prob::Float64, config_param::config
+)
 	# println("this is the sub function of the bender decomposition process")
 	# Δp_contingency = define_contingency_size(units, NG)
 	scuc_subproblem = Model(Gurobi.Optimizer)
@@ -80,41 +65,71 @@ function bd_subfunction(
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, Δp_contingency)
 	# @show model_summary(scuc_subproblem)
 
-	@show typeof(units_minuptime_constr)
-	@show typeof(units_mindowntime_constr)
-	@show typeof(units_init_stateslogic_consist_constr)
-	@show typeof(units_states_consist_constr)
-	@show typeof(units_init_shutup_cost_constr)
-	@show typeof(units_init_shutdown_cost_costr)
-	@show typeof(units_shutup_cost_constr)
-	@show typeof(units_shutdown_cost_constr)
+	# @show typeof(units_minuptime_constr)
+	# @show typeof(units_mindowntime_constr)
+	# @show typeof(units_init_stateslogic_consist_constr)
+	# @show typeof(units_states_consist_constr)
+	# @show typeof(units_init_shutup_cost_constr)
+	# @show typeof(units_init_shutdown_cost_costr)
+	# @show typeof(units_shutup_cost_constr)
+	# @show typeof(units_shutdown_cost_constr)
 
-	tem = [
-		# units_minuptime_constr,
-		# units_mindowntime_constr,
-		vec(units_init_stateslogic_consist_constr),
-		vec(units_states_consist_constr),
-		vec(units_init_shutup_cost_constr),
-		vec(units_init_shutdown_cost_costr),
-		vec(units_shutup_cost_constr),
-		vec(units_shutdown_cost_constr),
-		vec(winds_curt_constr),
-		vec(loads_curt_const),
-		vec(units_minpower_constr),
-		vec(units_maxpower_constr),
-		vec(sys_upreserve_constr),
-		vec(sys_down_reserve_constr),
-		vec(sys_balance_constr),
-		vec(units_upramp_constr),
-		vec(units_downramp_constr),
-		vec(units_pwlpower_sum_constr),
-		vec(units_pwlblock_upbound_constr),
-		vec(units_pwlblock_dwbound_constr),
-		vec(transmissionline_powerflow_upbound_constr),
-		vec(transmissionline_powerflow_downbound_constr)
-	]
+	# typeof(vec(sys_balance_constr[1])) <: AbstractVector
 
-	return scuc_subproblem, tem
+	all_constraints_dict = Dict{Symbol, Any}()
+
+	# vec(units_init_stateslogic_consist_constr)
+	# vec(units_states_consist_constr)
+	# vec(units_init_shutup_cost_constr)
+	# vec(units_init_shutdown_cost_costr)
+	# vec(collect(Iterators.flatten(units_shutup_cost_constr.data)))
+	# vec(collect(Iterators.flatten(units_shutdown_cost_constr.data)))
+	# vec(winds_curt_constr)
+	# vec(loads_curt_const)
+	# vec(units_minpower_constr)
+	# vec(units_maxpower_constr)
+	# vec(sys_upreserve_constr)
+	# vec(sys_down_reserve_constr)
+	# vec(units_upramp_constr)
+	# vec(units_downramp_constr)
+	# vec(units_pwlpower_sum_constr)
+	# vec(units_pwlblock_upbound_constr)
+	# vec(units_pwlblock_dwbound_constr)
+	# vec(transmissionline_powerflow_upbound_constr[1])
+	# vec(transmissionline_powerflow_downbound_constr[1])
+	# vec(convert_constraints_type_to_vector(sys_balance_constr))
+
+	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)
+	all_constraints_dict[:units_mindowntime_constr] = vec(units_mindowntime_constr)
+	all_constraints_dict[:units_init_stateslogic_consist_constr] = vec(units_init_stateslogic_consist_constr)
+	all_constraints_dict[:units_states_consist_constr] = vec(units_states_consist_constr)
+	all_constraints_dict[:units_init_shutup_cost_constr] = vec(units_init_shutup_cost_constr)
+	all_constraints_dict[:units_init_shutdown_cost_costr] = vec(units_init_shutdown_cost_costr)
+	all_constraints_dict[:units_shutup_cost_constr] = vec(collect(Iterators.flatten(units_shutup_cost_constr.data)))
+	all_constraints_dict[:units_shutdown_cost_constr] = vec(collect(Iterators.flatten(units_shutdown_cost_constr.data)))
+	all_constraints_dict[:winds_curt_constr] = vec(collect(Iterators.flatten(winds_curt_constr)))
+	all_constraints_dict[:loads_curt_const] = vec(collect(Iterators.flatten(loads_curt_const)))
+	all_constraints_dict[:units_minpower_constr] = vec(collect(Iterators.flatten(units_minpower_constr)))
+	all_constraints_dict[:units_maxpower_constr] = vec(collect(Iterators.flatten(units_maxpower_constr)))
+	all_constraints_dict[:sys_upreserve_constr] = vec(sys_upreserve_constr)
+	all_constraints_dict[:sys_down_reserve_constr] = vec(sys_down_reserve_constr)
+	all_constraints_dict[:units_upramp_constr] = vec(collect(Iterators.flatten(units_upramp_constr)))
+	all_constraints_dict[:units_downramp_constr] = vec(collect(Iterators.flatten(units_downramp_constr)))
+	all_constraints_dict[:units_pwlpower_sum_constr] = vec(units_pwlpower_sum_constr)
+	all_constraints_dict[:units_pwlblock_upbound_constr] = vec(units_pwlblock_upbound_constr)
+	all_constraints_dict[:units_pwlblock_dwbound_constr] = vec(units_pwlblock_dwbound_constr)
+	all_constraints_dict[:balance_constr] = vec(convert_constraints_type_to_vector(sys_balance_constr))
+	all_constraints_dict[:transmissionline_powerflow_upbound_constr] = vec(transmissionline_powerflow_upbound_constr[1])
+	all_constraints_dict[:transmissionline_powerflow_dwbound_constr] = vec(transmissionline_powerflow_downbound_constr[1])
+
+	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
+
+	all_reorginzed_constraints_dict = Dict{Symbol, Any}()
+	all_reorginzed_constraints_dict[:LessThan] = collect(Iterators.flatten(all_constr_lessthan_sets))
+	all_reorginzed_constraints_dict[:GreaterThan] = collect(Iterators.flatten(all_constr_greaterthan_sets))
+	all_reorginzed_constraints_dict[:EqualTo] = collect(Iterators.flatten(all_constr_equalto_sets))
+
+	return scuc_subproblem, all_reorginzed_constraints_dict
 end
 
 function define_subproblem_decision_variables!(
@@ -244,3 +259,4 @@ function set_subproblem_objective_economic!(
 	# println("objective_function")
 	return println("\t MILP_type define_subproblem objective_function \t\t\t\t\t\t done")
 end
+

@@ -37,12 +37,12 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# add_datacentra_constraints!(scuc_masterproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, stroges, config_param, Δp_contingency)
 
-	@show typeof(units_minuptime_constr)
-    @show typeof(units_mindowntime_constr)
-    @show typeof(units_init_stateslogic_consist_constr)
-    @show typeof(units_states_consist_constr)
-    @show typeof(units_init_shutup_cost_constr)
-    @show typeof(units_init_shutdown_cost_costr)
+	# @show typeof(units_minuptime_constr)
+    # @show typeof(units_mindowntime_constr)
+    # @show typeof(units_init_stateslogic_consist_constr)
+    # @show typeof(units_states_consist_constr)
+    # @show typeof(units_init_shutup_cost_constr)
+    # @show typeof(units_init_shutdown_cost_costr)
 
 	# @show model_summary(scuc_masterproblem)
 	# append!(
@@ -58,7 +58,24 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 		units_shutdown_cost_constr
 	]
 
-	return scuc_masterproblem, tem
+	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)
+	all_constraints_dict[:units_mindowntime_constr] = vec(units_mindowntime_constr)
+	all_constraints_dict[:units_init_stateslogic_consist_constr] = vec(units_init_stateslogic_consist_constr)
+	all_constraints_dict[:units_states_consist_constr] = vec(units_states_consist_constr)
+	all_constraints_dict[:units_init_shutup_cost_constr] = vec(units_init_shutup_cost_constr)
+	all_constraints_dict[:units_init_shutdown_cost_costr] = vec(units_init_shutdown_cost_costr)
+	all_constraints_dict[:units_shutup_cost_constr] = vec(collect(Iterators.flatten(units_shutup_cost_constr.data)))
+	all_constraints_dict[:units_shutdown_cost_constr] = vec(collect(Iterators.flatten(units_shutdown_cost_constr.data)))
+
+	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
+
+	all_reorginzed_constraints_dict = Dict{Symbol, Any}()
+	all_reorginzed_constraints_dict[:LessThan] = collect(Iterators.flatten(all_constr_lessthan_sets))
+	all_reorginzed_constraints_dict[:GreaterThan] = collect(Iterators.flatten(all_constr_greaterthan_sets))
+	all_reorginzed_constraints_dict[:EqualTo] = collect(Iterators.flatten(all_constr_equalto_sets))
+
+
+	return scuc_masterproblem, all_reorginzed_constraints_dict
 end
 
 # Helper function to define model variables
