@@ -3,7 +3,4 @@ scuc_masterproblem, scuc_subproblem, master_allconstr_sets, sub_allconstr_sets, 
 winds, config_param = main();
 
 # DEBUG - benderdecomposition_module
-bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
-
-
-
+bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_allconstr_sets, sub_allconstr_sets)

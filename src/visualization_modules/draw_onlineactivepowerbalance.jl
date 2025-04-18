@@ -1,5 +1,5 @@
 function draw_powerbalance(bench_x₀, bench_p₀, bench_pᵨ, bench_pᵩ, bench_seq_sr⁺, bench_seq_sr⁻, bench_pss_charge_p⁺,
-						   bench_pss_charge_p⁻, bench_su_cost, bench_sd_cost, bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, secnairos)
+	bench_pss_charge_p⁻, bench_su_cost, bench_sd_cost, bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, secnairos)
 	#! Plots power balance
 	selected_scenarios = secnairos
 	NS = winds.scenarios_nums
@@ -24,65 +24,65 @@ function draw_powerbalance(bench_x₀, bench_p₀, bench_pᵨ, bench_pᵩ, bench
 	basline_output = zeros(1, NT)[1, :]
 	xdata = collect(1:NT)
 	p1 = Plots.plot(xdata, basline_output;
-					fillrange = sum_conventional_generators_output,
-					size = (250, 280),
-					xlabel = L"t / h",
-					ylabel = L"\textrm{Output \,/\, p.u.}",
-					framestyle = :box,
-					foreground_color_grid = :grey,
-					# lc = :cornflowerblue,
-					tickfontfamily = "Palatino Bold",
-					# legendfontfamily = "Palatino Bold",
-					# fa=0.5,
-					background_color_inside = :transparent,
-					grid = :true,
-					# foreground_color_legend = nothing,
-					gc = 0.75,
-					lw = 0.5,
-					lc = :red,
-					ls = :dash,
-					xlims = (0, 25),
-					ylims = (-1, 6.6),
-					gridlinewidth = 1,
-					# fillalpha = 0.5,
-					c = RGB(159 / 255, 66 / 255, 64 / 255),
-					# legend_columns=-1,
-					label = L"\textrm{conventional \,\,units}",
-					legend = :topright)
+		fillrange = sum_conventional_generators_output,
+		size = (250, 280),
+		xlabel = L"t / h",
+		ylabel = L"\textrm{Output \,/\, p.u.}",
+		framestyle = :box,
+		foreground_color_grid = :grey,
+		# lc = :cornflowerblue,
+		tickfontfamily = "Palatino Bold",
+		# legendfontfamily = "Palatino Bold",
+		# fa=0.5,
+		background_color_inside = :transparent,
+		grid = :true,
+		# foreground_color_legend = nothing,
+		gc = 0.75,
+		lw = 0.5,
+		lc = :red,
+		ls = :dash,
+		xlims = (0, 25),
+		ylims = (-1, 6.6),
+		gridlinewidth = 1,
+		# fillalpha = 0.5,
+		c = RGB(159 / 255, 66 / 255, 64 / 255),
+		# legend_columns=-1,
+		label = L"\textrm{conventional \,\,units}",
+		legend = :topright)
 	p1 = Plots.plot!(xdata, sum_conventional_generators_output;
-					 fillrange = sum_conventional_generators_output .+ sum_winds_generators_output,
-					 fillalpha = 0.95,
-					 lw = 0.5,
-					 ls = :dash,
-					 lc = :blue,
-					 c = RGB(94 / 255, 133 / 255, 149 / 255),
-					 label = L"\textrm{winds\,\, farms}")
+		fillrange = sum_conventional_generators_output .+ sum_winds_generators_output,
+		fillalpha = 0.95,
+		lw = 0.5,
+		ls = :dash,
+		lc = :blue,
+		c = RGB(94 / 255, 133 / 255, 149 / 255),
+		label = L"\textrm{winds\,\, farms}")
 	p1 = Plots.plot!(xdata,
-					 sum_conventional_generators_output .+ sum_winds_generators_output;
-					 fillrange = sum_conventional_generators_output .+ sum_winds_generators_output .+ sum_bess_discharge_power,
-					 fillalpha = 0.95,
-					 lc = :blue,
-					 ls = :dash,
-					 lw = 0.5,
-					 c = RGB(137 / 255, 176 / 255, 81 / 255),
-					 label = L"\textrm{BESS \,(discharge)}")
+		sum_conventional_generators_output .+ sum_winds_generators_output;
+		fillrange = sum_conventional_generators_output .+ sum_winds_generators_output .+ sum_bess_discharge_power,
+		fillalpha = 0.95,
+		lc = :blue,
+		ls = :dash,
+		lw = 0.5,
+		c = RGB(137 / 255, 176 / 255, 81 / 255),
+		label = L"\textrm{BESS \,(discharge)}")
 	p1 = Plots.plot!(xdata,
-					 sum_conventional_generators_output .+ sum_winds_generators_output .+ sum_bess_discharge_power .+ sum_loadcurtailments;
-					 fillrange = sum_conventional_generators_output .+ sum_winds_generators_output .+ sum_bess_discharge_power .+ sum_loadcurtailments,
-					 fillalpha = 0.95,
-					 ls = :dash,
-					 lw = 0.5,
-					 lc = :blue,
-					 c = RGB(251 / 255, 234 / 255, 90 / 255),
-					 label = L"\textrm{Load\, shedding}")
+		sum_conventional_generators_output .+ sum_winds_generators_output .+ sum_bess_discharge_power .+ sum_loadcurtailments;
+		fillrange = sum_conventional_generators_output .+ sum_winds_generators_output .+ sum_bess_discharge_power .+ sum_loadcurtailments,
+		fillalpha = 0.95,
+		ls = :dash,
+		lw = 0.5,
+		lc = :blue,
+		c = RGB(251 / 255, 234 / 255, 90 / 255),
+		label = L"\textrm{Load\, shedding}")
 
 	p1 = Plots.plot!(xdata, basline_output;
-					 fillrange = -sum_bess_charge_power, fillalpha = 0.95,
-					 label = L"\textrm{BESS \,(charge)}", c = RGB(49 / 255, 163 / 255, 84 / 255))
+		fillrange = -sum_bess_charge_power, fillalpha = 0.95,
+		label = L"\textrm{BESS \,(charge)}", c = RGB(49 / 255, 163 / 255, 84 / 255))
 
 	p1 = Plots.plot!(xdata, -sum_bess_charge_power; ls = :dash,
-					 lw = 0.5,
-					 lc = :blue, label = "")
+		lw = 0.5,
+		lc = :blue, label = "")
 
 	return p1
 end

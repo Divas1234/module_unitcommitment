@@ -1,7 +1,7 @@
 """
 	bd_subfunction(NT, NB, NG, ND, NC, ND2, NS, NW, units, config_param)
 
-This function defines the subproblem for the Bender's decomposition algorithm.
+This function defines the subproblem for the Bender's decomposition algorithm. It formulates a Security-Constrained Unit Commitment (SCUC) subproblem.
 
 # Arguments
 - `NT::Int64`: Number of time periods.
@@ -12,92 +12,92 @@ This function defines the subproblem for the Bender's decomposition algorithm.
 - `ND2::Int64`: Number of data centers.
 - `NS::Int64`: Number of scenarios.
 - `NW::Int64`: Number of wind power plants.
-- `units::unit`: Unit data structure.
+- `units::unit`: Unit data structure containing generator parameters.
+- `winds::wind`: Wind power data structure.
+- `loads::load`: Load data structure.
+- `lines::transmissionline`: Transmission line data structure.
+- `DataCentras::data_centra`: Data center data structure.
+- `psses::pss`: Pumped storage system data structure.
+- `scenarios_prob::Float64`: Probability of each scenario.
 - `config_param::config`: Configuration parameters.
 
 # Returns
 - `scuc_subproblem::Model`: The JuMP model for the subproblem.
+- `all_reorginzed_constraints_dict::Dict{Symbol, Any}`: A dictionary containing all constraints, reorganized by type.
 """
 function bd_subfunction(
-	NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64, units::unit, winds::wind,
-	loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss, scenarios_prob::Float64, config_param::config
+	NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64,
+	units::unit, winds::wind, loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss,
+	scenarios_prob::Float64, config_param::config
 )
-	# println("this is the sub function of the bender decomposition process")
-	# Δp_contingency = define_contingency_size(units, NG)
+	# Input validation
+	@assert NT > 0 "Number of time periods (NT) must be positive."
+	@assert NB > 0 "Number of buses (NB) must be positive."
+	@assert NG > 0 "Number of generators (NG) must be positive."
+	@assert ND >= 0 "Number of loads (ND) must be non-negative."
+	@assert NC >= 0 "Number of storage units (NC) must be non-negative."
+	@assert ND2 >= 0 "Number of data centers (ND2) must be non-negative."
+	@assert NS > 0 "Number of scenarios (NS) must be positive."
+	@assert NW >= 0 "Number of wind power plants (NW) must be non-negative."
+	@assert scenarios_prob >= 0 && scenarios_prob <= 1 "Scenario probability must be between 0 and 1."
+
+	# Create the subproblem model
 	scuc_subproblem = Model(Gurobi.Optimizer)
 	set_silent(scuc_subproblem)
-	# set_silent(scuc_subproblem)
-	# --- Define Variables ---
-	# Define decision variables for the optimization model
+
+	# Define decision variables
 	define_subproblem_decision_variables!(
-		scuc_subproblem::Model, NT, NG, ND, NC, ND2, NS, NW, config_param
+		scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param
 	)
 
-	# --- Set Objective ---
-	# Set the objective function to be minimized
+	# Set the objective function
 	set_subproblem_objective_economic!(
-		scuc_subproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob
+		scuc_subproblem, NT, NG, ND, NW, NS, units, config_param, scenarios_prob
 	)
 
-	# NS = winds.scenarios_nums
-	# NW = length(winds.index)
-	Gsdf = calculate_gsdf(config_param, NL, units, lines, loads, NG, NB, ND)
+	# Calculate the Generator Shift Distribution Factor (GSDF)
+	gsdf = calculate_gsdf(config_param, NL, units, lines, loads, NG, NB, ND)
 
-	# println("subject to.") # Indicate the start of constraint definitions
+	# Calculate initial unit status
 	onoffinit = calculate_initial_unit_status(units, NG)
-	Δp_contingency = define_contingency_size(units, NG)
 
-	# --- Add Constraints ---
-	all_constr_sets = []
-	# Add the constraints to the optimization model
-	units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr, units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr,
-	units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)
+	# Define contingency size
+	contingency_size = define_contingency_size(units, NG)
+
+	# Add unit operation constraints
+	units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr,
+	units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr, units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)
+
+	# Add curtailment constraints for wind and loads
 	winds_curt_constr, loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS, loads, winds)
+
+	# Add generator power constraints
 	units_minpower_constr, units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS, units)
+
+	# Add reserve constraints
 	sys_upreserve_constr, sys_down_reserve_constr = add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS, units, loads, winds, config_param)
+
+	# Add power balance constraints
 	sys_balance_constr = add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
+
+	# Add ramp constraints
 	units_upramp_constr, units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)
+
+	# Add piecewise linear constraints
 	units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr = add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)
+
+	# Add transmission constraints
 	transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
-		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, Gsdf, config_param, ND2, DataCentras)
+		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras)
+
 	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
 	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
-	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, Δp_contingency)
+	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, contingency_size)
 	# @show model_summary(scuc_subproblem)
-
-	# @show typeof(units_minuptime_constr)
-	# @show typeof(units_mindowntime_constr)
-	# @show typeof(units_init_stateslogic_consist_constr)
-	# @show typeof(units_states_consist_constr)
-	# @show typeof(units_init_shutup_cost_constr)
-	# @show typeof(units_init_shutdown_cost_costr)
-	# @show typeof(units_shutup_cost_constr)
-	# @show typeof(units_shutdown_cost_constr)
 
 	# typeof(vec(sys_balance_constr[1])) <: AbstractVector
 
 	all_constraints_dict = Dict{Symbol, Any}()
-
-	# vec(units_init_stateslogic_consist_constr)
-	# vec(units_states_consist_constr)
-	# vec(units_init_shutup_cost_constr)
-	# vec(units_init_shutdown_cost_costr)
-	# vec(collect(Iterators.flatten(units_shutup_cost_constr.data)))
-	# vec(collect(Iterators.flatten(units_shutdown_cost_constr.data)))
-	# vec(winds_curt_constr)
-	# vec(loads_curt_const)
-	# vec(units_minpower_constr)
-	# vec(units_maxpower_constr)
-	# vec(sys_upreserve_constr)
-	# vec(sys_down_reserve_constr)
-	# vec(units_upramp_constr)
-	# vec(units_downramp_constr)
-	# vec(units_pwlpower_sum_constr)
-	# vec(units_pwlblock_upbound_constr)
-	# vec(units_pwlblock_dwbound_constr)
-	# vec(transmissionline_powerflow_upbound_constr[1])
-	# vec(transmissionline_powerflow_downbound_constr[1])
-	# vec(convert_constraints_type_to_vector(sys_balance_constr))
 
 	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)
 	all_constraints_dict[:units_mindowntime_constr] = vec(units_mindowntime_constr)
@@ -120,7 +120,7 @@ function bd_subfunction(
 	all_constraints_dict[:units_pwlblock_dwbound_constr] = vec(units_pwlblock_dwbound_constr)
 	all_constraints_dict[:balance_constr] = vec(convert_constraints_type_to_vector(sys_balance_constr))
 	all_constraints_dict[:transmissionline_powerflow_upbound_constr] = vec(transmissionline_powerflow_upbound_constr[1])
-	all_constraints_dict[:transmissionline_powerflow_dwbound_constr] = vec(transmissionline_powerflow_downbound_constr[1])
+	all_constraints_dict[:transmissionline_powerflow_downbound_constr] = vec(transmissionline_powerflow_downbound_constr[1])
 
 	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
 
@@ -132,6 +132,28 @@ function bd_subfunction(
 	return scuc_subproblem, all_reorginzed_constraints_dict
 end
 
+# Helper function to flatten constraints
+flatten_constraints(constr) = vec(collect(Iterators.flatten(constr)))
+
+"""
+	define_subproblem_decision_variables!(scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param)
+
+Define the decision variables for the subproblem.
+
+# Arguments
+- `scuc_subproblem::Model`: The JuMP model for the subproblem.
+- `NT::Int64`: Number of time periods.
+- `NG::Int64`: Number of generators.
+- `ND::Int64`: Number of loads.
+- `NC::Int64`: Number of storage units.
+- `ND2::Int64`: Number of data centers.
+- `NS::Int64`: Number of scenarios.
+- `NW::Int64`: Number of wind power plants.
+- `config_param::config`: Configuration parameters.
+
+# Returns
+- `scuc_subproblem::Model`: The JuMP model with decision variables defined.
+"""
 function define_subproblem_decision_variables!(
 	scuc_subproblem::Model,
 	NT::Int64,
@@ -175,15 +197,15 @@ function define_subproblem_decision_variables!(
 		@variable(scuc_subproblem, β[1:(NS * NC), 1:NT], Bin)
 	end
 
-	# if config_param.is_ConsiderDataCentra == 1
-	# 	@variable(scuc_subproblem, dc_p[1:(ND2 * NS), 1:NT]>=0)
-	# 	@variable(scuc_subproblem, dc_f[1:(ND2 * NS), 1:NT]>=0)
-	# 	# @variable(scuc_subproblem, dc_v[1:(ND2 * NS), 1:NT]>=0) # Currently commented out
-	# 	@variable(scuc_subproblem, dc_v²[1:(ND2 * NS), 1:NT]>=0)
-	# 	@variable(scuc_subproblem, dc_λ[1:(ND2 * NS), 1:NT]>=0)
-	# 	@variable(scuc_subproblem, dc_Δu1[1:(ND2 * NS), 1:NT]>=0)
-	# 	@variable(scuc_subproblem, dc_Δu2[1:(ND2 * NS), 1:NT]>=0)
-	# end
+	if config_param.is_ConsiderDataCentra == 1
+		@variable(scuc_subproblem, dc_p[1:(ND2 * NS), 1:NT] >= 0)
+		@variable(scuc_subproblem, dc_f[1:(ND2 * NS), 1:NT] >= 0)
+		@variable(scuc_subproblem, dc_v[1:(ND2 * NS), 1:NT] >= 0) # Currently commented out
+		@variable(scuc_subproblem, dc_v²[1:(ND2 * NS), 1:NT] >= 0)
+		@variable(scuc_subproblem, dc_λ[1:(ND2 * NS), 1:NT] >= 0)
+		@variable(scuc_subproblem, dc_Δu1[1:(ND2 * NS), 1:NT] >= 0)
+		@variable(scuc_subproblem, dc_Δu2[1:(ND2 * NS), 1:NT] >= 0)
+	end
 
 	# # Frequency control related variables (assuming these might be needed based on later constraints)
 	# # Check if these are actually used/defined in the constraints file later
@@ -197,6 +219,22 @@ function define_subproblem_decision_variables!(
 	return scuc_subproblem # Return model with variables
 end
 
+"""
+	set_subproblem_objective_economic!(scuc_subproblem, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
+
+Set the objective function for the subproblem, aiming to minimize the total cost of operation.
+
+# Arguments
+- `scuc_subproblem::Model`: The JuMP model for the subproblem.
+- `NT::Int64`: Number of time periods.
+- `NG::Int64`: Number of generators.
+- `ND::Int64`: Number of loads.
+- `NW::Int64`: Number of wind power plants.
+- `NS::Int64`: Number of scenarios.
+- `units::unit`: Unit data structure.
+- `config_param::config`: Configuration parameters.
+- `scenarios_prob::Float64`: Probability of each scenario.
+"""
 function set_subproblem_objective_economic!(
 	scuc_subproblem::Model,
 	NT::Int64,
@@ -206,7 +244,16 @@ function set_subproblem_objective_economic!(
 	NS::Int64,
 	units::unit,
 	config_param::config,
-	scenarios_prob)
+	scenarios_prob::Float64
+)
+	# Input validation
+	@assert NT > 0 "Number of time periods (NT) must be positive."
+	@assert NG > 0 "Number of generators (NG) must be positive."
+	@assert ND >= 0 "Number of loads (ND) must be non-negative."
+	@assert NW >= 0 "Number of wind power plants (NW) must be non-negative."
+	@assert NS > 0 "Number of scenarios (NS) must be positive."
+	@assert scenarios_prob >= 0 && scenarios_prob <= 1 "Scenario probability must be between 0 and 1."
+
 	# Cost parameters
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
@@ -244,7 +291,7 @@ function set_subproblem_objective_economic!(
 						for s in 1:NS
 					) for i in 1:NG
 				) +
-				sum(sum(sum(x[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS) +  # Assumes x is accessible
+				sum(sum(sum(x[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS) +
 				sum(
 					sum(
 						sum(
@@ -259,4 +306,3 @@ function set_subproblem_objective_economic!(
 	# println("objective_function")
 	return println("\t MILP_type define_subproblem objective_function \t\t\t\t\t\t done")
 end
-

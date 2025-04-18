@@ -12,7 +12,7 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 - `scuc_masterproblem::Model`: The JuMP model for the master problem.
 - `scuc_subproblem::Model`: The JuMP model for the subproblem.
 """
-function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
+function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_allconstr_sets, sub_allconstr_sets)
 	# Constants and parameters
 	MAXIMUM_ITERATIONS = 10000 # Maximum number of iterations for Bender's decomposition
 	ABSOLUTE_OPTIMIZATION_GAP = 1e-3 # Absolute gap for optimality
@@ -35,9 +35,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 		lower_bound = objective_value(scuc_masterproblem)
 
 		# Extract solution from master problem
-		x⁽⁰⁾ = value.(scuc_masterproblem[:x]) # Commitment decisions
-		u⁽⁰⁾ = value.(scuc_masterproblem[:u]) # Dispatch decisions
-		v⁽⁰⁾ = value.(scuc_masterproblem[:v]) # Voltage angle decisions
+		x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾ = value.(scuc_masterproblem[:x]), value.(scuc_masterproblem[:u]), value.(scuc_masterproblem[:v])
 		iter_value = (x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
 		# Solve subproblem with feasibility cut
 		ret = solve_subproblem_with_feasibility_cut(scuc_subproblem, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
@@ -51,14 +49,11 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 
 			# Calculate gap with best bounds
 			gap = abs(best_upper_bound - best_lower_bound) / (abs(best_upper_bound) + NUMERICAL_TOLERANCE)
-			# @show typeof(current_upper_bound)
-			# @show typeof(gap)
-			# @show typeof(best_upper_bound)
-			# @show typeof(best_lower_bound)
 
 			# Print iteration results
-			# print_iteration(iteration, lower_bound, upper_bound, gap)
-			# println("ITER:", [current_upper_bound best_lower_bound best_upper_bound gap])
+			if iteration == 1
+				println("ITER:", [current_upper_bound best_lower_bound best_upper_bound gap])
+			end
 			print_iteration([iteration, current_upper_bound, best_lower_bound, best_upper_bound, gap])
 
 			# Check convergence
@@ -69,32 +64,12 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)
 				println("Final gap: ", gap)
 				break
 			end
-
-			# Add optimality cut to master problem
-			# @constraint(scuc_masterproblem,
-			# 	scuc_masterproblem[:θ] >=
-			# 		ret.θ + sum(
-			# 		ret.ray_x .* (scuc_masterproblem[:x] - x⁽⁰⁾) + ret.ray_u .* (scuc_masterproblem[:u] - u⁽⁰⁾) +
-			# 		ret.ray_v .* (scuc_masterproblem[:v] - v⁽⁰⁾)
-			# 	))
-
 			add_optimitycut_constraints!(scuc_masterproblem, scuc_subproblem, ret, iter_value)
 		else
 			# Bender feasibility cut
-			# cut = @constraint(scuc_masterproblem,
-			# 	ret.dual_θ + sum(
-			# 		ret.ray_x .* (scuc_masterproblem[:x] - x⁽⁰⁾) + ret.ray_u .* (scuc_masterproblem[:u] - u⁽⁰⁾) +
-			# 		ret.ray_v .* (scuc_masterproblem[:v] - v⁽⁰⁾)
-			# 	) <= 0)
 			add_feasibilitycut_constraints!(scuc_masterproblem, scuc_subproblem, ret, iter_value)
 			# @info "Adding the feasibility cut $(cut)"
 		end
-
-		# # Extract the dual variables from the master problem (commented out)
-		# dual_θ = dual_objective_value(scuc_masterproblem)
-		# dual_x = dual.(scuc_masterproblem[:x])
-		# dual_u = dual.(scuc_masterproblem[:u])
-		# dual_v = dual.(scuc_masterproblem[:v])
 	end
 end
 
@@ -162,8 +137,6 @@ Prints the iteration number and other information.
 function print_iteration(numbers, col_width = 15)
 	# f(x) = Printf.@sprintf("%12.4e", x)
 	# println(lpad(k, 9), " ", join(f.(args), " "))
-	# 设定每列占用的字符宽度
-	# 格式化输出，每个数字占 col_width 的宽度，保留两位小数
 	for num in numbers
 		print(rpad(@sprintf("%.*g", 6, num), col_width))
 	end
