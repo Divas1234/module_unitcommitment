@@ -80,38 +80,38 @@ function bd_subfunction(
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, Δp_contingency)
 	# @show model_summary(scuc_subproblem)
 
-    @show typeof(units_minuptime_constr)
-    @show typeof(units_mindowntime_constr)
-    @show typeof(units_init_stateslogic_consist_constr)
-    @show typeof(units_states_consist_constr)
-    @show typeof(units_init_shutup_cost_constr)
-    @show typeof(units_init_shutdown_cost_costr)
-    @show typeof(units_shutup_cost_constr)
-    @show typeof(units_shutdown_cost_constr)
+	@show typeof(units_minuptime_constr)
+	@show typeof(units_mindowntime_constr)
+	@show typeof(units_init_stateslogic_consist_constr)
+	@show typeof(units_states_consist_constr)
+	@show typeof(units_init_shutup_cost_constr)
+	@show typeof(units_init_shutdown_cost_costr)
+	@show typeof(units_shutup_cost_constr)
+	@show typeof(units_shutdown_cost_constr)
 
 	tem = [
-	# units_minuptime_constr,
-	# units_mindowntime_constr,
-	units_init_stateslogic_consist_constr,
-	units_states_consist_constr,
-	units_init_shutup_cost_constr,
-	units_init_shutdown_cost_costr,
-	units_shutup_cost_constr,
-	units_shutdown_cost_constr,
-	winds_curt_constr,
-	loads_curt_const,
-	units_minpower_constr,
-	units_maxpower_constr,
-	sys_upreserve_constr,
-	sys_down_reserve_constr,
-	sys_balance_constr,
-	units_upramp_constr,
-	units_downramp_constr,
-	units_pwlpower_sum_constr,
-	units_pwlblock_upbound_constr,
-	units_pwlblock_dwbound_constr,
-	transmissionline_powerflow_upbound_constr,
-	transmissionline_powerflow_downbound_constr
+		# units_minuptime_constr,
+		# units_mindowntime_constr,
+		vec(units_init_stateslogic_consist_constr),
+		vec(units_states_consist_constr),
+		vec(units_init_shutup_cost_constr),
+		vec(units_init_shutdown_cost_costr),
+		vec(units_shutup_cost_constr),
+		vec(units_shutdown_cost_constr),
+		vec(winds_curt_constr),
+		vec(loads_curt_const),
+		vec(units_minpower_constr),
+		vec(units_maxpower_constr),
+		vec(sys_upreserve_constr),
+		vec(sys_down_reserve_constr),
+		vec(sys_balance_constr),
+		vec(units_upramp_constr),
+		vec(units_downramp_constr),
+		vec(units_pwlpower_sum_constr),
+		vec(units_pwlblock_upbound_constr),
+		vec(units_pwlblock_dwbound_constr),
+		vec(transmissionline_powerflow_upbound_constr),
+		vec(transmissionline_powerflow_downbound_constr)
 	]
 
 	return scuc_subproblem, tem

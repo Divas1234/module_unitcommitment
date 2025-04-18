@@ -142,7 +142,10 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 			dual_θ = dual_objective_value(scuc_subproblem),
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
-			ray_v = reduced_cost.(scuc_subproblem[:v])            # ray_x=scale_duals(farkas_dual[1:length(scuc_subproblem[:x])]),            # ray_u=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+1):(length(scuc_subproblem[:x])+length(scuc_subproblem[:u]))]),            # ray_v=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+length(scuc_subproblem[:u])+1):end])
+			ray_v = reduced_cost.(scuc_subproblem[:v])
+			# ray_x=scale_duals(farkas_dual[1:length(scuc_subproblem[:x])]),
+			# ray_u=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+1):(length(scuc_subproblem[:x])+length(scuc_subproblem[:u]))]),
+			# ray_v=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+length(scuc_subproblem[:u])+1):end])
 		)
 	end
 end
