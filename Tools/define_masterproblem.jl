@@ -47,16 +47,16 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# @show model_summary(scuc_masterproblem)
 	# append!(
 	# 	all_constr_sets,
-	tem = [
-		units_minuptime_constr,
-		units_mindowntime_constr,
-		units_init_stateslogic_consist_constr,
-		units_states_consist_constr,
-		units_init_shutup_cost_constr,
-		units_init_shutdown_cost_costr,
-		units_shutup_cost_constr,
-		units_shutdown_cost_constr
-	]
+	# tem = [
+	# 	units_minuptime_constr,
+	# 	units_mindowntime_constr,
+	# 	units_init_stateslogic_consist_constr,
+	# 	units_states_consist_constr,
+	# 	units_init_shutup_cost_constr,
+	# 	units_init_shutdown_cost_costr,
+	# 	units_shutup_cost_constr,
+	# 	units_shutdown_cost_constr
+	# ]
 
 	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)
 	all_constraints_dict[:units_mindowntime_constr] = vec(units_mindowntime_constr)
