@@ -15,21 +15,21 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 	println("Termination Status: ", status)
 
 	if status == MOI.OPTIMAL || status == MOI.LOCALLY_SOLVED || status == MOI.TIME_LIMIT ||
-	   status == MOI.OBJECTIVE_LIMIT # Added OBJECTIVE_LIMIT as acceptable status
+		status == MOI.OBJECTIVE_LIMIT # Added OBJECTIVE_LIMIT as acceptable status
 		println("Acceptable solution found (Status: $status).")
 
 		# Extract values
-		  x₀      = JuMP.value.(scuc[:x])
-		  u₀      = JuMP.value.(scuc[:u])
-		  v₀      = JuMP.value.(scuc[:v])
-		  pg₀     = JuMP.value.(scuc[:pg₀])
-		  pgₖ     = JuMP.value.(scuc[:pgₖ])
-		  su_cost = JuMP.value.(scuc[:su₀])
-		  sd_cost = JuMP.value.(scuc[:sd₀])
-		  seq_sr⁺ = JuMP.value.(scuc[:sr⁺])
-		  seq_sr⁻ = JuMP.value.(scuc[:sr⁻])
-		  pᵨ      = JuMP.value.(scuc[:Δpd])
-		  pᵩ      = JuMP.value.(scuc[:Δpw])
+		x₀      = JuMP.value.(scuc[:x])
+		u₀      = JuMP.value.(scuc[:u])
+		v₀      = JuMP.value.(scuc[:v])
+		pg₀     = JuMP.value.(scuc[:pg₀])
+		pgₖ     = JuMP.value.(scuc[:pgₖ])
+		su_cost = JuMP.value.(scuc[:su₀])
+		sd_cost = JuMP.value.(scuc[:sd₀])
+		seq_sr⁺ = JuMP.value.(scuc[:sr⁺])
+		seq_sr⁻ = JuMP.value.(scuc[:sr⁻])
+		pᵨ      = JuMP.value.(scuc[:Δpd])
+		pᵩ      = JuMP.value.(scuc[:Δpw])
 		# α       = JuMP.value.(α)
 		# β       = JuMP.value.(β)
 
@@ -53,14 +53,14 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		# These can be recalculated outside if needed, using the returned solved variables.
 
 		# Data centra results
-		dc_p_res, dc_f_res ,                          dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res = ntuple(_ -> nothing, 6) # Initialize as nothing
-		if       config_param.is_ConsiderDataCentra == 1 && ND2 > 0
-		         dc_p_res                            = JuMP.value.(scuc[:dc_p])
-		         dc_f_res                            = JuMP.value.(scuc[:dc_f])
-		         dc_v²_res                           = JuMP.value.(scuc[:dc_v²])
-		         dc_λ_res                            = JuMP.value.(scuc[:dc_λ])
-		         dc_Δu1_res                          = JuMP.value.(scuc[:dc_Δu1])
-		         dc_Δu2_res                          = JuMP.value.(scuc[:dc_Δu2])
+		dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res = ntuple(_ -> nothing, 6) # Initialize as nothing
+		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
+			dc_p_res   = JuMP.value.(scuc[:dc_p])
+			dc_f_res   = JuMP.value.(scuc[:dc_f])
+			dc_v²_res  = JuMP.value.(scuc[:dc_v²])
+			dc_λ_res   = JuMP.value.(scuc[:dc_λ])
+			dc_Δu1_res = JuMP.value.(scuc[:dc_Δu1])
+			dc_Δu2_res = JuMP.value.(scuc[:dc_Δu2])
 		end
 
 		# TODO -
@@ -76,31 +76,31 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		ρ⁻ = c₀ * 2
 
 		prod_cost = pₛ *
-					c₀ *
-					(
-						sum(
-						sum(
-							sum(sum(pgₖ[i + (s - 1) * NG, t, :] .* eachslope[:, i] for t in 1:NT))
-						for s in 1    : NS
-						)   for i in 1: NG
-					) + sum(sum(sum(x₀[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS)
-					)
-		cr⁺ = pₛ *
-			  c₀ *
-			  sum(
-				  sum(sum(ρ⁺ * seq_sr⁺[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT)
-					for s in 1: NS
-			  )
-		cr⁻ = pₛ *
-			  c₀ *
-			  sum(
-				  sum(sum(ρ⁺ * seq_sr⁻[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT)
-					for s in 1: NS
-			  )
+		c₀ *
+		(
+		sum(
+		sum(
+		sum(sum(pgₖ[i + (s - 1) * NG, t, :] .* eachslope[:, i] for t in 1:NT))
+		for s in 1:NS
+) for i in 1:NG
+) + sum(sum(sum(x₀[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS)
+)
+		cr⁺       = pₛ *
+		c₀ *
+		sum(
+		sum(sum(ρ⁺ * seq_sr⁺[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT)
+		for s in 1:NS
+)
+		cr⁻       = pₛ *
+		c₀ *
+		sum(
+		sum(sum(ρ⁺ * seq_sr⁻[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT)
+		for s in 1:NS
+)
 		seq_sr⁺   = pₛ * c₀ * sum(ρ⁺ * seq_sr⁺[i, :] for i in 1:NG)
 		seq_sr⁻   = pₛ * c₀ * sum(ρ⁺ * seq_sr⁻[i, :] for i in 1:NG)
-		𝜟pd      = pₛ * sum(sum(sum(pᵨ[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS)
-		𝜟pw      = pₛ * sum(sum(sum(pᵩ[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
+		𝜟pd       = pₛ * sum(sum(sum(pᵨ[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS)
+		𝜟pw       = pₛ * sum(sum(sum(pᵩ[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
 		str       = zeros(1, 7)
 		str[1, 1] = sum(su_cost) * 10
 		str[1, 2] = sum(sd_cost) * 10
@@ -111,8 +111,8 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		str[1, 7] = 𝜟pw
 
 		# Set output directory for results
-  # output_dir = joinpath(pwd(), "output")
-    output_dir = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
+		# output_dir = joinpath(pwd(), "output")
+		output_dir = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
 
 		# Create directory if it doesn't exist
 		try
@@ -249,7 +249,7 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 			println("Error writing results to file: $e")
 		end
 
-		  #   =================================
+		#   =================================
 		# res                                 = JuMP.value
 		println("Step-6: record datas")
 		# Note: Original function returned specific variables directly.

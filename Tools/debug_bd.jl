@@ -1,5 +1,5 @@
 include("mainfunc.jl")
-scuc_masterproblem, scuc_subproblem, scenarios_prob, refcost, eachslope, units, lines, loads,
+scuc_masterproblem, scuc_subproblem, master_allconstr_sets, sub_allconstr_sets, scenarios_prob, refcost, eachslope, units, lines, loads,
 winds, config_param = main();
 
 # DEBUG - benderdecomposition_module

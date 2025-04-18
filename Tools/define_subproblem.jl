@@ -63,21 +63,58 @@ function bd_subfunction(
 	Δp_contingency = define_contingency_size(units, NG)
 
 	# --- Add Constraints ---
+	all_constr_sets = []
 	# Add the constraints to the optimization model
-	# add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)
-	add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS, loads, winds)
-	add_generator_power_constraints!(scuc_subproblem, NT, NG, NS, units)
-	add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS, units, loads, winds, config_param)
-	add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
-	add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit) # <-- Uncommented
-	add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)
-	add_transmission_constraints!( # <-- Uncommented
+	units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr, units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr,
+	units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)
+	winds_curt_constr, loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS, loads, winds)
+	units_minpower_constr, units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS, units)
+	sys_upreserve_constr, sys_down_reserve_constr = add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS, units, loads, winds, config_param)
+	sys_balance_constr = add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
+	units_upramp_constr, units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)
+	units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr = add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)
+	transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
 		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, Gsdf, config_param, ND2, DataCentras)
 	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
 	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, Δp_contingency)
 	# @show model_summary(scuc_subproblem)
-	return scuc_subproblem
+
+    @show typeof(units_minuptime_constr)
+    @show typeof(units_mindowntime_constr)
+    @show typeof(units_init_stateslogic_consist_constr)
+    @show typeof(units_states_consist_constr)
+    @show typeof(units_init_shutup_cost_constr)
+    @show typeof(units_init_shutdown_cost_costr)
+    @show typeof(units_shutup_cost_constr)
+    @show typeof(units_shutdown_cost_constr)
+
+	tem = [
+	# units_minuptime_constr,
+	# units_mindowntime_constr,
+	units_init_stateslogic_consist_constr,
+	units_states_consist_constr,
+	units_init_shutup_cost_constr,
+	units_init_shutdown_cost_costr,
+	units_shutup_cost_constr,
+	units_shutdown_cost_constr,
+	winds_curt_constr,
+	loads_curt_const,
+	units_minpower_constr,
+	units_maxpower_constr,
+	sys_upreserve_constr,
+	sys_down_reserve_constr,
+	sys_balance_constr,
+	units_upramp_constr,
+	units_downramp_constr,
+	units_pwlpower_sum_constr,
+	units_pwlblock_upbound_constr,
+	units_pwlblock_dwbound_constr,
+	transmissionline_powerflow_upbound_constr,
+	transmissionline_powerflow_downbound_constr
+	]
+
+	return scuc_subproblem, tem
 end
 
 function define_subproblem_decision_variables!(

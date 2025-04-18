@@ -19,11 +19,13 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# println("subject to.") # Indicate the start of constraint definitions
 
 	# M = 1e3
+	all_constr_sets = []
 	onoffinit = calculate_initial_unit_status(units, NG)
 	# @constraints(scuc_masterproblem, sec_stage, θ>=M)
 	# --- Add Constraints ---
 	# Add the constraints to the optimization model
-	add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
+	units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr, units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr,
+	units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
 	# add_curtailment_constraints!(scuc_masterproblem, NT, ND, NW, NS, loads, winds)
 	# add_generator_power_constraints!(scuc_masterproblem, NT, NG, NS, units)
 	# add_reserve_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, loads, winds, config_param)
@@ -35,9 +37,28 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# add_datacentra_constraints!(scuc_masterproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, stroges, config_param, Δp_contingency)
 
-	# @show model_summary(scuc_masterproblem)
+	@show typeof(units_minuptime_constr)
+    @show typeof(units_mindowntime_constr)
+    @show typeof(units_init_stateslogic_consist_constr)
+    @show typeof(units_states_consist_constr)
+    @show typeof(units_init_shutup_cost_constr)
+    @show typeof(units_init_shutdown_cost_costr)
 
-	return scuc_masterproblem
+	# @show model_summary(scuc_masterproblem)
+	# append!(
+	# 	all_constr_sets,
+	tem = [
+		units_minuptime_constr,
+		units_mindowntime_constr,
+		units_init_stateslogic_consist_constr,
+		units_states_consist_constr,
+		units_init_shutup_cost_constr,
+		units_init_shutdown_cost_costr,
+		units_shutup_cost_constr,
+		units_shutdown_cost_constr
+	]
+
+	return scuc_masterproblem, tem
 end
 
 # Helper function to define model variables
