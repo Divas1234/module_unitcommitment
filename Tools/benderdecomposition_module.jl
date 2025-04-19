@@ -11,17 +11,24 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 # Arguments
 - `scuc_masterproblem::Model`: The JuMP model for the master problem.
 - `scuc_subproblem::Model`: The JuMP model for the subproblem.
+- `master_re_constr_sets`: The reconstruction sets for the master problem.
+- `sub_re_constr_sets`: The reconstruction sets for the subproblem.
+- `batch_scuc_subproblem_dic::OrderedDict`: The dictionary of batch subproblems for the scenario.
 """
-function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_allconstr_sets, sub_allconstr_sets)
+function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::OrderedDict, master_re_constr_sets::Any, sub_re_constr_sets::Any, winds::wind, config_param::config)
+
 	# Constants and parameters
 	MAXIMUM_ITERATIONS = 10000 # Maximum number of iterations for Bender's decomposition
 	ABSOLUTE_OPTIMIZATION_GAP = 1e-3 # Absolute gap for optimality
 	NUMERICAL_TOLERANCE = 1e-6 # Numerical tolerance for stability
-	@assert !is_mixed_integer_problem(scuc_subproblem)
 
 	# Initialize bounds
 	best_upper_bound = Inf
 	best_lower_bound = -Inf
+	NS = Int64(winds.scenarios_nums)
+	scenarios_prob = 1.0 / winds.scenarios_nums
+
+	@assert !is_mixed_integer_problem(scuc_subproblem)
 
 	# Iteration loop
 	for iteration in 1:MAXIMUM_ITERATIONS
@@ -35,45 +42,81 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		lower_bound = objective_value(scuc_masterproblem)
 
 		# Extract solution from master problem
-		x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾ = value.(scuc_masterproblem[:x]), value.(scuc_masterproblem[:u]), value.(scuc_masterproblem[:v])
+		x⁽⁰⁾ = value.(scuc_masterproblem[:x])
+		u⁽⁰⁾ = value.(scuc_masterproblem[:u])
+		v⁽⁰⁾ = value.(scuc_masterproblem[:v])
 		iter_value = (x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
 
 		# Solve subproblem with feasibility cut
-		ret = solve_subproblem_with_feasibility_cut(scuc_subproblem, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
-
-		# Check if subproblem is feasible
-		if ret.is_feasible
-			# Update bounds
-			current_upper_bound = sum(objective_value(scuc_masterproblem) .- JuMP.value.(scuc_masterproblem[:θ])) + ret.θ[1]
-			best_upper_bound = min(best_upper_bound, current_upper_bound)[1]
-			best_lower_bound = max(best_lower_bound, lower_bound)[1]
-
-			# Calculate gap with best bounds
-			gap = abs(best_upper_bound - best_lower_bound) / (abs(best_upper_bound) + NUMERICAL_TOLERANCE)
-
-			# Print iteration results
-			if iteration == 1
-				println("ITER:", [current_upper_bound best_lower_bound best_upper_bound gap])
-			end
-			print_iteration([iteration, current_upper_bound, best_lower_bound, best_upper_bound, gap])
-
-			# Check convergence
-			if gap < ABSOLUTE_OPTIMIZATION_GAP || abs(best_upper_bound - best_lower_bound) < NUMERICAL_TOLERANCE
-				println("=========================================================")
-				println("Convergence achieved - Optimal solution found")
-				println("Final upper bound: ", best_upper_bound)
-				println("Final lower bound: ", best_lower_bound)
-				println("Final gap: ", gap)
-				println("=========================================================")
-				break
-			end
-			add_optimitycut_constraints!(scuc_masterproblem, scuc_subproblem, ret, iter_value)
+		ret_dic = if (config_param.is_ConsiderMultiCUTs == 1)
+			batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾, NS)
 		else
-			# Bender feasibility cut
-			add_feasibilitycut_constraints!(scuc_masterproblem, scuc_subproblem, ret, iter_value)
-			# @info "Adding the feasibility cut $(cut)"
+			batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
+		end
+
+		# Update bounds
+		batch_subproblem_nummber = length(ret_dic)
+		if ((config_param.is_ConsiderMultiCUTs == 1) ? batch_subproblem_nummber == NS : batch_subproblem_nummber == Int64(1)) == false
+			println("Error: The number of batch_subproblems does not match the expected number.")
+			return nothing
+		end
+		best_upper_bound, best_lower_bound, current_upper_bound, all_subproblems_feasibility_flag = get_upper_lower_bounds(
+			scuc_masterproblem, ret_dic, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob
+		)
+
+		# Check for convergence
+		if all_subproblems_feasibility_flag &&
+			check_Bender_convergence(best_upper_bound, best_lower_bound, current_upper_bound, iteration, ABSOLUTE_OPTIMIZATION_GAP, NUMERICAL_TOLERANCE) == 1
+			break
+		end
+
+		# Add appropriate Bender's cut based on subproblem feasibility
+		for (s, ret) in ret_dic
+			cut_function = ret.is_feasible ? add_optimitycut_constraints! : add_feasibilitycut_constraints!
+			cut_function(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
 		end
 	end
+end
+
+function get_upper_lower_bounds(scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
+	# flag = all(s -> s.is_feasible, ret_dic)
+	flag = all(ret.is_feasible for ret in values(ret_dic))
+
+	if flag == true
+		average_θ = sum(ret.θ for ret in values(ret_dic)) * scenarios_prob
+		current_upper_bound = sum(objective_value(scuc_masterproblem) .- value.(scuc_masterproblem[:θ])) + average_θ
+		best_upper_bound = min(best_upper_bound, current_upper_bound)[1]
+		best_lower_bound = max(best_lower_bound, lower_bound)[1]
+	else
+		current_upper_bound = missing
+	end
+
+	return best_upper_bound, best_lower_bound, current_upper_bound, flag
+end
+
+function check_Bender_convergence(best_upper_bound, best_lower_bound, current_upper_bound, iteration, ABSOLUTE_OPTIMIZATION_GAP, NUMERICAL_TOLERANCE)
+	flag = 0
+	# Calculate gap with best bounds
+	gap = abs(best_upper_bound - best_lower_bound) / (abs(best_upper_bound) + NUMERICAL_TOLERANCE)
+
+	# Print iteration results
+	if iteration == 1
+		println("ITER:", [current_upper_bound best_lower_bound best_upper_bound gap])
+	end
+	print_iteration([iteration, current_upper_bound, best_lower_bound, best_upper_bound, gap])
+
+	# Check convergence
+	if gap < ABSOLUTE_OPTIMIZATION_GAP || abs(best_upper_bound - best_lower_bound) < NUMERICAL_TOLERANCE
+		println("=========================================================")
+		println("Convergence achieved - Optimal solution found")
+		println("Final upper bound: ", best_upper_bound)
+		println("Final lower bound: ", best_lower_bound)
+		println("Final gap: ", gap)
+		println("=========================================================")
+		# break
+		flag = 1
+	end
+	return flag
 end
 
 """
@@ -86,7 +129,18 @@ Solves the subproblem with fixed values for the first-stage variables and return
 - `x`: Fixed values for commitment decisions.
 - `u`: Fixed values for dispatch decisions.
 - `v`: Fixed values for voltage angle decisions.
+- `NS`: Number of scenarios (default is 1).
 """
+
+function batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic::OrderedDict, x, u, v, NS = 1)
+	ret_dic = OrderedDict{Int64, Any}()
+	for s in 1:NS
+		ret = solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic[s]::Model, x, u, v)
+		ret_dic[s] = ret
+	end
+	return ret_dic
+end
+
 function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 	# Fix variables in subproblem
 	fix.(scuc_subproblem[:x], x; force = true)

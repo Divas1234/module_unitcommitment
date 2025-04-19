@@ -7,6 +7,7 @@ include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentm
 include("define_masterproblem.jl")
 include("define_subproblem.jl")
 include("benderdecomposition_module.jl")
+include("define_batch_subproblems.jl")
 
 function main()
 	UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve, DataLoad, datacentra_Data = readxlssheet()

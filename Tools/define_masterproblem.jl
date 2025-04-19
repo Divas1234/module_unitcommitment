@@ -74,7 +74,7 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	@variable(scuc_masterproblem, su₀[1:NG, 1:NT] >= 0)
 	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT] >= 0)
 
-	@variable(scuc_masterproblem, θ >= -1e3)
+	@variable(scuc_masterproblem, θ >= 1e2)
 
 	# @variable(scuc_masterproblem, sr⁺[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, sr⁻[1:(NG * NS), 1:NT]>=0)
@@ -118,7 +118,7 @@ end
 function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
 	# Cost parameters
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
-	pₛ = scenarios_prob  # Probability of scenarios
+	# pₛ = scenarios_prob  # Probability of scenarios
 
 	# Penalty coefficients for load and wind curtailment
 	load_curtailment_penalty = config_param.is_LoadsCuttingCoefficient * 1e10
@@ -143,6 +143,6 @@ function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG
 	@objective(scuc_masterproblem,
 		Min,
 		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG)
-			for t in 1:NT) + pₛ * c₀ * θ)
+			for t in 1:NT) + c₀ * θ)
 	return println("\t MILP_type objective_function \t\t\t\t\t\t done")
 end

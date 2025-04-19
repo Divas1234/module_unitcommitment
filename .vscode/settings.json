@@ -254,5 +254,13 @@
   "editor.scrollbar.horizontalScrollbarSize": 88,
   "editor.scrollbar.verticalScrollbarSize": 5,
   "editor.wordWrapColumn": 150,
-  "vim.textwidth": 1
+  "vim.textwidth": 1,
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": false,
+    "julia": true,
+    "python": true
+  }
 }
