@@ -15,7 +15,7 @@ Validates the input data for the SUC model.
 - `Bool`: True if all checks pass, false otherwise.
 """
 function validate_inputs(NT, NB, NG, ND, NC, ND2, units, loads, winds, lines,
-		DataCentras, config_param, stroges, scenarios_prob, NL)
+	DataCentras, config_param, stroges, scenarios_prob, NL)
 	# Check if the number of generators matches the expected value
 	if size(units.p_max, 1) != NG
 		@warn "Number of generators in `units` ($(size(units.p_max, 1))) does not match NG ($NG). This might lead to errors."
@@ -42,4 +42,3 @@ function validate_inputs(NT, NB, NG, ND, NC, ND2, units, loads, winds, lines,
 	# Return true if all checks pass, false otherwise
 	return true
 end
-
