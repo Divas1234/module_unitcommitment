@@ -24,8 +24,8 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# @constraints(scuc_masterproblem, sec_stage, θ>=M)
 	# --- Add Constraints ---
 	# Add the constraints to the optimization model
-	units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr, units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr,
-	units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
+	scuc_masterproblem, _units_minuptime_constr, _units_mindowntime_constr, _units_init_stateslogic_consist_constr, _units_states_consist_constr, _units_init_shutup_cost_constr, _units_init_shutdown_cost_costr, _units_shutup_cost_constr,
+	_units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_masterproblem, NT, NG, units, onoffinit)
 	# add_curtailment_constraints!(scuc_masterproblem, NT, ND, NW, NS, loads, winds)
 	# add_generator_power_constraints!(scuc_masterproblem, NT, NG, NS, units)
 	# add_reserve_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, loads, winds, config_param)
@@ -42,14 +42,14 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	println("\n")
 
 	all_constraints_dict = Dict{Symbol, Any}()
-	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)
-	all_constraints_dict[:units_mindowntime_constr] = vec(units_mindowntime_constr)
-	all_constraints_dict[:units_init_stateslogic_consist_constr] = vec(units_init_stateslogic_consist_constr)
-	all_constraints_dict[:units_states_consist_constr] = vec(units_states_consist_constr)
-	all_constraints_dict[:units_init_shutup_cost_constr] = vec(units_init_shutup_cost_constr)
-	all_constraints_dict[:units_init_shutdown_cost_costr] = vec(units_init_shutdown_cost_costr)
-	all_constraints_dict[:units_shutup_cost_constr] = vec(collect(Iterators.flatten(units_shutup_cost_constr.data)))
-	all_constraints_dict[:units_shutdown_cost_constr] = vec(collect(Iterators.flatten(units_shutdown_cost_constr.data)))
+	all_constraints_dict[:key_units_minuptime_constr] = vec(_units_minuptime_constr)
+	all_constraints_dict[:key_units_mindowntime_constr] = vec(_units_mindowntime_constr)
+	all_constraints_dict[:key_units_init_stateslogic_consist_constr] = vec(_units_init_stateslogic_consist_constr)
+	all_constraints_dict[:key_units_states_consist_constr] = vec(_units_states_consist_constr)
+	all_constraints_dict[:key_units_init_shutup_cost_constr] = vec(_units_init_shutup_cost_constr)
+	all_constraints_dict[:key_units_init_shutdown_cost_costr] = vec(_units_init_shutdown_cost_costr)
+	all_constraints_dict[:key_units_shutup_cost_constr] = vec(collect(Iterators.flatten(_units_shutup_cost_constr.data)))
+	all_constraints_dict[:key_units_shutdown_cost_constr] = vec(collect(Iterators.flatten(_units_shutdown_cost_constr.data)))
 
 	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
 

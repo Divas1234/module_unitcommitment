@@ -7,194 +7,239 @@
   "txtsyntax.showHighlightSidebar": true,
   "editor.tokenColorCustomizations": {
     "[GitHub Light Colorblind (Beta)]": {
-      "textMateRules": [
-        {
-          "scope": "keyword",
-          "settings": {
-            "foreground": "#d73a49",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "comment",
-          "settings": {
-            "foreground": "#b4c3d2",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "string",
-          "settings": {
-            "foreground": "#144989"
-          }
-        },
-        {
-          "scope": "type",
-          "settings": {
-            "foreground": "#618dbf",
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "function",
-          "settings": {
-            "foreground": "#0a0ae5",
-            "fontStyle": "bold underline"
-          }
-        },
-        {
-          "scope": "number",
-          "settings": {
-            "foreground": "#c4570e",
-            "fontStyle": "bold"
-          }
-        }
-      ]
+        "textMateRules": [
+            {
+                "scope": "keyword",
+                "settings": {
+                    "foreground": "#d73a49",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment",
+                "settings": {
+                    "foreground": "#b4c3d2",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "string",
+                "settings": {
+                    "foreground": "#144989"
+                }
+            },
+            {
+                "scope": "type",
+                "settings": {
+                    "foreground": "#618dbf",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "function",
+                "settings": {
+                    "foreground": "#0a0ae5",
+                    "fontStyle": "bold underline"
+                }
+            },
+            {
+                "scope": "number",
+                "settings": {
+                    "foreground": "#c4570e",
+                    "fontStyle": "bold"
+                }
+            }
+        ]
     },
-    "[Dainty – City Lights]": {
-      "textMateRules": [
-        {
-          "scope": "keyword",
-          "settings": {
-            "foreground": "#d73a49",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "comment",
-          "settings": {
-            "foreground": "#213c56",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "string",
-          "settings": {
-            "foreground": "#59708a"
-          }
-        },
-        {
-          "scope": "entity.name.type",
-          "settings": {
-            "foreground": "#618dbf",
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "entity.name.function",
-          "settings": {
-            "foreground": "#0a0ae5",
-            "fontStyle": "bold underline"
-          }
-        },
-        {
-          "scope": "number",
-          "settings": {
-            "foreground": "#c4570e",
-            "fontStyle": "bold"
-          }
-        }
-      ]
-    },
-    "[GitHub Sharp]": {
-      "textMateRules": [
-        {
-          "settings": {
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "keyword",
-          "settings": {
-            "foreground": "#d73a49",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "comment",
-          "settings": {
-            "foreground": "#b4c3d2",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "string",
-          "settings": {
-            "foreground": "#144989"
-          }
-        },
-        {
-          "scope": "type",
-          "settings": {
-            "foreground": "#618dbf",
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "function",
-          "settings": {
-            "foreground": "#0a0ae5",
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "number",
-          "settings": {
-            "foreground": "#c4570e",
-            "fontStyle": "bold"
-          }
-        }
-      ]
+    "[Dainty – Ayu Mirage]": {
+        "textMateRules": [
+            {
+                "scope": "keyword",
+                "settings": {
+                    "foreground": "#d73a49",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment",
+                "settings": {
+                    "foreground": "#213c56",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "string",
+                "settings": {
+                    "foreground": "#59708a"
+                }
+            },
+            {
+                "scope": "entity.name.type",
+                "settings": {
+                    "foreground": "#618dbf",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "entity.name.function",
+                "settings": {
+                    "foreground": "#7193b0",
+                    "fontStyle": "bold underline"
+                }
+            },
+            {
+                "scope": "number",
+                "settings": {
+                    "foreground": "#c4570e",
+                    "fontStyle": "bold"
+                }
+            }
+        ]
     },
     "[Dainty – Dark+]": {
-      "textMateRules": [
-        {
-          "scope": "keyword",
-          "settings": {
-            "foreground": "#d73a49",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "comment",
-          "settings": {
-            "foreground": "#213c56",
-            "fontStyle": "italic"
-          }
-        },
-        {
-          "scope": "string",
-          "settings": {
-            "foreground": "#59708a"
-          }
-        },
-        {
-          "scope": "entity.name.type",
-          "settings": {
-            "foreground": "#618dbf",
-            "fontStyle": "bold"
-          }
-        },
-        {
-          "scope": "entity.name.function",
-          "settings": {
-            "foreground": "#2c679b",
-            "fontStyle": "bold underline"
-          }
-        },
-        {
-          "scope": "number",
-          "settings": {
-            "foreground": "#c4570e",
-            "fontStyle": "bold"
-          }
-        }
-      ]
+        "textMateRules": [
+            {
+                "scope": "keyword",
+                "settings": {
+                    "foreground": "#d73a49",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment",
+                "settings": {
+                    "foreground": "#213c56",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "string",
+                "settings": {
+                    "foreground": "#59708a"
+                }
+            },
+            {
+                "scope": "entity.name.type",
+                "settings": {
+                    "foreground": "#618dbf",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "entity.name.function",
+                "settings": {
+                    "foreground": "#2c679b",
+                    "fontStyle": "bold underline"
+                }
+            },
+            {
+                "scope": "number",
+                "settings": {
+                    "foreground": "#c4570e",
+                    "fontStyle": "bold"
+                }
+            }
+        ]
+    },
+    "[Dainty – City Lights]": {
+        "textMateRules": [
+            {
+                "scope": "keyword",
+                "settings": {
+                    "foreground": "#d73a49",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment",
+                "settings": {
+                    "foreground": "#213c56",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "string",
+                "settings": {
+                    "foreground": "#59708a"
+                }
+            },
+            {
+                "scope": "entity.name.type",
+                "settings": {
+                    "foreground": "#618dbf",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "entity.name.function",
+                "settings": {
+                    "foreground": "#0a0ae5",
+                    "fontStyle": "bold underline"
+                }
+            },
+            {
+                "scope": "number",
+                "settings": {
+                    "foreground": "#c4570e",
+                    "fontStyle": "bold"
+                }
+            }
+        ]
+    },
+    "[GitHub Sharp]": {
+        "textMateRules": [
+            {
+                "settings": {
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "keyword",
+                "settings": {
+                    "foreground": "#d73a49",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment",
+                "settings": {
+                    "foreground": "#b4c3d2",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "string",
+                "settings": {
+                    "foreground": "#144989"
+                }
+            },
+            {
+                "scope": "type",
+                "settings": {
+                    "foreground": "#618dbf",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "function",
+                "settings": {
+                    "foreground": "#0a0ae5",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "number",
+                "settings": {
+                    "foreground": "#c4570e",
+                    "fontStyle": "bold"
+                }
+            }
+        ]
     },
     "textMateRules": [],
     "comments": ""
-  },
-  "editor.fontFamily": "Hack, Julia Mono, Droid Sans Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, Fira Code, Maple Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+},
+  "editor.fontFamily": "Fira Code, Hack, Julia Mono, Droid Sans Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, Fira Code, Maple Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
   "workbench.tree.indent": 18,
   "material-icon-theme.hidesExplorerArrows": true,
   "workbench.tree.renderIndentGuides": "onHover",
@@ -262,5 +307,6 @@
     "scminput": false,
     "julia": true,
     "python": true
-  }
+},
+"terminal.integrated.tabs.defaultColor": null
 }

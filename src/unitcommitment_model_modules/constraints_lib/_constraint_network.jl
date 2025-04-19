@@ -109,7 +109,7 @@ function add_transmission_constraints!(
 			end
 		end
 		println("\t constraints: 10) transmissionline limits for basline\t\t\t done")
-		return transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr
+		return scuc, transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr
 	else
 		return println("\t constraints: 10) transmissionline limits skipped (is_NetWorkCon != 1 or Gsdf missing or NL=0)")
 	end

@@ -1,10 +1,12 @@
 # Bender Decomposition Framework
 # This module provides a framework for solving stochastic optimization problems using Bender's decomposition.
-include("add_cut_constraints.jl")
+include("get_bender_cuts.jl")
+include("define_SCUCmodel_struct.jl")
+
 using Printf
 
 """
-`bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model)`
+`bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::OrderedDict, master_re_constr_sets::Any, sub_re_constr_sets::Any, winds::wind, config_param::config)`
 
 Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC problem.
 
@@ -29,6 +31,11 @@ function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::Orde
 	scenarios_prob = 1.0 / winds.scenarios_nums
 
 	@assert !is_mixed_integer_problem(scuc_subproblem)
+	println("Starting (Strengthen) Benders decomposition algorithm")
+	println("iteration start ...\n")
+	println("====================================================")
+	println("ITER \t LOWER_bound \t    UPPER_bound   \t GAP")
+	println("----------------------------------------------------")
 
 	# Iteration loop
 	for iteration in 1:MAXIMUM_ITERATIONS
@@ -101,19 +108,19 @@ function check_Bender_convergence(best_upper_bound, best_lower_bound, current_up
 
 	# Print iteration results
 	if iteration == 1
-		println("ITER:", [current_upper_bound best_lower_bound best_upper_bound gap])
+		println("ITER:", [best_lower_bound best_upper_bound gap])
 	end
-	print_iteration([iteration, current_upper_bound, best_lower_bound, best_upper_bound, gap])
+	print_iteration([iteration, best_lower_bound, best_upper_bound, gap])
 
 	# Check convergence
 	if gap < ABSOLUTE_OPTIMIZATION_GAP || abs(best_upper_bound - best_lower_bound) < NUMERICAL_TOLERANCE
-		println("=========================================================")
+		println("\n")
+		println("====================================================")
 		println("Convergence achieved - Optimal solution found")
 		println("Final upper bound: ", best_upper_bound)
 		println("Final lower bound: ", best_lower_bound)
 		println("Final gap: ", gap)
-		println("=========================================================")
-		# break
+		println("====================================================")
 		flag = 1
 	end
 	return flag
@@ -162,8 +169,7 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 			θ = objective_value(scuc_subproblem),
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
-			ray_v = reduced_cost.(scuc_subproblem[:v])
-		)
+			ray_v = reduced_cost.(scuc_subproblem[:v]))
 	else
 		# Get Farkas certificate (dual rays) for infeasibility
 		# farkas_dual = MOI.get(scuc_subproblem, MOI.FarkasDual())

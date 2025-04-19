@@ -26,7 +26,6 @@ This function defines the subproblem for the Bender's decomposition algorithm. I
 - `all_reorginzed_constraints_dict::Dict{Symbol, Any}`: A dictionary containing all constraints, reorganized by type.
 """
 
-
 function bd_subfunction(
 	NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64,
 	units::unit, winds::wind, loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss,
@@ -48,10 +47,14 @@ function bd_subfunction(
 	set_silent(scuc_subproblem)
 
 	# Define decision variables
-	define_subproblem_decision_variables!(scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param)
+	scuc_subproblem, x, u, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β = define_subproblem_decision_variables!(
+		scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param
+	)
+	vars = SCUCModel_decision_variables(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β)
 
 	# Set the objective function
-	set_subproblem_objective_economic!(scuc_subproblem, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
+	scuc_subproblem, obj = set_subproblem_objective_economic!(scuc_subproblem, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
+	@show typeof(obj)
 
 	# Calculate the Generator Shift Distribution Factor (GSDF)
 	gsdf = calculate_gsdf(config_param, NL, units, lines, loads, NG, NB, ND)
@@ -64,33 +67,20 @@ function bd_subfunction(
 
 	NS_copy = (config_param.is_ConsiderMultiCUTs == 1) ? NS : Int64(1)
 
-	units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr,
-	units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr, units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)# Add unit operation constraints
-	winds_curt_constr, loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS_copy, loads, winds)# Add curtailment constraints for wind and loads
-	units_minpower_constr, units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add generator power constraints
-	sys_upreserve_constr, sys_down_reserve_constr = add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS_copy, units, loads, winds, config_param)# Add reserve constraints
-	sys_balance_constr = add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS_copy, loads, winds, config_param, ND2)# Add power balance constraints
-	units_upramp_constr, units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS_copy, units, onoffinit)# Add ramp constraints
-	units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr = add_pwl_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add piecewise linear constraints
-	transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
+	scuc_subproblem, _units_minuptime_constr, _units_mindowntime_constr, _units_init_stateslogic_consist_constr, _units_states_consist_constr,
+	_units_init_shutup_cost_constr, _units_init_shutdown_cost_costr, _units_shutup_cost_constr, _units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)# Add unit operation constraints
+	scuc_subproblem, _winds_curt_constr, _loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS_copy, loads, winds)# Add curtailment constraints for wind and loads
+	scuc_subproblem, _units_minpower_constr, _units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add generator power constraints
+	scuc_subproblem, _sys_upreserve_constr, _sys_down_reserve_constr = add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS_copy, units, loads, winds, config_param)# Add reserve constraints
+	scuc_subproblem, _sys_balance_constr = add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS_copy, loads, winds, config_param, ND2)# Add power balance constraints
+	scuc_subproblem, _units_upramp_constr, _units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS_copy, units, onoffinit)# Add ramp constraints
+	scuc_subproblem, _units_pwlpower_sum_constr, _units_pwlblock_upbound_constr, _units_pwlblock_dwbound_constr = add_pwl_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add piecewise linear constraints
+	scuc_subproblem, _transmissionline_powerflow_upbound_constr, _transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
 		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS_copy, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras)# Add transmission constraints
-
-	# units_minuptime_constr, units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr,
-	# units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr, units_shutdown_cost_constr = add_unit_operation_constraints!(scuc_subproblem, NT, NG, units, onoffinit)# Add unit operation constraints
-	# winds_curt_constr, loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS, loads, winds)# Add curtailment constraints for wind and loads
-	# units_minpower_constr, units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS, units)# Add generator power constraints
-	# sys_upreserve_constr, sys_down_reserve_constr = add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS, units, loads, winds, config_param)# Add reserve constraints
-	# sys_balance_constr = add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)# Add power balance constraints
-	# units_upramp_constr, units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS, units, onoffinit)# Add ramp constraints
-	# units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr = add_pwl_constraints!(scuc_subproblem, NT, NG, NS, units)# Add piecewise linear constraints
-	# transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
-	# 	scuc_subproblem, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras)# Add transmission constraints
 	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
 	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, contingency_size)
 	# @show model_summary(scuc_subproblem)
-
-	# typeof(vec(sys_balance_constr[1])) <: AbstractVector
 
 	println("\n")
 	@show scuc_subproblem
@@ -98,29 +88,29 @@ function bd_subfunction(
 
 	all_constraints_dict = Dict{Symbol, Any}()
 
-	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)
-	all_constraints_dict[:units_mindowntime_constr] = vec(units_mindowntime_constr)
-	all_constraints_dict[:units_init_stateslogic_consist_constr] = vec(units_init_stateslogic_consist_constr)
-	all_constraints_dict[:units_states_consist_constr] = vec(units_states_consist_constr)
-	all_constraints_dict[:units_init_shutup_cost_constr] = vec(units_init_shutup_cost_constr)
-	all_constraints_dict[:units_init_shutdown_cost_costr] = vec(units_init_shutdown_cost_costr)
-	all_constraints_dict[:units_shutup_cost_constr] = vec(collect(Iterators.flatten(units_shutup_cost_constr.data)))
-	all_constraints_dict[:units_shutdown_cost_constr] = vec(collect(Iterators.flatten(units_shutdown_cost_constr.data)))
-	all_constraints_dict[:winds_curt_constr] = vec(collect(Iterators.flatten(winds_curt_constr)))
-	all_constraints_dict[:loads_curt_const] = vec(collect(Iterators.flatten(loads_curt_const)))
-	all_constraints_dict[:units_minpower_constr] = vec(collect(Iterators.flatten(units_minpower_constr)))
-	all_constraints_dict[:units_maxpower_constr] = vec(collect(Iterators.flatten(units_maxpower_constr)))
-	all_constraints_dict[:sys_upreserve_constr] = vec(sys_upreserve_constr)
-	all_constraints_dict[:sys_down_reserve_constr] = vec(sys_down_reserve_constr)
-	all_constraints_dict[:units_upramp_constr] = vec(collect(Iterators.flatten(units_upramp_constr)))
-	all_constraints_dict[:units_downramp_constr] = vec(collect(Iterators.flatten(units_downramp_constr)))
-	all_constraints_dict[:units_pwlpower_sum_constr] = vec(units_pwlpower_sum_constr)
-	all_constraints_dict[:units_pwlblock_upbound_constr] = vec(units_pwlblock_upbound_constr)
-	all_constraints_dict[:units_pwlblock_dwbound_constr] = vec(units_pwlblock_dwbound_constr)
-	all_constraints_dict[:balance_constr] = vec((sys_balance_constr[1]))
+	all_constraints_dict[:key_units_minuptime_constr] = vec(_units_minuptime_constr)
+	all_constraints_dict[:key_units_mindowntime_constr] = vec(_units_mindowntime_constr)
+	all_constraints_dict[:key_units_init_stateslogic_consist_constr] = vec(_units_init_stateslogic_consist_constr)
+	all_constraints_dict[:key_units_states_consist_constr] = vec(_units_states_consist_constr)
+	all_constraints_dict[:key_units_init_shutup_cost_constr] = vec(_units_init_shutup_cost_constr)
+	all_constraints_dict[:key_units_init_shutdown_cost_costr] = vec(_units_init_shutdown_cost_costr)
+	all_constraints_dict[:key_units_shutup_cost_constr] = vec(collect(Iterators.flatten(_units_shutup_cost_constr.data)))
+	all_constraints_dict[:key_units_shutdown_cost_constr] = vec(collect(Iterators.flatten(_units_shutdown_cost_constr.data)))
+	all_constraints_dict[:key_winds_curt_constr] = vec(collect(Iterators.flatten(_winds_curt_constr)))
+	all_constraints_dict[:key_loads_curt_const] = vec(collect(Iterators.flatten(_loads_curt_const)))
+	all_constraints_dict[:key_units_minpower_constr] = vec(collect(Iterators.flatten(_units_minpower_constr)))
+	all_constraints_dict[:key_units_maxpower_constr] = vec(collect(Iterators.flatten(_units_maxpower_constr)))
+	all_constraints_dict[:key_sys_upreserve_constr] = vec(_sys_upreserve_constr)
+	all_constraints_dict[:key_sys_down_reserve_constr] = vec(_sys_down_reserve_constr)
+	all_constraints_dict[:key_units_upramp_constr] = vec(collect(Iterators.flatten(_units_upramp_constr)))
+	all_constraints_dict[:key_units_downramp_constr] = vec(collect(Iterators.flatten(_units_downramp_constr)))
+	all_constraints_dict[:key_units_pwlpower_sum_constr] = vec(_units_pwlpower_sum_constr)
+	all_constraints_dict[:key_units_pwlblock_upbound_constr] = vec(_units_pwlblock_upbound_constr)
+	all_constraints_dict[:key_units_pwlblock_dwbound_constr] = vec(_units_pwlblock_dwbound_constr)
+	all_constraints_dict[:key_balance_constr] = vec((_sys_balance_constr[1]))
 	# all_constraints_dict[:balance_constr] = vec(convert_constraints_type_to_vector(sys_balance_constr))
-	all_constraints_dict[:transmissionline_powerflow_upbound_constr] = vec(transmissionline_powerflow_upbound_constr[1])
-	all_constraints_dict[:transmissionline_powerflow_downbound_constr] = vec(transmissionline_powerflow_downbound_constr[1])
+	all_constraints_dict[:key_transmissionline_powerflow_upbound_constr] = vec(_transmissionline_powerflow_upbound_constr[1])
+	all_constraints_dict[:key_transmissionline_powerflow_downbound_constr] = vec(_transmissionline_powerflow_downbound_constr[1])
 
 	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
 
@@ -149,6 +139,7 @@ Define the decision variables for the subproblem.
 - `ND2::Int64`: Number of data centers.
 - `NS::Int64`: Number of scenarios.
 - `NW::Int64`: Number of wind power plants.
++ `NW::Int64`: Number of wind power plants (optional).
 - `config_param::config`: Configuration parameters.
 
 # Returns
@@ -192,11 +183,17 @@ function define_subproblem_decision_variables!(
 		@variable(scuc_subproblem, pc⁺[1:(NC * NS_copy), 1:NT] >= 0)# charge power
 		@variable(scuc_subproblem, pc⁻[1:(NC * NS_copy), 1:NT] >= 0)# discharge power
 		@variable(scuc_subproblem, qc[1:(NC * NS_copy), 1:NT] >= 0) # cumsum power
-		# @variable(scuc_subproblem, pss_sumchargeenergy[1:NC * NS, 1] >= 0) # Currently commented out
+		@variable(scuc_subproblem, pss_sumchargeenergy[1:(NC * NS), 1] >= 0) # TODO Currently commented out
 
 		# defination charging and discharging of BESS
 		@variable(scuc_subproblem, α[1:(NS_copy * NC), 1:NT], Bin)
 		@variable(scuc_subproblem, β[1:(NS_copy * NC), 1:NT], Bin)
+	else
+		κ⁺, κ⁻, pc⁺, pc⁻, qc = Union{Missing, Matrix{VariableRef}},
+		Union{Missing, Matrix{VariableRef}}, Union{Missing, Matrix{VariableRef}}, Union{Missing, Matrix{VariableRef}},
+		Union{Missing, Matrix{VariableRef}}
+		pss_sumchargeenergy = Union{Missing, Matrix{VariableRef}}
+		α, β = Union{Missing, Matrix{VariableRef}}, Union{Missing, Matrix{VariableRef}}
 	end
 
 	if config_param.is_ConsiderDataCentra == 1
@@ -218,7 +215,7 @@ function define_subproblem_decision_variables!(
 	# end
 
 	# println("\t Variables defined.")
-	return scuc_subproblem # Return model with variables
+	return scuc_subproblem, x, u, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β
 end
 
 """
@@ -285,7 +282,7 @@ function set_subproblem_objective_economic!(
 	# Linearize fuel cost curve (assuming function is in linearization.jl)
 	refcost, eachslope = linearizationfuelcurve(units, NG)
 
-	@objective(scuc_subproblem,
+	obj = @objective(scuc_subproblem,
 		Min,
 		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT) +
 			pₛ * c₀ *
@@ -333,6 +330,8 @@ function set_subproblem_objective_economic!(
 	# 		pₛ * load_curtailment_penalty * sum(sum(sum(Δpd[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS) +
 	# 		pₛ * wind_curtailment_penalty * sum(sum(sum(Δpw[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS))
 	# println("objective_function")
-	return println("\t LP_type subproblem objective_function \t\t\t\t\t done")
-end
+	println("\t LP_type subproblem objective_function \t\t\t\t\t done")
 
+	println("Objective function has been set.")
+	return scuc_subproblem, obj
+end

@@ -64,7 +64,7 @@ function add_unit_operation_constraints!(scuc::Model, NT, NG, units, onoffinit)
 	units_shutdown_cost_constr = @constraint(scuc, [t = 2:NT], sd₀[:, t] .>= shutdowncost .* v[:, t])
 
 	println("\t constraints: 3) shutup/shutdown cost\t\t\t\t\t done")
-	return units_minuptime_constr,
+	return scuc, units_minuptime_constr,
 	units_mindowntime_constr, units_init_stateslogic_consist_constr, units_states_consist_constr, units_init_shutup_cost_constr, units_init_shutdown_cost_costr, units_shutup_cost_constr,
 	units_shutdown_cost_constr
 end
@@ -87,7 +87,7 @@ function add_generator_power_constraints!(scuc::Model, NT, NG, NS, units)
 		sr⁻[(1 + (s - 1) * NG):(s * NG), t] .>=
 			units.p_min[:, 1] .* x[:, t])
 	println("\t constraints: 5) generatos power limits\t\t\t\t\t done")
-	return units_minpower_constr, units_maxpower_constr
+	return scuc, units_minpower_constr, units_maxpower_constr
 end
 
 # Helper function for ramp rate constraints
@@ -123,7 +123,7 @@ function add_ramp_constraints!(scuc::Model, NT, NG, NS, units, onoffinit)
 		shut_down[:, 1] .* v[:, t] +
 		p_max[:, 1] .* (x[:, t]))
 	println("\t constraints: 8) ramp-up/ramp-down constraints\t\t\t\t done")
-	return units_upramp_constr, units_downramp_constr
+	return scuc, units_upramp_constr, units_downramp_constr
 end
 
 # Helper function for Piecewise Linear (PWL) cost constraints
@@ -156,5 +156,5 @@ function add_pwl_constraints!(scuc::Model, NT, NG, NS, units)
 		[s = 1:NS, t = 1:NT, i = 1:NG, k = 1:num_segments],
 		pgₖ[i + (s - 1) * NG, t, k] >= 0)
 	println("\t constraints: 9) piece linearization constraints\t\t\t done")
-	return units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr
+	return scuc, units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr
 end

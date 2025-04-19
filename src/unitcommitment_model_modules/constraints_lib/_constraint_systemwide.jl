@@ -24,7 +24,7 @@ function add_curtailment_constraints!(scuc::Model, NT, ND, NW, NS, loads, winds)
 		[s = 1:NS, t = 1:NT],
 		Δpd[(1 + (s - 1) * ND):(s * ND), t] .<= load_curve[:, t])
 	println("\t constraints: 4) loadcurtailments and spoliedwinds\t\t\t done")
-	return winds_curt_constr, loads_curt_const
+	return scuc, winds_curt_constr, loads_curt_const
 end
 
 # Helper function for system reserve limits
@@ -67,7 +67,7 @@ function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, win
 		 0.0) >=
 			1.0 * (alpha_res * forcast_reserve[s, t] + beta_res * sum(load_curve[:, t])))
 	println("\t constraints: 6) system reserves limits\t\t\t\t\t done")
-	return sys_upreserve_constr, sys_down_reserve_constr
+	return scuc, sys_upreserve_constr, sys_down_reserve_constr
 end
 
 # Helper function for power balance constraints
@@ -118,7 +118,7 @@ function add_power_balance_constraints!(scuc::Model, NT, NG, ND, NC, NW, NS, loa
 		end
 	end
 	println("\t constraints: 7) power balance constraints\t\t\t\t done")
-	return sys_balance_constr
+	return scuc, sys_balance_constr
 end
 
 function check_var_exists(model::Model, name::String)
