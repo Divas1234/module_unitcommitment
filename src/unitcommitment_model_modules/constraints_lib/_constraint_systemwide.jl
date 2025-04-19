@@ -17,7 +17,7 @@ function add_curtailment_constraints!(scuc::Model, NT, ND, NW, NS, loads, winds)
 	load_curve = loads.load_curve
 
 	winds_curt_constr = @constraint(scuc,
-		[s = 1:NS, t = 1:NT],
+		winds_curt_constr_for_eachscenario[s = 1:NS, t = 1:NT],
 		Δpw[(1 + (s - 1) * NW):(s * NW), t] .<=
 			winds.scenarios_curve[s, t] * wind_pmax[:, 1])
 	loads_curt_const = @constraint(scuc,

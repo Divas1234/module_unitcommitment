@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "D:\\GithubClonefiles\\module_unitcommitment\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GithubClonefiles\\module_unitcommitment\\tools\\define_masterproblem.jl||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tools\\define_masterproblem.jl||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GithubClonefiles\\module_unitcommitment\\tools\\benderdecomposition_module.jl||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tools\\benderdecomposition_module.jl||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GithubClonefiles\\module_unitcommitment\\tools\\debug_bd.jl||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tools\\debug_bd.jl||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GithubClonefiles\\module_unitcommitment\\tools\\define_masterproblem.jl||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tools\\define_masterproblem.jl||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GithubClonefiles\\module_unitcommitment\\tools\\add_cut_constraints.jl||{3B902123-F8A7-4915-9F01-361F908088D0}",
@@ -31,12 +35,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "benderdecomposition_module.jl",
+              "DocumentMoniker": "D:\\GithubClonefiles\\module_unitcommitment\\tools\\benderdecomposition_module.jl",
+              "RelativeDocumentMoniker": "tools\\benderdecomposition_module.jl",
+              "ToolTip": "D:\\GithubClonefiles\\module_unitcommitment\\tools\\benderdecomposition_module.jl",
+              "RelativeToolTip": "tools\\benderdecomposition_module.jl",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAfAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|",
+              "WhenOpened": "2025-04-18T14:35:15.715Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "define_masterproblem.jl",
               "DocumentMoniker": "D:\\GithubClonefiles\\module_unitcommitment\\tools\\define_masterproblem.jl",
               "RelativeDocumentMoniker": "tools\\define_masterproblem.jl",
               "ToolTip": "D:\\GithubClonefiles\\module_unitcommitment\\tools\\define_masterproblem.jl",
               "RelativeToolTip": "tools\\define_masterproblem.jl",
-              "ViewState": "AgIAAFQAAAAAAAAAAAAAAFwAAAA+AAAAAAAAAA==",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAAAGMAAAAGAAAAAAAAAA==",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|",
               "WhenOpened": "2025-04-18T14:33:29.827Z",
               "EditorCaption": ""
@@ -47,7 +64,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "add_cut_constraints.jl",
               "DocumentMoniker": "D:\\GithubClonefiles\\module_unitcommitment\\tools\\add_cut_constraints.jl",
               "RelativeDocumentMoniker": "tools\\add_cut_constraints.jl",
@@ -55,12 +72,11 @@
               "RelativeToolTip": "tools\\add_cut_constraints.jl",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAMAAAAAAAAAA==",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|",
-              "WhenOpened": "2025-04-18T14:32:43.223Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-18T14:32:43.223Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "mainfunc.jl",
               "DocumentMoniker": "D:\\GithubClonefiles\\module_unitcommitment\\tools\\mainfunc.jl",
               "RelativeDocumentMoniker": "tools\\mainfunc.jl",
@@ -68,8 +84,7 @@
               "RelativeToolTip": "tools\\mainfunc.jl",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAA7AAAAAAAAAA==",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|",
-              "WhenOpened": "2025-04-18T14:32:17.012Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-18T14:32:17.012Z"
             },
             {
               "$type": "Document",

@@ -68,6 +68,9 @@ transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_
 
 # typeof(vec(sys_balance_constr[1])) <: AbstractVector
 
+
+vec(sys_balance_constr[1])
+
 all_constraints_dict = Dict{Symbol, Any}()
 
 # vec(units_init_stateslogic_consist_constr)

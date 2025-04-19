@@ -1,7 +1,7 @@
 include(joinpath(pwd(), "src", "environment_config.jl"))
 include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentmodel.jl"))
 
-function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, units::unit, config_param::config)
+function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, units::unit, config_param::config, scenarios_prob::Float64)
 	println("this is the master function of the bender decomposition process")
 	Δp_contingency = define_contingency_size(units, NG)
 	scuc_masterproblem = Model(Gurobi.Optimizer)
@@ -36,6 +36,10 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# add_storage_constraints!(scuc_masterproblem, NT, NC, NS, config_param, stroges)
 	# add_datacentra_constraints!(scuc_masterproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_masterproblem, NT, NG, NC, NS, units, stroges, config_param, Δp_contingency)
+
+	println("\n")
+	@show scuc_masterproblem
+	println("\n")
 
 	all_constraints_dict = Dict{Symbol, Any}()
 	all_constraints_dict[:units_minuptime_constr] = vec(units_minuptime_constr)

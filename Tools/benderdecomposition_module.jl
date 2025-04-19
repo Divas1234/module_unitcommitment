@@ -37,6 +37,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		# Extract solution from master problem
 		x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾ = value.(scuc_masterproblem[:x]), value.(scuc_masterproblem[:u]), value.(scuc_masterproblem[:v])
 		iter_value = (x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
+
 		# Solve subproblem with feasibility cut
 		ret = solve_subproblem_with_feasibility_cut(scuc_subproblem, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
 
@@ -58,10 +59,12 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 
 			# Check convergence
 			if gap < ABSOLUTE_OPTIMIZATION_GAP || abs(best_upper_bound - best_lower_bound) < NUMERICAL_TOLERANCE
+				println("=========================================================")
 				println("Convergence achieved - Optimal solution found")
 				println("Final upper bound: ", best_upper_bound)
 				println("Final lower bound: ", best_lower_bound)
 				println("Final gap: ", gap)
+				println("=========================================================")
 				break
 			end
 			add_optimitycut_constraints!(scuc_masterproblem, scuc_subproblem, ret, iter_value)

@@ -11,7 +11,8 @@ function reorginze_constraints_sets(all_constraints_dict)
 		elseif occursin("GreaterThan", string(typeof(item[2])))
 			push!(all_constr_greaterthan_sets, item[2])
 		else
-			println("check it, not the regular MOP type in the all_constraints_dict")
+			println("check it, not the regular MOI type in the all_constraints_dict",item[1])
+            @info tem[1]:: typeof(item[2])
 		end
 	end
 	return all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets

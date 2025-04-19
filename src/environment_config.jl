@@ -2,7 +2,7 @@ using Pkg
 
 neededPackages = [:Revise, :JuMP, :Gurobi, :Test, :DelimitedFiles,
 	:LaTeXStrings, :Plots, "JLD", :DataFrames, :Clustering, :XLSX,
-	:StatsPlots, :Distributions, :CSV, :Random, :DataFrames, :MultivariateStats, :UnicodePlots]
+	:StatsPlots, :Distributions, :CSV, :Random, :DataFrames, :MultivariateStats, :UnicodePlots, :DataStructures]
 
 # Make sure all needed Pkg's are ready to go
 for neededpackage in neededPackages
@@ -11,7 +11,7 @@ for neededpackage in neededPackages
 end
 
 using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, JLD, DataFrames, Clustering, StatsPlots, Distributions, CSV, Random,
-	  DataFrames, MultivariateStats
+	DataFrames, MultivariateStats, DataStructures
 
 gr()
 Random.seed!(1234)
