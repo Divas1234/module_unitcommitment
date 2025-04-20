@@ -28,8 +28,8 @@ function main()
 	@show NS = Int64(winds.scenarios_nums)
 
 	refcost, eachslope = linearizationfuelcurve(units, NG)
-	scuc_masterproblem, master_re_constr_sets = bd_masterfunction(NT, NB, NG, ND, NC, ND2, NS, units, config_param, scenarios_prob)
-	scuc_subproblem, sub_re_constr_sets = bd_subfunction(
+	scuc_masterproblem, master_model_struct = bd_masterfunction(NT, NB, NG, ND, NC, ND2, NS, units, config_param, scenarios_prob)
+	scuc_subproblem, sub_model_struct = bd_subfunction(
 		NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64, units::unit, winds::wind,
 		loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss, scenarios_prob::Float64, config_param::config)
 	# Make sure refcost and eachslope are defined before using them in the subproblem
@@ -38,5 +38,5 @@ function main()
 		scenarios_prob = 1.0 / NS
 	end
 
-	return scuc_masterproblem, scuc_subproblem, master_re_constr_sets, sub_re_constr_sets, config_param, units, lines, loads,  winds, psses, NB, NG, NL, ND, NS, NT, NC, ND2, DataCentras
+	return scuc_masterproblem, scuc_subproblem, master_model_struct, sub_model_struct, config_param, units, lines, loads,  winds, psses, NB, NG, NL, ND, NS, NT, NC, ND2, DataCentras
 end
