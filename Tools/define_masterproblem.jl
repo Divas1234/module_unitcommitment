@@ -91,7 +91,7 @@ function bd_masterfunction(
 		master_reformat_cons::SCUCModel_reformat_constraints
 	)
 
-	return scuc_masterproblem, scuc_masterproblem
+	return scuc_masterproblem, master_scuc_struct
 end
 
 # Helper function to define model variables

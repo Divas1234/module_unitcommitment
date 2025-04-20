@@ -74,18 +74,17 @@ function bd_subfunction(
 
 	scuc_subproblem, _units_minuptime_constr, _units_mindowntime_constr, _units_init_stateslogic_consist_constr, _units_states_consist_constr,
 	_units_init_shutup_cost_constr, _units_init_shutdown_cost_constr, _units_shutup_cost_constr, _units_shutdown_cost_constr = add_unit_operation_constraints!(
-		scuc_subproblem, NT, NG, units, onoffinit)# Add unit operation constraints
+		scuc_subproblem, NT, NG, units, onoffinit
+	)# Add unit operation constraints
 	scuc_subproblem, _winds_curt_constr, _loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS_copy, loads, winds)# Add curtailment constraints for wind and loads
 	scuc_subproblem, _units_minpower_constr, _units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add generator power constraints
-	scuc_subproblem, _sys_upreserve_constr, _sys_down_reserve_constr = add_reserve_constraints!(
-		scuc_subproblem, NT, NG, NC, NS_copy, units, loads, winds, config_param)# Add reserve constraints
-	scuc_subproblem, _sys_balance_constr = add_power_balance_constraints!(
-		scuc_subproblem, NT, NG, ND, NC, NW, NS_copy, loads, winds, config_param, ND2)# Add power balance constraints
+	scuc_subproblem, _sys_upreserve_constr, _sys_down_reserve_constr = add_reserve_constraints!(scuc_subproblem, NT, NG, NC, NS_copy, units, loads, winds, config_param)# Add reserve constraints
+	scuc_subproblem, _sys_balance_constr = add_power_balance_constraints!(scuc_subproblem, NT, NG, ND, NC, NW, NS_copy, loads, winds, config_param, ND2)# Add power balance constraints
 	scuc_subproblem, _units_upramp_constr, _units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS_copy, units, onoffinit)# Add ramp constraints
-	scuc_subproblem, _units_pwlpower_sum_constr, _units_pwlblock_upbound_constr, _units_pwlblock_dwbound_constr = add_pwl_constraints!(
-		scuc_subproblem, NT, NG, NS_copy, units)# Add piecewise linear constraints
+	scuc_subproblem, _units_pwlpower_sum_constr, _units_pwlblock_upbound_constr, _units_pwlblock_dwbound_constr = add_pwl_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add piecewise linear constraints
 	scuc_subproblem, _transmissionline_powerflow_upbound_constr, _transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
-		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS_copy, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras)# Add transmission constraints
+		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS_copy, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras
+	)# Add transmission constraints
 	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
 	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, contingency_size)
@@ -141,20 +140,8 @@ function bd_subfunction(
 		]...
 	)
 
-	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
-
-	all_reorginzed_constraints_dict = Dict{Symbol, Any}()
-	all_reorginzed_constraints_dict[:LessThan] = collect(Iterators.flatten(all_constr_lessthan_sets))
-	all_reorginzed_constraints_dict[:GreaterThan] = collect(Iterators.flatten(all_constr_greaterthan_sets))
-	all_reorginzed_constraints_dict[:EqualTo] = collect(Iterators.flatten(all_constr_equalto_sets))
-
 	# NOTE - save the reformated constraints in a dictionary for easy access
-	sub_reformat_cons = SCUCModel_reformat_constraints(
-		[vec(all_reorginzed_constraints_dict[key])
-		 for key in [
-			:EqualTo, :GreaterThan, :LessThan
-		]]...
-	)
+	sub_reformat_cons = get_reorganize_constraints_struct(all_constraints_dict)
 
 	# NOTE - save all scuc model components in struct! SCUC_model
 	sub_scuc_struct = SCUC_Model(
@@ -168,8 +155,25 @@ function bd_subfunction(
 	return scuc_subproblem, sub_scuc_struct
 end
 
+function get_reorganize_constraints_struct(all_constraints_dict)
+	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
+	# TODO
+	all_reorginzed_constraints_dict = Dict{Symbol, Dict{Any, Any}}()
+	all_reorginzed_constraints_dict[:LessThan] = collect(Iterators.flatten(all_constr_lessthan_sets))
+	all_reorginzed_constraints_dict[:GreaterThan] = collect(Iterators.flatten(all_constr_greaterthan_sets))
+	all_reorginzed_constraints_dict[:EqualTo] = collect(Iterators.flatten(all_constr_equalto_sets))
+
+	sub_reformat_cons = SCUCModel_reformat_constraints(
+		[vec(all_reorginzed_constraints_dict[key])
+		 for key in [
+			:EqualTo, :GreaterThan, :LessThan
+		]]...
+	)
+	return sub_reformat_cons
+end
+
 # Helper function to flatten constraints
-flatten_constraints(constr) = vec(collect(Iterators.flatten(constr)))
+# flatten_constraints(constr) = vec(collect(Iterators.flatten(constr)))
 
 """
 	define_subproblem_decision_variables!(scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param)

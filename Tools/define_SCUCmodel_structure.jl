@@ -122,9 +122,12 @@ function build_constraints(; kwargs...)
 end
 
 struct SCUCModel_reformat_constraints
-	_equal_to::Vector{ConstraintRef}
-	_greater_than::Vector{ConstraintRef}
-	_smaller_than::Vector{ConstraintRef}
+	# _equal_to::Vector{ConstraintRef}
+	# _greater_than::Vector{ConstraintRef}
+	# _smaller_than::Vector{ConstraintRef}
+	_equal_to::Dict{Any, T1}
+	_greater_than::Dict{Any, T2}
+    _smaller_than::Dict{Any,T0}
 end
 
 struct SCUCModel_objective_function

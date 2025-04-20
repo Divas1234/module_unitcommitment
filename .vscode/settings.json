@@ -239,7 +239,7 @@
     "textMateRules": [],
     "comments": ""
 },
-  "editor.fontFamily": "Droid Sans Mono, Fira Code, Hack, Julia Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, Fira Code, Maple Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontFamily": "Maple Mono, Droid Sans Mono, Fira Code, Hack, Julia Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
   "workbench.tree.indent": 18,
   "material-icon-theme.hidesExplorerArrows": true,
   "workbench.tree.renderIndentGuides": "onHover",
