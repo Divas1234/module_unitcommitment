@@ -13,7 +13,8 @@ function main()
 	UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve, DataLoad, datacentra_Data = readxlssheet()
 
 	# Form input data for the model
-	config_param, units, lines, loads, psses, NB, NG, NL, ND, NT, NC, ND2, DataCentras = forminputdata(
+	config_param, units, lines, loads, psses, NB, NG, NL, ND, NT, NC,
+	ND2, DataCentras = forminputdata(
 		DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam, StrogeData, datacentra_Data)
 
 	# Generate wind scenarios
@@ -29,7 +30,8 @@ function main()
 
 	refcost, eachslope = linearizationfuelcurve(units, NG)
 	scuc_masterproblem, master_model_struct = bd_masterfunction(NT, NB, NG, ND, NC, ND2, NS, units, config_param, scenarios_prob)
-	scuc_subproblem, sub_model_struct = bd_subfunction(
+	scuc_subproblem,
+	sub_model_struct = bd_subfunction(
 		NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64, units::unit, winds::wind,
 		loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss, scenarios_prob::Float64, config_param::config)
 	# Make sure refcost and eachslope are defined before using them in the subproblem
@@ -38,5 +40,21 @@ function main()
 		scenarios_prob = 1.0 / NS
 	end
 
-	return scuc_masterproblem, scuc_subproblem, master_model_struct, sub_model_struct, config_param, units, lines, loads,  winds, psses, NB, NG, NL, ND, NS, NT, NC, ND2, DataCentras
+	# Define the subproblem structure for multi_cuts in benderdecomposition_module.jl
+	# If the multi-cut option is enabled, generate batch subproblems
+	if config_param.is_ConsiderMultiCUTs == 1
+		batch_scuc_subproblem_dic = OrderedDict{Int64, SCUC_Model}()
+		batch_scuc_subproblem_dic = (config_param.is_ConsiderMultiCUTs == 1) ?
+									get_batch_scuc_subproblems_for_scenario(
+			scuc_subproblem::Model, sub_model_struct, winds::wind, config_param::config) :
+									OrderedDict(1 => sub_model_struct)
+		# @info batch_scuc_subproblem_dic
+		@info "Generating batch subproblems for multi-cut scenarios"
+		@info "Batch subproblem dictionary created with $(length(batch_scuc_subproblem_dic)) entries, [batch_scuc_subproblem_dic] have been created"
+	else
+		@info "Single subproblem mode, no batch scuc_model generation in multicuts..."
+	end
+
+	return scuc_masterproblem, scuc_subproblem, master_model_struct, sub_model_struct, batch_scuc_subproblem_dic, config_param, units,
+	lines, loads, winds, psses, NB, NG, NL, ND, NS, NT, NC, ND2, DataCentras
 end

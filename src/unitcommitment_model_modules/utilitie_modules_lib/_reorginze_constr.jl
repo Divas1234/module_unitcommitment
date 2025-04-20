@@ -15,10 +15,10 @@ function reorginze_constraints_sets(all_constraints_dict)
 	#         @info tem[1]:: typeof(item[2])
 	# 	end
 	# end
-
-	all_constr_lessthan_sets = Dict{Any, T1}()
-	all_constr_greaterthan_sets = Dict{Any, T2}()
-	all_constr_equalto_sets = Dict{Any, T0}()
+	
+	all_constr_lessthan_sets = Dict{Symbol, T1}()
+	all_constr_greaterthan_sets = Dict{Symbol, T2}()
+	all_constr_equalto_sets = Dict{Symbol, T0}()
 
 	for (key, constr) in all_constraints_dict
 		constr_type_str = string(typeof(constr))

@@ -1,5 +1,5 @@
 function draw_powerbalance(bench_x₀, bench_p₀, bench_pᵨ, bench_pᵩ, bench_seq_sr⁺, bench_seq_sr⁻, bench_pss_charge_p⁺,
-	bench_pss_charge_p⁻, bench_su_cost, bench_sd_cost, bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, secnairos)
+		bench_pss_charge_p⁻, bench_su_cost, bench_sd_cost, bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, secnairos)
 	#! Plots power balance
 	selected_scenarios = secnairos
 	NS = winds.scenarios_nums
