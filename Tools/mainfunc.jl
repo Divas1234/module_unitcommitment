@@ -26,7 +26,7 @@ function main()
 	# Run the SUC-SCUC model
 	# Define scenario probability (assuming equal probability)
 	scenarios_prob = 1.0 / winds.scenarios_nums
-	@show NS = Int64(winds.scenarios_nums)
+	NS = Int64(winds.scenarios_nums)
 
 	refcost, eachslope = linearizationfuelcurve(units, NG)
 	scuc_masterproblem, master_model_struct = bd_masterfunction(NT, NB, NG, ND, NC, ND2, NS, units, config_param, scenarios_prob)
@@ -45,12 +45,11 @@ function main()
 	if config_param.is_ConsiderMultiCUTs == 1
 		batch_scuc_subproblem_dic = OrderedDict{Int64, SCUC_Model}()
 		batch_scuc_subproblem_dic = (config_param.is_ConsiderMultiCUTs == 1) ?
-									get_batch_scuc_subproblems_for_scenario(
-			scuc_subproblem::Model, sub_model_struct, winds::wind, config_param::config) :
+									get_batch_scuc_subproblems_for_scenario(scuc_subproblem, sub_model_struct, winds, config_param, NS) :
 									OrderedDict(1 => sub_model_struct)
 		# @info batch_scuc_subproblem_dic
 		@info "Generating batch subproblems for multi-cut scenarios"
-		@info "Batch subproblem dictionary created with $(length(batch_scuc_subproblem_dic)) entries, [batch_scuc_subproblem_dic] have been created"
+		@info "Batch subproblem dictionary created with $(length(batch_scuc_subproblem_dic)) entries, [batch_scuc_subproblem_dic] have been created..."
 	else
 		@info "Single subproblem mode, no batch scuc_model generation in multicuts..."
 	end
