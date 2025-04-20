@@ -17,7 +17,8 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 - `sub_re_constr_sets`: The reconstruction sets for the subproblem.
 - `batch_scuc_subproblem_dic::OrderedDict`: The dictionary of batch subproblems for the scenario.
 """
-function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::OrderedDict, master_re_constr_sets::Any, sub_re_constr_sets::Any, winds::wind, config_param::config)
+function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::OrderedDict,
+		master_re_constr_sets::Any, sub_re_constr_sets::Any, winds::wind, config_param::config)
 
 	# Constants and parameters
 	MAXIMUM_ITERATIONS = 10000 # Maximum number of iterations for Bender's decomposition
@@ -73,7 +74,8 @@ function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::Orde
 
 		# Check for convergence
 		if all_subproblems_feasibility_flag &&
-			check_Bender_convergence(best_upper_bound, best_lower_bound, current_upper_bound, iteration, ABSOLUTE_OPTIMIZATION_GAP, NUMERICAL_TOLERANCE) == 1
+		   check_Bender_convergence(
+			best_upper_bound, best_lower_bound, current_upper_bound, iteration, ABSOLUTE_OPTIMIZATION_GAP, NUMERICAL_TOLERANCE) == 1
 			break
 		end
 
@@ -85,7 +87,8 @@ function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::Orde
 	end
 end
 
-function get_upper_lower_bounds(scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
+function get_upper_lower_bounds(
+		scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
 	# flag = all(s -> s.is_feasible, ret_dic)
 	flag = all(ret.is_feasible for ret in values(ret_dic))
 
@@ -180,10 +183,7 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
 			dual_θ = dual_objective_value(scuc_subproblem),
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
-			ray_v = reduced_cost.(scuc_subproblem[:v])
-			# ray_x=scale_duals(farkas_dual[1:length(scuc_subproblem[:x])]),
-			# ray_u=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+1):(length(scuc_subproblem[:x])+length(scuc_subproblem[:u]))]),
-			# ray_v=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+length(scuc_subproblem[:u])+1):end])
+			ray_v = reduced_cost.(scuc_subproblem[:v])            # ray_x=scale_duals(farkas_dual[1:length(scuc_subproblem[:x])]),            # ray_u=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+1):(length(scuc_subproblem[:x])+length(scuc_subproblem[:u]))]),            # ray_v=scale_duals(farkas_dual[(length(scuc_subproblem[:x])+length(scuc_subproblem[:u])+1):end])
 		)
 	end
 end

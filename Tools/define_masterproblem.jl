@@ -1,7 +1,8 @@
 include(joinpath(pwd(), "src", "environment_config.jl"))
 include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentmodel.jl"))
 
-function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, units::unit, config_param::config, scenarios_prob::Float64)
+function bd_masterfunction(
+		NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, units::unit, config_param::config, scenarios_prob::Float64)
 	println("this is the master function of the bender decomposition process")
 	Δp_contingency = define_contingency_size(units, NG)
 	scuc_masterproblem = Model(Gurobi.Optimizer)
@@ -10,18 +11,26 @@ function bd_masterfunction(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64
 	# set_silent(scuc_masterproblem)
 	# --- Define Variables ---
 	# Define decision variables for the optimization model
-	define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT, NG, ND, NC, ND2, NS, NW, config_param)
+	scuc_masterproblem, x, u, v, su₀, sd₀, θ = define_masterproblem_decision_variables!(
+		scuc_masterproblem::Model, NT, NG, ND, NC, ND2, NS, NW, config_param)
+	pg₀ = sr⁺ = sr⁻ = Δpd = Δpw = κ⁺ = κ⁻ = pc⁺ = pc⁻ = qc = pss_sumchargeenergy = α = β = Matrix{VariableRef}(undef, 0, 0)
+	pgₖ = Array{VariableRef, 3}(undef, 0, 0, 0)
+	# NOTE - save the decision variables in a dictionary for easy access
+	master_vars = SCUCModel_decision_variables(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
 
 	# --- Set Objective ---
 	# Set the objective function to be minimized
-	set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
+	scuc_masterproblem, obj = set_masterproblem_objective_economic!(
+		scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
+	# NOTE - save the objective function in a dictionary for easy access
+	master_obj = SCUCModel_objective_function(obj)
 
 	# println("subject to.") # Indicate the start of constraint definitions
 
 	# M = 1e3
 	all_constr_sets = []
 	onoffinit = calculate_initial_unit_status(units, NG)
-	# @constraints(scuc_masterproblem, sec_stage, θ>=M)
+	
 	# --- Add Constraints ---
 	# Add the constraints to the optimization model
 	scuc_masterproblem, _units_minuptime_constr, _units_mindowntime_constr, _units_init_stateslogic_consist_constr, _units_states_consist_constr, _units_init_shutup_cost_constr, _units_init_shutdown_cost_costr, _units_shutup_cost_constr,
@@ -71,11 +80,12 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	# continuous variables
 	# @variable(scuc_masterproblem, pg₀[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, pgₖ[1:(NG * NS), 1:NT, 1:3]>=0)
-	@variable(scuc_masterproblem, su₀[1:NG, 1:NT] >= 0)
-	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT] >= 0)
+	@variable(scuc_masterproblem, su₀[1:NG, 1:NT]>=0)
+	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT]>=0)
 
-	@variable(scuc_masterproblem, θ >= 1e2)
+	@variable(scuc_masterproblem, θ>=1e2)
 
+	# @variable(scuc_masterproblem, pg[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, sr⁺[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, sr⁻[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, Δpd[1:(ND * NS), 1:NT]>=0)
@@ -112,7 +122,7 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	# end
 
 	# println("\t Variables defined.")
-	return scuc_masterproblem # Return model with variables
+	return scuc_masterproblem, x, u, v, su₀, sd₀, θ
 end
 
 function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
@@ -140,9 +150,11 @@ function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG
 	# @objective(scuc_masterproblem,
 	# 	Min,
 	# 	sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT) + pₛ * c₀ * sum(sum(sum(θ[((s - 1) * NG + 1):(s * NG), t] for t in 1:NT) for s in 1:NS)))
-	@objective(scuc_masterproblem,
+	obj = @objective(scuc_masterproblem,
 		Min,
 		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG)
-			for t in 1:NT) + c₀ * θ)
-	return println("\t MILP_type objective_function \t\t\t\t\t\t done")
+		for t in 1:NT)+c₀ * θ)
+
+	println("\t MILP_type objective_function \t\t\t\t\t\t done")
+	return scuc_masterproblem, obj
 end

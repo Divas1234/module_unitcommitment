@@ -20,135 +20,67 @@ struct SCUCModel_decision_variables
 	pss_sumchargeenergy::Matrix{VariableRef}
 	α::Matrix{VariableRef}
 	β::Matrix{VariableRef}
+	θ::Any #add for debug
 
-	function SCUCModel_decision_variables(
-		u::Matrix{VariableRef},
-		x::Matrix{VariableRef},
-		v::Matrix{VariableRef},
-		su₀::Matrix{VariableRef},
-		sd₀::Matrix{VariableRef},
-		pg₀::Matrix{VariableRef},
-		pgₖ::Array{VariableRef, 3},
-		sr⁺::Matrix{VariableRef},
-		sr⁻::Matrix{VariableRef},
-		Δpd::Matrix{VariableRef},
-		Δpw::Matrix{VariableRef},
-		κ⁺::Matrix{VariableRef},
-		κ⁻::Matrix{VariableRef},
-		pc⁺::Matrix{VariableRef},
-		pc⁻::Matrix{VariableRef},
-		qc::Matrix{VariableRef},
-		pss_sumchargeenergy::Matrix{VariableRef},
-		α::Matrix{VariableRef},
-		β::Matrix{VariableRef}
-	)
-		return SCUCModel_decision_variables(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β)
-	end
+	# function SCUCModel_decision_variables(
+	# 		u = Matrix{VariableRef}(undef, 0, 0),
+	# 		x = Matrix{VariableRef}(undef, 0, 0),
+	# 		v = Matrix{VariableRef}(undef, 0, 0),
+	# 		su₀ = Matrix{VariableRef}(undef, 0, 0),
+	# 		sd₀ = Matrix{VariableRef}(undef, 0, 0),
+	# 		pg₀ = Matrix{VariableRef}(undef, 0, 0),
+	# 		pgₖ = Array{VariableRef, 3}(undef, 0, 0, 0),
+	# 		sr⁺ = Matrix{VariableRef}(undef, 0, 0),
+	# 		sr⁻ = Matrix{VariableRef}(undef, 0, 0),
+	# 		Δpd = Matrix{VariableRef}(undef, 0, 0),
+	# 		Δpw = Matrix{VariableRef}(undef, 0, 0),
+	# 		κ⁺ = Matrix{VariableRef}(undef, 0, 0),
+	# 		κ⁻ = Matrix{VariableRef}(undef, 0, 0),
+	# 		pc⁺ = Matrix{VariableRef}(undef, 0, 0),
+	# 		pc⁻ = Matrix{VariableRef}(undef, 0, 0),
+	# 		qc = Matrix{VariableRef}(undef, 0, 0),
+	# 		pss_sumchargeenergy = Matrix{VariableRef}(undef, 0, 0),
+	# 		α = Matrix{VariableRef}(undef, 0, 0),
+	# 		β = Matrix{VariableRef}(undef, 0, 0)
+	# )
+	# 	# Constructor for SCUCModel_decision_variables
+	# 	new(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β)
+	# end
 end
 
 struct SCUCModel_constraints
-	units_minuptime_constr::Union{Missing, Vector{ConstraintRef}}
-	units_mindowntime_constr::Union{Missing, Vector{ConstraintRef}}
-	units_init_stateslogic_consist_constr::Union{Missing, Vector{ConstraintRef}}
-	units_states_consist_constr::Union{Missing, Vector{ConstraintRef}}
-	units_init_shutup_cost_constr::Union{Missing, Vector{ConstraintRef}}
-	units_init_shutdown_cost_costr::Union{Missing, Vector{ConstraintRef}}
-	units_shutup_cost_constr::Union{Missing, Vector{ConstraintRef}}
-	units_shutdown_cost_constr::Union{Missing, Vector{ConstraintRef}}
-	winds_curt_constr::Union{Missing, Vector{ConstraintRef}}
-	loads_curt_const::Union{Missing, Vector{ConstraintRef}}
-	units_minpower_constr::Union{Missing, Vector{ConstraintRef}}
-	units_maxpower_constr::Union{Missing, Vector{ConstraintRef}}
-	sys_upreserve_constr::Union{Missing, Vector{ConstraintRef}}
-	sys_down_reserve_constr::Union{Missing, Vector{ConstraintRef}}
-	units_upramp_constr::Union{Missing, Vector{ConstraintRef}}
-	units_downramp_constr::Union{Missing, Vector{ConstraintRef}}
-	units_pwlpower_sum_constr::Union{Missing, Vector{ConstraintRef}}
-	units_pwlblock_upbound_constr::Union{Missing, Vector{ConstraintRef}}
-	units_pwlblock_dwbound_constr::Union{Missing, Vector{ConstraintRef}}
-	balance_constr::Union{Missing, Vector{ConstraintRef}}
-	transmissionline_powerflow_upbound_constr::Union{Missing, Vector{ConstraintRef}}
-	transmissionline_powerflow_downbound_constr::Union{Missing, Vector{ConstraintRef}}
+	units_minuptime_constr::Vector{ConstraintRef}
+	units_mindowntime_constr::Vector{ConstraintRef}
+	units_init_stateslogic_consist_constr::Vector{ConstraintRef}
+	units_states_consist_constr::Vector{ConstraintRef}
+	units_init_shutup_cost_constr::Vector{ConstraintRef}
+	units_init_shutdown_cost_costr::Vector{ConstraintRef}
+	units_shutup_cost_constr::Vector{ConstraintRef}
+	units_shutdown_cost_constr::Vector{ConstraintRef}
+	winds_curt_constr::Vector{ConstraintRef}
+	loads_curt_const::Vector{ConstraintRef}
+	units_minpower_constr::Vector{ConstraintRef}
+	units_maxpower_constr::Vector{ConstraintRef}
+	sys_upreserve_constr::Vector{ConstraintRef}
+	sys_down_reserve_constr::Vector{ConstraintRef}
+	units_upramp_constr::Vector{ConstraintRef}
+	units_downramp_constr::Vector{ConstraintRef}
+	units_pwlpower_sum_constr::Vector{ConstraintRef}
+	units_pwlblock_upbound_constr::Vector{ConstraintRef}
+	units_pwlblock_dwbound_constr::Vector{ConstraintRef}
+	balance_constr::Vector{ConstraintRef}
+	transmissionline_powerflow_upbound_constr::Vector{ConstraintRef}
+	transmissionline_powerflow_downbound_constr::Vector{ConstraintRef}
+end
 
-	function SCUCModel_constraints(
-		units_minuptime_constr = missing,
-		units_mindowntime_constr = missing,
-		units_init_stateslogic_consist_constr = missing,
-		units_states_consist_constr = missing,
-		units_init_shutup_cost_constr = missing,
-		units_init_shutdown_cost_costr = missing,
-		units_shutup_cost_constr = missing,
-		units_shutdown_cost_constr = missing,
-		winds_curt_constr = missing,
-		loads_curt_const = missing,
-		units_minpower_constr = missing,
-		units_maxpower_constr = missing,
-		sys_upreserve_constr = missing,
-		sys_down_reserve_constr = missing,
-		units_upramp_constr = missing,
-		units_downramp_constr = missing,
-		units_pwlpower_sum_constr = missing,
-		units_pwlblock_upbound_constr = missing,
-		units_pwlblock_dwbound_constr = missing,
-		balance_constr = missing,
-		transmissionline_powerflow_upbound_constr = missing,
-		transmissionline_powerflow_downbound_constr = missing
-	)
-		units_minuptime_constr = units_minuptime_constr
-		units_mindowntime_constr = units_mindowntime_constr
-		units_init_stateslogic_consist_constr = units_init_stateslogic_consist_constr
-		units_states_consist_constr = units_states_consist_constr
-		units_init_shutup_cost_constr = units_init_shutup_cost_constr
-		units_init_shutdown_cost_costr = units_init_shutdown_cost_costr
-		units_shutup_cost_constr = units_shutup_cost_constr
-		units_shutdown_cost_constr = units_shutdown_cost_constr
-		winds_curt_constr = winds_curt_constr
-		loads_curt_const = loads_curt_const
-		units_minpower_constr = units_minpower_constr
-		units_maxpower_constr = units_maxpower_constr
-		sys_upreserve_constr = sys_upreserve_constr
-		sys_down_reserve_constr = sys_down_reserve_constr
-		units_upramp_constr = units_upramp_constr
-		units_downramp_constr = units_downramp_constr
-		units_pwlpower_sum_constr = units_pwlpower_sum_constr
-		units_pwlblock_upbound_constr = units_pwlblock_upbound_constr
-		units_pwlblock_dwbound_constr = units_pwlblock_dwbound_constr
-		balance_constr = balance_constr
-		transmissionline_powerflow_upbound_constr = transmissionline_powerflow_upbound_constr
-		transmissionline_powerflow_downbound_constr = transmissionline_powerflow_downbound_constr
-		return new(
-			units_minuptime_constr,
-			units_mindowntime_constr,
-			units_init_stateslogic_consist_constr,
-			units_states_consist_constr,
-			units_init_shutup_cost_constr,
-			units_init_shutdown_cost_costr,
-			units_shutup_cost_constr,
-			units_shutdown_cost_constr,
-			winds_curt_constr,
-			loads_curt_const,
-			units_minpower_constr,
-			units_maxpower_constr,
-			sys_upreserve_constr,
-			sys_down_reserve_constr,
-			units_upramp_constr,
-			units_downramp_constr,
-			units_pwlpower_sum_constr,
-			units_pwlblock_upbound_constr,
-			units_pwlblock_dwbound_constr,
-			balance_constr,
-			transmissionline_powerflow_upbound_constr,
-			transmissionline_powerflow_downbound_constr
-		)
-	end
+struct SCUCModel_reformat_constraints
+	_equal_to::Vector{ConstraintRef}
+	_greater_than::Vector{ConstraintRef}
+	_smaller_than::Vector{ConstraintRef}
 end
 
 struct SCUCModel_objective_function
 	objective_function::Union{Missing, AffExpr}
-
-	function SCUCModel_objective_function(objective_function = missing)
-		return new(objective_function)
-	end
 end
 
 struct SCUC_Model
@@ -156,8 +88,5 @@ struct SCUC_Model
 	decision_variables::SCUCModel_decision_variables
 	objective_function::SCUCModel_objective_function
 	constraints::SCUCModel_constraints
-
-	function SCUC_Model(decision_variables::SCUCModel_decision_variables, objective_function::SCUCModel_objective_function, constraints::SCUCModel_constraints, model = missing)
-		return new(model, decision_variables, objective_function, constraints)
-	end
+	reformated_constraints::SCUCModel_reformat_constraints
 end

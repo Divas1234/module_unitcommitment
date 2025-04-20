@@ -239,7 +239,7 @@
     "textMateRules": [],
     "comments": ""
 },
-  "editor.fontFamily": "Fira Code, Hack, Julia Mono, Droid Sans Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, Fira Code, Maple Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontFamily": "Droid Sans Mono, Fira Code, Hack, Julia Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, Fira Code, Maple Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
   "workbench.tree.indent": 18,
   "material-icon-theme.hidesExplorerArrows": true,
   "workbench.tree.renderIndentGuides": "onHover",
@@ -280,7 +280,7 @@
   "editor.mouseWheelZoom": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminalAllInOne.terminalTheme": "Atelier Cave",
-  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
+  "julia.executablePath": "/Applications/Julia-1.11.app/Contents/Resources/julia/bin/julia",
   "julia.execution.inlineResultsForCellEvaluation": true,
   "julia.execution.codeInREPL": true,
   "vim.autoSwitchInputMethod.enable": true,
@@ -308,5 +308,6 @@
     "julia": true,
     "python": true
 },
-"terminal.integrated.tabs.defaultColor": null
+"terminal.integrated.tabs.defaultColor": null,
+"window.autoDetectColorScheme": true
 }
