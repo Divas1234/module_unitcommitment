@@ -114,7 +114,7 @@ function bd_subfunction(
 	all_constraints_dict[:key_units_shutup_cost_constr] = vec(collect(Iterators.flatten(_units_shutup_cost_constr.data)))
 	all_constraints_dict[:key_units_shutdown_cost_constr] = vec(collect(Iterators.flatten(_units_shutdown_cost_constr.data)))
 	all_constraints_dict[:key_winds_curt_constr] = vec(collect(Iterators.flatten(_winds_curt_constr)))
-	all_constraints_dict[:key_loads_curt_const] = vec(collect(Iterators.flatten(_loads_curt_const)))
+	all_constraints_dict[:key_loads_curt_constr] = vec(collect(Iterators.flatten(_loads_curt_const)))
 	all_constraints_dict[:key_units_minpower_constr] = vec(collect(Iterators.flatten(_units_minpower_constr)))
 	all_constraints_dict[:key_units_maxpower_constr] = vec(collect(Iterators.flatten(_units_maxpower_constr)))
 	all_constraints_dict[:key_sys_upreserve_constr] = vec(_sys_upreserve_constr)
@@ -137,7 +137,7 @@ function bd_subfunction(
 		:key_units_init_stateslogic_consist_constr, :key_units_states_consist_constr,
 		:key_units_init_shutup_cost_constr, :key_units_init_shutdown_cost_constr,  # corrected typo here
 		:key_units_shutup_cost_constr, :key_units_shutdown_cost_constr,
-		:key_winds_curt_constr, :key_loads_curt_const,
+		:key_winds_curt_constr, :key_loads_curt_constr,
 		:key_units_minpower_constr, :key_units_maxpower_constr,
 		:key_sys_upreserve_constr, :key_sys_down_reserve_constr,
 		:key_units_upramp_constr, :key_units_downramp_constr,

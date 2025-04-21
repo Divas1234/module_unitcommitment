@@ -30,11 +30,12 @@ function main()
 	NS = Int64(winds.scenarios_nums)
 
 	refcost, eachslope = linearizationfuelcurve(units, NG)
-	scuc_masterproblem, master_model_struct = bd_masterfunction(NT, NB, NG, ND, NC, ND2, NS, units, config_param, scenarios_prob)
-	scuc_subproblem,
-	sub_model_struct = bd_subfunction(
-		NT::Int64, NB::Int64, NL::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, NW::Int64, units::unit, winds::wind,
-		loads::load, lines::transmissionline, DataCentras::data_centra, psses::pss, scenarios_prob::Float64, config_param::config)
+	scuc_masterproblem, master_model_struct = bd_masterfunction(
+		NT, NB, NG, ND, NC, ND2, NS, units, config_param, scenarios_prob
+	)
+	scuc_subproblem, sub_model_struct = bd_subfunction(
+		NT, NB, NL, NG, ND, NC, ND2, NS, NW, units, winds, loads, lines, DataCentras, psses, scenarios_prob, config_param
+	)
 	# Make sure refcost and eachslope are defined before using them in the subproblem
 	if !@isdefined(scenarios_prob)
 		println("Warning: scenarios_prob not defined, setting to default value")
@@ -46,8 +47,8 @@ function main()
 	if config_param.is_ConsiderMultiCUTs == 1
 		batch_scuc_subproblem_struct_dic = OrderedDict{Int64, SCUC_Model}()
 		batch_scuc_subproblem_struct_dic = (config_param.is_ConsiderMultiCUTs == 1) ?
-									get_batch_scuc_subproblems_for_scenario(scuc_subproblem, sub_model_struct, winds, config_param, NS) :
-									OrderedDict(1 => sub_model_struct)
+										   get_batch_scuc_subproblems_for_scenario(scuc_subproblem, sub_model_struct, winds, config_param, NS) :
+										   OrderedDict(1 => sub_model_struct)
 		# @info batch_scuc_subproblem_dic
 		@info "Generating batch subproblems for multi-cut scenarios"
 		@info "Batch subproblem dictionary created with $(length(batch_scuc_subproblem_struct_dic)) entries, [batch_scuc_subproblem_struct_dic] have been created..."
