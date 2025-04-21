@@ -2,7 +2,7 @@ include(joinpath(pwd(), "src", "environment_config.jl"))
 include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentmodel.jl"))
 
 function bd_masterfunction(
-		NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, units::unit, config_param::config, scenarios_prob::Float64)
+	NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, NS::Int64, units::unit, config_param::config, scenarios_prob::Float64)
 	println("this is the master function of the bender decomposition process")
 	Δp_contingency = define_contingency_size(units, NG)
 	scuc_masterproblem = Model(Gurobi.Optimizer)
@@ -69,7 +69,7 @@ function bd_masterfunction(
 	fields = [Symbol(string(k)[5:end]) for k in keys(all_constraints_dict) if startswith(string(k), "key_")]
 	master_cons = build_constraints(; (
 		f => all_constraints_dict[Symbol("key_", f)]
-	for f in fields
+		for f in fields
 	)...)
 
 	# NOTE - save the reformated constraints in a dictionary for easy access
@@ -111,10 +111,10 @@ function define_masterproblem_decision_variables!(scuc_masterproblem::Model, NT,
 	# continuous variables
 	# @variable(scuc_masterproblem, pg₀[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, pgₖ[1:(NG * NS), 1:NT, 1:3]>=0)
-	@variable(scuc_masterproblem, su₀[1:NG, 1:NT]>=0)
-	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT]>=0)
+	@variable(scuc_masterproblem, su₀[1:NG, 1:NT] >= 0)
+	@variable(scuc_masterproblem, sd₀[1:NG, 1:NT] >= 0)
 
-	@variable(scuc_masterproblem, θ>=1e2)
+	@variable(scuc_masterproblem, θ >= 1e2)
 
 	# @variable(scuc_masterproblem, pg[1:(NG * NS), 1:NT]>=0)
 	# @variable(scuc_masterproblem, sr⁺[1:(NG * NS), 1:NT]>=0)
@@ -184,7 +184,7 @@ function set_masterproblem_objective_economic!(scuc_masterproblem::Model, NT, NG
 	obj = @objective(scuc_masterproblem,
 		Min,
 		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG)
-		for t in 1:NT)+c₀ * θ)
+			for t in 1:NT) + c₀ * θ)
 
 	println("\t MILP_type objective_function \t\t\t\t\t\t done")
 	return scuc_masterproblem, obj

@@ -1,9 +1,9 @@
 function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, units::unit, loads::load,
-	winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, su_cost, sd_cost, pgₖ, pg₀, x₀,
-	seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost,
-	pss_charge_state⁺ = nothing, pss_charge_state⁻ = nothing,
-	pss_charge_p⁺ = nothing, pss_charge_p⁻ = nothing, pss_Qc = nothing,
-	dc_p_res = nothing, dc_f_res = nothing, dc_v²_res = nothing, dc_λ_res = nothing, dc_Δu1_res = nothing, dc_Δu2_res = nothing)
+		winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, su_cost, sd_cost, pgₖ, pg₀, x₀,
+		seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost,
+		pss_charge_state⁺ = nothing, pss_charge_state⁻ = nothing,
+		pss_charge_p⁺ = nothing, pss_charge_p⁻ = nothing, pss_Qc = nothing,
+		dc_p_res = nothing, dc_f_res = nothing, dc_v²_res = nothing, dc_λ_res = nothing, dc_Δu1_res = nothing, dc_Δu2_res = nothing)
 	c₀ = config_param.is_CoalPrice  # Base cost of coal
 	pₛ = scenarios_prob  # Probability of scenarios
 
@@ -14,13 +14,15 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 	ρ⁺ = c₀ * 2
 	ρ⁻ = c₀ * 2
 
-	prod_cost = pₛ * c₀ * (sum(sum(sum(sum(pgₖ[i + (s - 1) * NG, t, :] .* eachslope[:, i] for t in 1:NT)) for s in 1:NS) for i in 1:NG) + sum(sum(sum(x₀[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS))
-	cr⁺       = pₛ * c₀ * sum(sum(sum(ρ⁺ * seq_sr⁺[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT) for s in 1:NS)
-	cr⁻       = pₛ * c₀ * sum(sum(sum(ρ⁺ * seq_sr⁻[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT) for s in 1:NS)
+	prod_cost = pₛ * c₀ *
+				(sum(sum(sum(sum(pgₖ[i + (s - 1) * NG, t, :] .* eachslope[:, i] for t in 1:NT)) for s in 1:NS) for i in 1:NG) +
+				 sum(sum(sum(x₀[:, t] .* refcost[:, 1] for t in 1:NT)) for s in 1:NS))
+	cr⁺ = pₛ * c₀ * sum(sum(sum(ρ⁺ * seq_sr⁺[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT) for s in 1:NS)
+	cr⁻ = pₛ * c₀ * sum(sum(sum(ρ⁺ * seq_sr⁻[i + (s - 1) * NG, t] for i in 1:NG) for t in 1:NT) for s in 1:NS)
 	# seq_sr⁺   = pₛ * c₀ * sum(ρ⁺ * seq_sr⁺[i, :] for i in 1:NG)
 	# seq_sr⁻   = pₛ * c₀ * sum(ρ⁺ * seq_sr⁻[i, :] for i in 1:NG)
-	𝜟pd       = pₛ * sum(sum(sum(pᵨ[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS)
-	𝜟pw       = pₛ * sum(sum(sum(pᵩ[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
+	𝜟pd    = pₛ * sum(sum(sum(pᵨ[(1 + (s - 1) * ND):(s * ND), t]) for t in 1:NT) for s in 1:NS)
+	𝜟pw    = pₛ * sum(sum(sum(pᵩ[(1 + (s - 1) * NW):(s * NW), t]) for t in 1:NT) for s in 1:NS)
 	str       = zeros(1, 7)
 	str[1, 1] = sum(su_cost) * 1.0
 	str[1, 2] = sum(sd_cost) * 1.0

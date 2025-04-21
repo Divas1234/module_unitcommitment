@@ -4,6 +4,7 @@ include(joinpath(pwd(), "src", "renewableresource_modules", "stochasticsimulatio
 include(joinpath(pwd(), "src", "read_inputdata_modules", "readdatas.jl"));
 include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentmodel.jl"));
 
+include("define_SCUCmodel_structure.jl")
 include("define_masterproblem.jl")
 include("define_subproblem.jl")
 include("benderdecomposition_module.jl")

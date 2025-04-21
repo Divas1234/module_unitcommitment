@@ -2,16 +2,16 @@ using Printf
 using UnicodePlots
 
 function boundrycondition(NB::Int64,
-	NL::Int64,
-	NG::Int64,
-	NT::Int64,
-	ND::Int64,
-	units::unit,
-	loads::load,
-	lines::transmissionline,
-	winds::wind,
-	stroges::pss,
-	config_param::config)
+		NL::Int64,
+		NG::Int64,
+		NT::Int64,
+		ND::Int64,
+		units::unit,
+		loads::load,
+		lines::transmissionline,
+		winds::wind,
+		stroges::pss,
+		config_param::config)
 	# (Assuming this code is inside a function, e.g., showboundrycase)
 	# Consider defining Base.show methods for custom structs (units, loads, etc.)
 	# for better encapsulation and reusability of display logic.

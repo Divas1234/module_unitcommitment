@@ -81,8 +81,11 @@ function bd_framework(scuc_masterproblem::Model, batch_scuc_subproblem_dic::Orde
 
 		# Add appropriate Bender's cut based on subproblem feasibility
 		for (s, ret) in ret_dic
-			cut_function = ret.is_feasible ? add_optimitycut_constraints! : add_feasibilitycut_constraints!
-			cut_function(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
+			if ret.is_feasible == true
+				add_optimitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
+			else
+				add_feasibilitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
+			end
 		end
 	end
 end
@@ -145,13 +148,15 @@ Solves the subproblem with fixed values for the first-stage variables and return
 function batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic::OrderedDict, x, u, v, NS = 1)
 	ret_dic = OrderedDict{Int64, Any}()
 	for s in 1:NS
-		ret = solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic[s]::Model, x, u, v)
+		ret = solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic[s]::SCUC_Model, x, u, v)
 		ret_dic[s] = ret
 	end
 	return ret_dic
 end
 
-function solve_subproblem_with_feasibility_cut(scuc_subproblem::Model, x, u, v)
+function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, x, u, v)
+	scuc_subproblem = scuc_subproblem_dic.model
+
 	# Fix variables in subproblem
 	fix.(scuc_subproblem[:x], x; force = true)
 	fix.(scuc_subproblem[:u], u; force = true)
