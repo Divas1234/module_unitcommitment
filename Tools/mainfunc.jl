@@ -43,17 +43,17 @@ function main()
 	# Define the subproblem structure for multi_cuts in benderdecomposition_module.jl
 	# If the multi-cut option is enabled, generate batch subproblems
 	if config_param.is_ConsiderMultiCUTs == 1
-		batch_scuc_subproblem_dic = OrderedDict{Int64, SCUC_Model}()
-		batch_scuc_subproblem_dic = (config_param.is_ConsiderMultiCUTs == 1) ?
+		batch_scuc_subproblem_struct_dic = OrderedDict{Int64, SCUC_Model}()
+		batch_scuc_subproblem_struct_dic = (config_param.is_ConsiderMultiCUTs == 1) ?
 									get_batch_scuc_subproblems_for_scenario(scuc_subproblem, sub_model_struct, winds, config_param, NS) :
 									OrderedDict(1 => sub_model_struct)
 		# @info batch_scuc_subproblem_dic
 		@info "Generating batch subproblems for multi-cut scenarios"
-		@info "Batch subproblem dictionary created with $(length(batch_scuc_subproblem_dic)) entries, [batch_scuc_subproblem_dic] have been created..."
+		@info "Batch subproblem dictionary created with $(length(batch_scuc_subproblem_struct_dic)) entries, [batch_scuc_subproblem_struct_dic] have been created..."
 	else
 		@info "Single subproblem mode, no batch scuc_model generation in multicuts..."
 	end
 
-	return scuc_masterproblem, scuc_subproblem, master_model_struct, sub_model_struct, batch_scuc_subproblem_dic, config_param, units,
+	return scuc_masterproblem, scuc_subproblem, master_model_struct, sub_model_struct, batch_scuc_subproblem_struct_dic, config_param, units,
 	lines, loads, winds, psses, NB, NG, NL, ND, NS, NT, NC, ND2, DataCentras
 end
