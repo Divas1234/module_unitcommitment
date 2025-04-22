@@ -18,7 +18,7 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 - `batch_scuc_subproblem_dic::OrderedDict`: The dictionary of batch subproblems for the scenario.
 """
 function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_model_struct::SCUC_Model,
-		batch_scuc_subproblem_dic::OrderedDict{Int64, SCUC_Model}, winds::wind, config_param::config)
+	batch_scuc_subproblem_dic::OrderedDict{Int64, SCUC_Model}, winds::wind, config_param::config)
 
 	# Constants and parameters
 	MAXIMUM_ITERATIONS = 10000 # Maximum number of iterations for Bender's decomposition
@@ -76,7 +76,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 
 		# Check for convergence
 		if all_subproblems_feasibility_flag &&
-		   check_Bender_convergence(
+			check_Bender_convergence(
 			best_upper_bound, best_lower_bound, current_upper_bound, iteration, ABSOLUTE_OPTIMIZATION_GAP, NUMERICAL_TOLERANCE) == 1
 			break
 		end
@@ -94,7 +94,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 end
 
 function get_upper_lower_bounds(
-		scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
+	scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
 	# flag = all(s -> s.is_feasible, ret_dic)
 	flag = all(ret.is_feasible for ret in values(ret_dic))
 
