@@ -18,7 +18,7 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 - `batch_scuc_subproblem_dic::OrderedDict`: The dictionary of batch subproblems for the scenario.
 """
 function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_model_struct::SCUC_Model,
-	batch_scuc_subproblem_dic::OrderedDict{Int64, SCUC_Model}, winds::wind, config_param::config)
+		batch_scuc_subproblem_dic::OrderedDict{Int64, SCUC_Model}, winds::wind, config_param::config)
 
 	# Constants and parameters
 	MAXIMUM_ITERATIONS = 10000 # Maximum number of iterations for Bender's decomposition
@@ -56,11 +56,9 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		iter_value = (x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
 
 		# Solve subproblem with feasibility cut
-		ret_dic = if (config_param.is_ConsiderMultiCUTs == 1)
-			batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾, NS)
-		else
-			batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
-		end
+		ret_dic = (config_param.is_ConsiderMultiCUTs == 1) ?
+				  batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾, NS) :
+				  batch_solve_subproblem_with_feasibility_cut(batch_scuc_subproblem_dic, x⁽⁰⁾, u⁽⁰⁾, v⁽⁰⁾)
 
 		# Update bounds
 		batch_subproblem_nummber = length(ret_dic)
@@ -68,15 +66,15 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 			println("Error: The number of batch_subproblems does not match the expected number.")
 			return nothing
 		end
-		best_upper_bound, best_lower_bound,
-		current_upper_bound,
+
+		best_upper_bound, best_lower_bound, current_upper_bound,
 		all_subproblems_feasibility_flag = get_upper_lower_bounds(
 			scuc_masterproblem, ret_dic, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob
 		)
 
 		# Check for convergence
 		if all_subproblems_feasibility_flag &&
-			check_Bender_convergence(
+		   check_Bender_convergence(
 			best_upper_bound, best_lower_bound, current_upper_bound, iteration, ABSOLUTE_OPTIMIZATION_GAP, NUMERICAL_TOLERANCE) == 1
 			break
 		end
@@ -94,7 +92,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 end
 
 function get_upper_lower_bounds(
-	scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
+		scuc_masterproblem::Model, ret_dic::OrderedDict{Int64, Any}, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob::Float64)
 	# flag = all(s -> s.is_feasible, ret_dic)
 	flag = all(ret.is_feasible for ret in values(ret_dic))
 
@@ -181,6 +179,9 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
 			ray_v = reduced_cost.(scuc_subproblem[:v]),
+
+			# NOTE - strong convex duality
+
 			dual_smaller_than_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
 			dual_greater_than_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
 			dual_equal_to_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
@@ -196,9 +197,12 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 			ray_x = reduced_cost.(scuc_subproblem[:x]),
 			ray_u = reduced_cost.(scuc_subproblem[:u]),
 			ray_v = reduced_cost.(scuc_subproblem[:v]),
-			farkas_dual_smaller_than_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
-			farkas_dual_greater_than_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
-			farkas_dual_equal_to_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
+
+			# NOTE - farkas_dual process
+
+			dual_smaller_than_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
+			dual_greater_than_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
+			dual_equal_to_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
 		)
 	end
 end

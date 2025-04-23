@@ -27,27 +27,35 @@ Fields:
 - `β`: Auxiliary variables for linearization (purpose-specific)
 - `θ`: Flexible field for debugging or additional variables
 """
-mutable struct SCUCModel_decision_variables
-    u::Matrix{VariableRef}                # Commitment status (binary)
-    x::Matrix{VariableRef}                # Startup indicator
-    v::Matrix{VariableRef}                # Shutdown indicator
-    su₀::Matrix{VariableRef}              # Initial startup costs
-    sd₀::Matrix{VariableRef}              # Initial shutdown costs
-    pg₀::Matrix{VariableRef}              # Base power generation
-    pgₖ::Array{VariableRef,3}            # Piecewise linear power generation segments
-    sr⁺::Matrix{VariableRef}              # Upward spinning reserve
-    sr⁻::Matrix{VariableRef}              # Downward spinning reserve
-    Δpd::Matrix{VariableRef}              # Load curtailment
-    Δpw::Matrix{VariableRef}              # Wind curtailment
-    κ⁺::Matrix{VariableRef}               # Positive slack variables
-    κ⁻::Matrix{VariableRef}               # Negative slack variables
-    pc⁺::Matrix{VariableRef}              # Storage charging power
-    pc⁻::Matrix{VariableRef}              # Storage discharging power
-    qc::Matrix{VariableRef}               # Storage state of charge
-    pss_sumchargeenergy::Matrix{VariableRef} # Cumulative energy charged to storage
-    α::Matrix{VariableRef}                # Auxiliary variable for linearization
-    β::Matrix{VariableRef}                # Auxiliary variable for linearization
-    θ::Any                                # Flexible field for debugging or additional variables
+mutable struct SCUCModel_decision_variables{T <: VariableRef} # Decision variables for SCUC model
+    u::Matrix{T}                # Commitment status (binary) (generators × time periods)
+    x::Matrix{T}                # Startup indicator (generators × time periods)
+    v::Matrix{T}                # Shutdown indicator (generators × time periods)
+    su₀::Matrix{T}              # Initial startup costs
+    sd₀::Matrix{T}              # Initial shutdown costs
+    pg₀::Matrix{T}              # Base power generation
+    pgₖ::Array{T,3}            # Piecewise linear power generation segments
+    sr⁺::Matrix{T}              # Upward spinning reserve
+    sr⁻::Matrix{T}              # Downward spinning reserve
+    Δpd::Matrix{T}              # Load curtailment
+    Δpw::Matrix{T}              # Wind curtailment
+    κ⁺::Matrix{T}               # Positive slack variables
+    κ⁻::Matrix{T}               # Negative slack variables
+    pc⁺::Matrix{T}              # Storage charging power
+    pc⁻::Matrix{T}              # Storage discharging power
+    qc::Matrix{T}               # Storage state of charge
+    pss_sumchargeenergy::Matrix{T} # Cumulative energy charged to storage
+    α::Matrix{T}                # Auxiliary variable for linearization
+    β::Matrix{T}                # Auxiliary variable for linearization
+    θ::Any                                # Flexible field for debugging or additional variables. Consider replacing `Any` with a concrete type or a type parameter.
+
+    function SCUCModel_decision_variables(u::Matrix{T}, x::Matrix{T}, v::Matrix{T}, su₀::Matrix{T}, sd₀::Matrix{T}, pg₀::Matrix{T},
+        pgₖ::Array{T,3}, sr⁺::Matrix{T}, sr⁻::Matrix{T}, Δpd::Matrix{T}, Δpw::Matrix{T},
+        κ⁺::Matrix{T}, κ⁻::Matrix{T}, pc⁺::Matrix{T}, pc⁻::Matrix{T}, qc::Matrix{T},
+        pss_sumchargeenergy::Matrix{T}, α::Matrix{T}, β::Matrix{T}, θ::Any) where {T <: VariableRef}
+
+        new{T}(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
+    end
 end
 
 """
@@ -61,6 +69,11 @@ Initializes empty matrices/arrays for any fields not explicitly provided.
 
 # Returns
 - An initialized SCUCModel_decision_variables object
+
+# Example
+# ```julia
+# vars = build_decision_variables(u = rand(0:1, 5, 24))
+# ```
 """
 function build_decision_variables(; kwargs...)
     fields = fieldnames(SCUCModel_decision_variables)
@@ -80,9 +93,11 @@ function build_decision_variables(; kwargs...)
     # Override defaults with user-provided values
     for (k, v) in kwargs
         if haskey(defaults, k)
-            defaults[k] = v
-        else
-            error("Invalid field name: $k. Valid fields are: $(join(string.(fields), ", "))")
+            if haskey(defaults, k)
+                defaults[k] = v
+            else
+                error("Invalid field name: $k. Valid fields are: $(join(string.(fields), ", "))")
+            end
         end
     end
 
@@ -103,7 +118,7 @@ Structure containing all constraints for the SCUC model, organized by constraint
 Each field is a vector of JuMP ConstraintRef objects representing a specific type of constraint
 in the optimization model.
 """
-mutable struct SCUCModel_constraints
+mutable struct SCUCModel_constraints # Constraints for SCUC model
     units_minuptime_constr::Vector{ConstraintRef}                    # Minimum up time constraints
     units_mindowntime_constr::Vector{ConstraintRef}                  # Minimum down time constraints
     units_init_stateslogic_consist_constr::Vector{ConstraintRef}     # Initial state logic consistency

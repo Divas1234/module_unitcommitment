@@ -33,6 +33,7 @@ function subproblem_callback(cb_data)
     status = termination_status(sub)
 
     if status == MOI.OPTIMAL
+
         # Optimality cut
         π = dual.(sub[:demand_con])
         μ_min = dual.(sub[:gen_min])
@@ -48,7 +49,9 @@ function subproblem_callback(cb_data)
             sum(ρ_up[i, t] * (p[i, t] - p[i, t-1]) for i in 1:num_units, t in 2:num_periods) +
             sum(ρ_down[i, t] * (p[i, t-1] - p[i, t]) for i in 1:num_units, t in 2:num_periods))
         add_lazy_constraint(cb_data, η >= cut)
+
     else
+
         # Feasibility subproblem
         feas_sub = Model(Gurobi.Optimizer)
         set_optimizer_attribute(feas_sub, "OutputFlag", 0)
@@ -80,7 +83,9 @@ function subproblem_callback(cb_data)
         else
             error("Feasibility subproblem failed")
         end
+
     end
+    
 end
 
 # Master problem
