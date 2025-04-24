@@ -47,14 +47,20 @@ function bd_subfunction(
 	set_silent(scuc_subproblem)
 
 	# Define decision variables
-	scuc_subproblem, x, u, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy,
+	# scuc_subproblem, x, u, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy,
+	# α, β = define_subproblem_decision_variables!(
+	# 	scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param
+	# )
+	scuc_subproblem, x, u, v, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy,
 	α, β = define_subproblem_decision_variables!(
 		scuc_subproblem, NT, NG, ND, NC, ND2, NS, NW, config_param
 	)
 	θ = Matrix{VariableRef}(undef, 0, 0)
+
 	# NOTE - save the decision variables in a dictionary for easy access
 	# sub_vars = SCUCModel_decision_variables(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β,θ)
-	sub_vars = build_decision_variables(; u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
+	# sub_vars = build_decision_variables(; u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
+	sub_vars = build_decision_variables(; x, u, v, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
 
 	# Set the objective function
 	scuc_subproblem, obj = set_subproblem_objective_economic!(scuc_subproblem, NT, NG, ND, NW, NS, units, config_param, scenarios_prob)
@@ -73,11 +79,11 @@ function bd_subfunction(
 
 	NS_copy = (config_param.is_ConsiderMultiCUTs == 1) ? NS : Int64(1)
 
-	scuc_subproblem, _units_minuptime_constr, _units_mindowntime_constr, _units_init_stateslogic_consist_constr, _units_states_consist_constr,
-	_units_init_shutup_cost_constr, _units_init_shutdown_cost_constr,
-	_units_shutup_cost_constr, _units_shutdown_cost_constr = add_unit_operation_constraints!(
-		scuc_subproblem, NT, NG, units, onoffinit
-	)# Add unit operation constraints
+	# scuc_subproblem, _units_minuptime_constr, _units_mindowntime_constr, _units_init_stateslogic_consist_constr, _units_states_consist_constr,
+	# _units_init_shutup_cost_constr, _units_init_shutdown_cost_constr,
+	# _units_shutup_cost_constr, _units_shutdown_cost_constr = add_unit_operation_constraints!(
+	# 	scuc_subproblem, NT, NG, units, onoffinit
+	# )# Add unit operation constraints
 	scuc_subproblem, _winds_curt_constr, _loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS_copy, loads, winds)# Add curtailment constraints for wind and loads
 	scuc_subproblem, _units_minpower_constr, _units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add generator power constraints
 	scuc_subproblem, _sys_upreserve_constr,
@@ -105,14 +111,15 @@ function bd_subfunction(
 
 	all_constraints_dict = Dict{Symbol, Any}()
 
-	all_constraints_dict[:key_units_minuptime_constr] = vec(_units_minuptime_constr)
-	all_constraints_dict[:key_units_mindowntime_constr] = vec(_units_mindowntime_constr)
-	all_constraints_dict[:key_units_init_stateslogic_consist_constr] = vec(_units_init_stateslogic_consist_constr)
-	all_constraints_dict[:key_units_states_consist_constr] = vec(_units_states_consist_constr)
-	all_constraints_dict[:key_units_init_shutup_cost_constr] = vec(_units_init_shutup_cost_constr)
-	all_constraints_dict[:key_units_init_shutdown_cost_constr] = vec(_units_init_shutdown_cost_constr)  # corrected typo here
-	all_constraints_dict[:key_units_shutup_cost_constr] = vec(collect(Iterators.flatten(_units_shutup_cost_constr.data)))
-	all_constraints_dict[:key_units_shutdown_cost_constr] = vec(collect(Iterators.flatten(_units_shutdown_cost_constr.data)))
+	# all_constraints_dict[:key_units_minuptime_constr] = vec(_units_minuptime_constr)
+	# all_constraints_dict[:key_units_mindowntime_constr] = vec(_units_mindowntime_constr)
+	# all_constraints_dict[:key_units_init_stateslogic_consist_constr] = vec(_units_init_stateslogic_consist_constr)
+	# all_constraints_dict[:key_units_states_consist_constr] = vec(_units_states_consist_constr)
+	# all_constraints_dict[:key_units_init_shutup_cost_constr] = vec(_units_init_shutup_cost_constr)
+	# all_constraints_dict[:key_units_init_shutdown_cost_constr] = vec(_units_init_shutdown_cost_constr)  # corrected typo here
+	# all_constraints_dict[:key_units_shutup_cost_constr] = vec(collect(Iterators.flatten(_units_shutup_cost_constr.data)))
+	# all_constraints_dict[:key_units_shutdown_cost_constr] = vec(collect(Iterators.flatten(_units_shutdown_cost_constr.data)))
+
 	all_constraints_dict[:key_winds_curt_constr] = vec(collect(Iterators.flatten(_winds_curt_constr)))
 	all_constraints_dict[:key_loads_curt_constr] = vec(collect(Iterators.flatten(_loads_curt_const)))
 	all_constraints_dict[:key_units_minpower_constr] = vec(collect(Iterators.flatten(_units_minpower_constr)))
@@ -130,22 +137,28 @@ function bd_subfunction(
 	all_constraints_dict[:key_transmissionline_powerflow_downbound_constr] = vec(_transmissionline_powerflow_downbound_constr[1])
 
 	# NOTE - save the constraints in a dictionary for easy access
-	sub_cons = SCUCModel_constraints(
-		[vec(all_constraints_dict[key])
-		 for key in [
-		:key_units_minuptime_constr, :key_units_mindowntime_constr,
-		:key_units_init_stateslogic_consist_constr, :key_units_states_consist_constr,
-		:key_units_init_shutup_cost_constr, :key_units_init_shutdown_cost_constr,  # corrected typo here
-		:key_units_shutup_cost_constr, :key_units_shutdown_cost_constr,
-		:key_winds_curt_constr, :key_loads_curt_constr,
-		:key_units_minpower_constr, :key_units_maxpower_constr,
-		:key_sys_upreserve_constr, :key_sys_down_reserve_constr,
-		:key_units_upramp_constr, :key_units_downramp_constr,
-		:key_units_pwlpower_sum_constr, :key_units_pwlblock_upbound_constr,
-		:key_units_pwlblock_dwbound_constr, :key_balance_constr,
-		:key_transmissionline_powerflow_upbound_constr, :key_transmissionline_powerflow_downbound_constr
-	]]...
-	)
+	# sub_cons = SCUCModel_constraints(
+	# 	[vec(all_constraints_dict[key])
+	# 	 for key in [
+	# 	# :key_units_minuptime_constr, :key_units_mindowntime_constr,
+	# 	# :key_units_init_stateslogic_consist_constr, :key_units_states_consist_constr,
+	# 	# :key_units_init_shutup_cost_constr, :key_units_init_shutdown_cost_constr,  # corrected typo here
+	# 	# :key_units_shutup_cost_constr, :key_units_shutdown_cost_constr,
+	# 	:key_winds_curt_constr, :key_loads_curt_constr,
+	# 	:key_units_minpower_constr, :key_units_maxpower_constr,
+	# 	:key_sys_upreserve_constr, :key_sys_down_reserve_constr,
+	# 	:key_units_upramp_constr, :key_units_downramp_constr,
+	# 	:key_units_pwlpower_sum_constr, :key_units_pwlblock_upbound_constr,
+	# 	:key_units_pwlblock_dwbound_constr, :key_balance_constr,
+	# 	:key_transmissionline_powerflow_upbound_constr, :key_transmissionline_powerflow_downbound_constr
+	# ]]...
+	# )
+
+	fields = [Symbol(string(k)[5:end]) for k in keys(all_constraints_dict) if startswith(string(k), "key_")]
+	sub_cons = build_constraints(; (
+		f => all_constraints_dict[Symbol("key_", f)]
+	for f in fields
+	)...)
 
 	# NOTE - save the reformated constraints in a dictionary for easy access
 	all_constr_lessthan_sets, all_constr_greaterthan_sets, all_constr_equalto_sets = reorginze_constraints_sets(all_constraints_dict)
@@ -221,8 +234,8 @@ function define_subproblem_decision_variables!(
 	@variable(scuc_subproblem, x[1:NG, 1:NT])
 	@variable(scuc_subproblem, u[1:NG, 1:NT])
 	@variable(scuc_subproblem, v[1:NG, 1:NT])
-	@variable(scuc_subproblem, su₀[1:NG, 1:NT]>=0)
-	@variable(scuc_subproblem, sd₀[1:NG, 1:NT]>=0)
+	# @variable(scuc_subproblem, su₀[1:NG, 1:NT]>=0)
+	# @variable(scuc_subproblem, sd₀[1:NG, 1:NT]>=0)
 
 	# @variable(scuc_subproblem, θ[NG * NS, 1:NT]>=0)
 
@@ -277,7 +290,7 @@ function define_subproblem_decision_variables!(
 	# end
 
 	# println("\t Variables defined.")
-	return scuc_subproblem, x, u, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β
+	return scuc_subproblem, x, u, v, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β
 end
 
 """
@@ -333,8 +346,8 @@ function set_subproblem_objective_economic!(
 	ρ⁻ = RESERVE_COST_NEGATIVE
 
 	x = scuc_subproblem[:x]
-	su₀ = scuc_subproblem[:su₀]
-	sd₀ = scuc_subproblem[:sd₀]
+	# su₀ = scuc_subproblem[:su₀]
+	# sd₀ = scuc_subproblem[:sd₀]
 	pgₖ = scuc_subproblem[:pgₖ]
 	sr⁺ = scuc_subproblem[:sr⁺]
 	sr⁻ = scuc_subproblem[:sr⁻]
@@ -346,7 +359,7 @@ function set_subproblem_objective_economic!(
 
 	obj = @objective(scuc_subproblem,
 		Min,
-		sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT)+
+		# sum(sum(su₀[i, t] + sd₀[i, t] for i in 1:NG) for t in 1:NT)+
 		pₛ * c₀ *
 		(
 			sum(

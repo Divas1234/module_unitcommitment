@@ -1,7 +1,7 @@
 using JuMP
 using MathOptInterface
 
-function get_greater_than_constr_rhs(current_model, constr)
+function get_greater_than_constr_rhs(current_model::Model, constr)
 	rhs = Float64[]
 	for con in constr
 		idx = JuMP.index(con)
@@ -10,7 +10,7 @@ function get_greater_than_constr_rhs(current_model, constr)
 	return rhs
 end
 
-function get_smaller_than_constr_rhs(current_model, constr)
+function get_smaller_than_constr_rhs(current_model::Model, constr)
 	rhs = Float64[]
 	for con in constr
 		idx = JuMP.index(con)
@@ -19,12 +19,19 @@ function get_smaller_than_constr_rhs(current_model, constr)
 	return rhs
 end
 
-function get_equal_to_constr_rhs(current_model, constr)
+function get_equal_to_constr_rhs(current_model::Model, constr)
+	# rhs = Float64[]
+	# for (_, con) in constr
+	# 	idx = JuMP.index(con[1])
+	# 	push!(rhs, MOI.get(JuMP.backend(current_model), MOI.ConstraintSet(), idx).value)
+	# end
+
 	rhs = Float64[]
 	for con in constr
 		idx = JuMP.index(con)
 		push!(rhs, MOI.get(JuMP.backend(current_model), MOI.ConstraintSet(), idx).value)
 	end
+
 	return rhs
 end
 
@@ -39,59 +46,145 @@ end
 # 	return coeffs, length(coeffs)
 # end
 
-function get_x_coeff_vectors_from_constr(current_model, constr, NT, NG)
+function get_v_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
 	coeffs = zeros(NG * NT, 1)
+	# sort_order = 0
+	# default value for sort_order
+	# NOTE - if sort_order == 0, it means the cureent constraints does not constains x
 
-	for t in 1:NT
-		for g in 1:NG
-			target_var = current_model[:x][g, t]
-			idx = JuMP.index(constr[NG * (t - 1) + g])
-			func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-			res = get_coeff_from_constr(func, target_var)
-			println("this is:", res)
-			coeffs[NG * (t - 1) + g, 1]  = res
+	sort_order = -1
+	is_included_in_current_constr = true # check current variable is in the constraint or not
+
+	try
+		for t in 1:NT
+			if is_included_in_current_constr == false
+				break
+			end
+
+			for g in 1:NG
+				target_var = current_model[:v][g, t]
+				idx = JuMP.index(constr[NG * (t - 1) + g])
+				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+
+				im_idx = JuMP.index(constr[NT * (g - 1) + t])
+				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+
+				f = get_coeff_from_constr(func, target_var)
+				res = (!isnothing(f)) ? f : get_coeff_from_constr(im_func, target_var)
+
+				if !isnothing(f) || !isnothing(im_f)
+					res = (!isnothing(f)) ? f : im_f
+					sort_order = (!isnothing(f)) ? 0 : 1
+				else
+					is_included_in_current_constr = false
+				end
+
+				# sort_order = (!isnothing(f)) ? 0 : 1
+
+				# println("this is:", res)
+				if sort_order == 0
+					coeffs[NG * (t - 1) + g, 1] = res
+				else
+					coeffs[NT * (g - 1) + t, 1] = res
+				end
+			end
 		end
+	catch e
+		# println("\t v in not in current constraint\t", nam)
+		# @info "v coeffs = zeros, default"
 	end
-	return coeffs
+	return coeffs, sort_order
 end
 
-function get_u_coeff_vectors_from_constr(current_model, constr, NT, NG)
+function get_u_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
 	coeffs = zeros(NG * NT, 1)
+	# sort_order = 0
+	sort_order = -1
+	is_included_in_current_constr = true # check current variable is in the constraint or not
 
-	for t in 1:NT
-		for g in 1:NG
-			target_var = current_model[:u][g, t]
-			idx = JuMP.index(constr[NG * (t - 1) + g])
-			func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-			res = get_coeff_from_constr(func, target_var)
-			# println("this is:", res)
-			coeffs[NG * (t - 1) + g, 1]  = res
+	try
+		for t in 1:NT
+			if is_included_in_current_constr == false
+				break
+			end
+
+			for g in 1:NG
+				target_var = current_model[:u][g, t]
+				idx = JuMP.index(constr[NG * (t - 1) + g])
+				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+
+				im_idx = JuMP.index(constr[NT * (g - 1) + t])
+				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+
+				f = get_coeff_from_constr(func, target_var)
+				im_f = get_coeff_from_constr(im_func, target_var)
+
+				if !isnothing(f) || !isnothing(im_f)
+					res = (!isnothing(f)) ? f : im_f
+					sort_order = (!isnothing(f)) ? 0 : 1
+				else
+					is_included_in_current_constr = false
+				end
+
+				# println("this is:", res)
+				if sort_order == 0
+					coeffs[NG * (t - 1) + g, 1] = res
+				else
+					coeffs[NT * (g - 1) + t, 1] = res
+				end
+			end
 		end
+	catch e
+		# println("\t u in not in current constraint\t", nam)
+		# @info "coeffs = zeros, default"
 	end
-	return coeffs
+	return coeffs, sort_order
 end
 
-function get_x_coeff_vectors_from_constr(current_model, constr, NT, NG)
+function get_x_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
 	coeffs = zeros(NG * NT, 1)
+	sort_order = -1
+	sort_order = -1
+	is_included_in_current_constr = true # check current variable is in the constraint or not
 
-	for t in 1:NT
-		for g in 1:NG
-			println("t:", t, "g:", g)
-			target_var = current_model[:x][g, t]
-			idx = JuMP.index(constr[NG * (t - 1) + g])
-			func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+	try
+		for t in 1:NT
+			if is_included_in_current_constr == false
+				break
+			end
+			for g in 1:NG
+				# println("t:", t, "g:", g)
+				target_var = current_model[:x][g, t]
+				idx = JuMP.index(constr[NG * (t - 1) + g])
+				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
 
-			im_idx = JuMP.index(constr[NT * (g - 1) + t])
-			im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-			f = get_coeff_from_constr(func, target_var)
-			res = (!isnothing(f)) ? f : get_coeff_from_constr(im_func, target_var)
-			println("this is:", res)
-			coeffs[NG * (t - 1) + g, 1]  = res
+				im_idx = JuMP.index(constr[NT * (g - 1) + t])
+				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+
+				f = get_coeff_from_constr(func, target_var)
+				res = (!isnothing(f)) ? f : get_coeff_from_constr(im_func, target_var)
+
+				if !isnothing(f) || !isnothing(im_f)
+					res = (!isnothing(f)) ? f : im_f
+					sort_order = (!isnothing(f)) ? 0 : 1
+				else
+					is_included_in_current_constr = false
+				end
+
+				# println("this is:", res)
+				if sort_order == 0
+					coeffs[NG * (t - 1) + g, 1] = res
+				else
+					coeffs[NT * (g - 1) + t, 1] = res
+				end
+			end
 		end
+	catch e
+		# println("\t x in not in current constraint\t", nam)
+		# @info "x coeffs = zeros, default"
 	end
-	return coeffs
+	return coeffs, sort_order
 end
-
 
 function get_coeff_from_constr(func, target_var)
 	for term in func.terms
@@ -100,4 +193,5 @@ function get_coeff_from_constr(func, target_var)
 			return term.coefficient
 		end
 	end
+	return nothing
 end

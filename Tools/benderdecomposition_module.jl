@@ -1,7 +1,9 @@
 # Bender Decomposition Framework
 # This module provides a framework for solving stochastic optimization problems using Bender's decomposition.
-include("get_bender_cuts.jl")
+include("get_benders_multi_opti_feas_cuts.jl")
 include("define_SCUCmodel_structure.jl")
+include("get_RhsCoeffi_in_DIFFconstraints.jl")
+include("get_dual_subprob_constrs_coefficients,jl")
 
 using Printf
 
@@ -47,7 +49,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		assert_is_solved_and_feasible(scuc_masterproblem)
 
 		# Get lower bound from master problem
-		lower_bound = objective_value(scuc_masterproblem)
+		lower_bound = objective_value(scuc_masterproblem) # NOTE - lower bound from master problem
 
 		# Extract solution from master problem
 		x⁽⁰⁾ = value.(scuc_masterproblem[:x])
@@ -70,7 +72,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		best_upper_bound, best_lower_bound, current_upper_bound,
 		all_subproblems_feasibility_flag = get_upper_lower_bounds(
 			scuc_masterproblem, ret_dic, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob
-		)
+		) # NOTE - upper bound from subproblem
 
 		# Check for convergence
 		if all_subproblems_feasibility_flag &&
@@ -171,8 +173,17 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 	optimize!(scuc_subproblem)
 
 	# Check if subproblem is solved and feasible
-	if is_solved_and_feasible(scuc_subproblem; dual = true)
+	opti_termination_status = is_solved_and_feasible(scuc_subproblem; dual = true)
+
+	res_smaller_than = get_dual_constrs_coefficient(scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._smaller_than, opti_termination_status)
+	res_equal_to = get_dual_constrs_coefficient(scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._equal_to, opti_termination_status)
+	res_greater_than = get_dual_constrs_coefficient(scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._greater_than, opti_termination_status)
+
+	final_dual_subproblem_coefficient_results = merge(res_equal_to, res_smaller_than, res_greater_than)
+
+	if opti_termination_status == true
 		# Return solution information with scaled duals for numerical stability
+
 		return (
 			is_feasible = true,
 			θ = objective_value(scuc_subproblem),
@@ -181,7 +192,9 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 			ray_v = reduced_cost.(scuc_subproblem[:v]),
 
 			# NOTE - strong convex duality
+			dual_coeffs = final_dual_subproblem_coefficient_results,
 
+			# NOTE - additional dual info
 			dual_smaller_than_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
 			dual_greater_than_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
 			dual_equal_to_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
@@ -199,10 +212,15 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 			ray_v = reduced_cost.(scuc_subproblem[:v]),
 
 			# NOTE - farkas_dual process
+			dual_coeffs = final_dual_subproblem_coefficient_results,
 
-			dual_smaller_than_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
-			dual_greater_than_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
-			dual_equal_to_constr_dic = Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
+			# NOTE - additional dual info
+			dual_smaller_than_constr_dic =
+			Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
+			dual_greater_than_constr_dic =
+			Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
+			dual_equal_to_constr_dic =
+			Dict(k => shadow_price.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
 		)
 	end
 end
