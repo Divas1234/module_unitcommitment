@@ -67,7 +67,8 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 			return nothing
 		end
 
-		best_upper_bound, best_lower_bound, current_upper_bound,
+		best_upper_bound, best_lower_bound,
+		current_upper_bound,
 		all_subproblems_feasibility_flag = get_upper_lower_bounds(
 			scuc_masterproblem, ret_dic, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob
 		) # NOTE - upper bound from subproblem
@@ -173,9 +174,11 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 	# Check if subproblem is solved and feasible
 	opti_termination_status = is_solved_and_feasible(scuc_subproblem; dual = true)
 
-	res_smaller_than = get_dual_constrs_coefficient(scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._smaller_than, opti_termination_status)
+	res_smaller_than = get_dual_constrs_coefficient(
+		scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._smaller_than, opti_termination_status)
 	res_equal_to = get_dual_constrs_coefficient(scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._equal_to, opti_termination_status)
-	res_greater_than = get_dual_constrs_coefficient(scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._greater_than, opti_termination_status)
+	res_greater_than = get_dual_constrs_coefficient(
+		scuc_subproblem_dic, scuc_subproblem_dic.reformated_constraints._greater_than, opti_termination_status)
 
 	final_dual_subproblem_coefficient_results = merge(res_equal_to, res_smaller_than, res_greater_than)
 
