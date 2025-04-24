@@ -1,4 +1,5 @@
 function get_dual_constrs_coefficient(current_model::SCUC_Model, constrs, opti_termination_status)
+
 	dual_results = Dict{Symbol, dual_subprob_expr_coefficient}()
 
 	for (key, value) in constrs
