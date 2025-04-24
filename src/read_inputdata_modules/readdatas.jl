@@ -4,4 +4,4 @@ include("_showboundrycase.jl")
 
 export readxlssheet, forminputdata, boundrycondition
 
-println("inputdata was writeen and reformated for UC modeling...")
+println("\t\u2192 inputdata was written and reformatted for UC modeling.")

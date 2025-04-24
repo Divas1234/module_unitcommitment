@@ -18,4 +18,4 @@ export add_unit_operation_constraints!, add_generator_power_constraints!, add_ra
 	add_datacentra_constraints!, # From _constraint_datacentra.jl
 	add_curtailment_constraints!, add_reserve_constraints!, add_power_balance_constraints!, add_frequency_constraints! # From _constraint_systemwide.jl
 
-println("Constraint modules included and functions exported.")
+println("\t\u2192 constraint modules included and functions exported.")

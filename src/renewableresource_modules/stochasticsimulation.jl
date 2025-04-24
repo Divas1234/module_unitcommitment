@@ -24,4 +24,4 @@ end
 
 export genscenario
 
-println("renewable energy curves module loaded.")
+println("\t\u2192 the renewable energy curves module loaded.")

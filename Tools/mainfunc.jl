@@ -2,13 +2,11 @@
 include(joinpath(pwd(), "src", "environment_config.jl"));
 include(joinpath(pwd(), "src", "renewableresource_modules", "stochasticsimulation.jl"));
 include(joinpath(pwd(), "src", "read_inputdata_modules", "readdatas.jl"));
-include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentmodel.jl"));
+# include(joinpath(pwd(), "src", "unitcommitment_model_modules", "SUCuccommitmentmodel.jl"));
 
-include("define_SCUCmodel_structure.jl")
-include("define_masterproblem.jl")
-include("define_subproblem.jl")
+include("define_master_sub_problems/construct_rmp_sub_models.jl")
+include("construct_multicuts_lib/construct_multicuts.jl")
 include("benderdecomposition_module.jl")
-include("define_batch_subproblems.jl")
 
 function main()
 	UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve, DataLoad, datacentra_Data = readxlssheet()

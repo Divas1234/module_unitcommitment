@@ -29,4 +29,4 @@ function set_objective!(
 		scuc::Model, NT, NG, ND, NW, NS, units, config_param, scenarios_prob, refcost, eachslope)
 end
 
-println("objective functions exported.")
+println("\t\u2192 objective functions exported.")

@@ -1,7 +1,7 @@
 {
 	"files": [
 		{
-			"path": "tools/define_subproblem.jl",
+			"path": "tools/define_master_sub_problems/_define_subproblem.jl",
 			"bookmarks": [
 				{
 					"line": 160,

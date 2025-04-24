@@ -16,5 +16,5 @@ using Revise, JuMP, Gurobi, Test, DelimitedFiles, LaTeXStrings, Plots, JLD, Data
 gr()
 Random.seed!(1234)
 
-println("The [JULIA] environment_config has been loaded")
+println("\t\u2192 The [JULIA] environment_config has been loaded.")
 # println("\n\n\n")

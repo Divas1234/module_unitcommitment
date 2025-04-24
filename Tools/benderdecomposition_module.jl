@@ -1,9 +1,7 @@
 # Bender Decomposition Framework
 # This module provides a framework for solving stochastic optimization problems using Bender's decomposition.
-include("get_benders_multi_opti_feas_cuts.jl")
-include("define_SCUCmodel_structure.jl")
-include("get_RhsCoeffi_in_DIFFconstraints.jl")
-include("get_dual_subprob_constrs_coefficients,jl")
+include("define_master_sub_problems/construct_rmp_sub_models.jl")
+include("construct_multicuts_lib/construct_multicuts.jl")
 
 using Printf
 
