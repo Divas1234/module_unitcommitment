@@ -1,31 +1,5 @@
-using JuMP
-
-"""
-	get_dual_constrs_coefficients(
-		current_model::SCUC_Model,
-		constrs::Dict{Symbol, <:ConstraintRef},
-		opti_termination_status::Bool,
-		NT::Int, # Pass NT as argument
-		NG::Int  # Pass NG as argument
-	)::Dict{Symbol, dual_subprob_expr_coefficient}
-
-Calculates the coefficients for constructing dual feasibility or optimality cuts
-based on the constraints of a subproblem model.
-
-Args:
-	current_model: The SCUC_Model containing the solved JuMP model.
-	constrs: A dictionary mapping constraint names (Symbols) to their JuMP ConstraintRef objects.
-	opti_termination_status: Boolean indicating if the optimization terminated successfully (true)
-							 or if shadow prices should be used (false, e.g., infeasible/unbounded).
-	NT: Number of time periods (passed as argument).
-	NG: Number of generators (passed as argument).
-
-Returns:
-	A dictionary mapping constraint names (Symbols) to their corresponding
-	`dual_subprob_expr_coefficient` structs containing coefficients for the dual cut expression.
-"""
-
 function get_dual_constrs_coefficient(current_model::SCUC_Model, constrs, opti_termination_status)
+
 	dual_results = Dict{Symbol, dual_subprob_expr_coefficient}()
 
 	for (key, value) in constrs
@@ -46,8 +20,8 @@ function get_dual_constrs_coefficient(current_model::SCUC_Model, constrs, opti_t
 		v_coeff, v_sort_order = get_v_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
 
 		x_coeff = x_coeff[:, 1]
-		u_coeff = u_coeff[:, 1]
-		v_coeff = v_coeff[:, 1]
+        u_coeff = u_coeff[:, 1]
+        v_coeff = v_coeff[:, 1]
 
 		#check order is valid
 		# @show x_sort_order, u_sort_order, v_sort_order
