@@ -280,7 +280,7 @@
   "editor.mouseWheelZoom": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminalAllInOne.terminalTheme": "Atelier Cave",
-  "julia.executablePath": "/Applications/Julia-1.11.app/Contents/Resources/julia/bin/julia",
+  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
   "julia.execution.inlineResultsForCellEvaluation": true,
   "julia.execution.codeInREPL": true,
   "vim.autoSwitchInputMethod.enable": true,
@@ -326,5 +326,6 @@
 "github.copilot.chat.languageContext.inline.typescript.enabled": true,
 "github.copilot.chat.languageContext.typescript.enabled": true,
 "github.copilot.chat.completionContext.typescript.mode": "sidecar",
-"github.copilot.chat.search.keywordSuggestions": true
+"github.copilot.chat.search.keywordSuggestions": true,
+"editor.cursorSmoothCaretAnimation": "explicit"
 }

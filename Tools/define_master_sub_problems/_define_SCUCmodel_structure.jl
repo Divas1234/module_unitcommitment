@@ -127,7 +127,7 @@ mutable struct SCUCModel_constraints # Constraints for SCUC model
 	units_shutup_cost_constr::Vector{ConstraintRef}                  # Startup cost constraints
 	units_shutdown_cost_constr::Vector{ConstraintRef}                # Shutdown cost constraints
 	winds_curt_constr::Vector{ConstraintRef}                         # Wind curtailment constraints
-	loads_curt_constr::Vector{ConstraintRef}                          # Load curtailment constraints
+	loads_curt_constr::Vector{ConstraintRef}                         # Load curtailment constraints
 	units_minpower_constr::Vector{ConstraintRef}                     # Minimum power output constraints
 	units_maxpower_constr::Vector{ConstraintRef}                     # Maximum power output constraints
 	sys_upreserve_constr::Vector{ConstraintRef}                      # System upward reserve constraints

@@ -26,9 +26,45 @@ function add_feasibilitycut_constraints!(scuc_masterproblem::JuMP.Model, sub_mod
 	return scuc_masterproblem, add_feasibility_cut
 end
 
+function get_batch_cut_expressions(scuc_masterproblem::JuMP.Model, sub_model_struct::SCUC_Model, ret)
 
+	# each_dual_result = ret[1]
+	# TODO - 
+    summarysize_dual_express = []
+	for (key, coeff) in ret.dual_coeffs
+		# Add the dual constraint to the master problem
+		dual_expression = get_cut_expression(scuc_masterproblem::JuMP.Model, sub_model_struct::SCUC_Model, coeff)
+		summarysize_dual_express = @expression(scuc_masterproblem,
+			summarysize_dual_express + dual_expression)
+		return scuc_masterproblem, summarysize_dual_express
+	end
+end
 
+function get_cut_expression(scuc_masterproblem::JuMP.Model, sub_model_struct::SCUC_Model, coeff)
+	x_coefficient, u_coefficient, v_coefficient = coeff.x, coeff.u, coeff.v # coefficients for x, u, v variables
+	x_order, u_order, v_order = coeff.x_sort_order, coeff.u_sort_order, coeff.v_sort_order # sorted order for x, u, v variables
+	rhs = coeff.rhs # right-hand side value
+	dual_coefficient = coeff.dual_coeffVector # dual coefficient value
+	operator_precedence = coeff.operator_associatively # operator precedence for the expression: _equal_to to 1, _greater_than to -1, _less_than to 1
+	dual_express = @expression(scuc_masterproblem,
+		operator_precedence * sum(
+		(
+			(max(x_order, u_order, v_order) <= 0) ?
+			dual_coefficient[(t - 1) * NG + g, 1] .* (
+			((x_order < 0) ? 0 : x_coefficient[(t - 1) * NG + g, 1] .* scuc_masterproblem[:x][g, t]) +
+			((u_order < 0) ? 0 : u_coefficient[(t - 1) * NG + g, 1] .* scuc_masterproblem[:u][g, t]) +
+			((v_order < 0) ? 0 : v_coefficient[(t - 1) * NG + g, 1] .* scuc_masterproblem[:v][g, t])
+		)
+			:
+			dual_coefficient[(g - 1) * NT + g, 1] * (
+			((x_order < 0) ? 0 : x_coefficient[(g - 1) * NT + g, 1] .* scuc_masterproblem[:x][g, t]) +
+			((u_order < 0) ? 0 : u_coefficient[(g - 1) * NT + g, 1] .* scuc_masterproblem[:u][g, t]) +
+			((v_order < 0) ? 0 : v_coefficient[(g - 1) * NT + g, 1] .* scuc_masterproblem[:v][g, t])
+		)
+		) for g ∈ 1:NG, t ∈ 1:NT))
 
+	return dual_express
+end
 
 # function construct_benders_cut(scuc_masterproblem::JuMP.Model, units::unit, winds::wind, loads::load, lines::transmission, NG::Int64, NT::Int64, NW::Int64, ND::Int64, NL::Int64, config_param::config)
 
