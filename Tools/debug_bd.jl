@@ -53,12 +53,18 @@ for (s, ret) in ret_dic
 end
 
 ret = ret_dic[1]
+
+sub_model_struct.constraints.units_upramp_constr
+
+
 s = 1
 scuc_masterproblem, add_optimity_cut = add_optimitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
 
-ret.dual_coeffs
+@show coeff = ret.dual_coeffs[:key_units_upramp_constr]
+
 typeof(ret.dual_coeffs)
-@show coeff = ret.dual_coeffs[:key_units_downramp_constr]
+
+# @show coeff = ret.dual_coeffs[:key_units_downramp_constr]
 
 get_cut_expression(scuc_masterproblem::JuMP.Model, sub_model_struct::SCUC_Model, coeff)
 
@@ -67,6 +73,103 @@ x_order, u_order, v_order = coeff.x_sort_order, coeff.u_sort_order, coeff.v_sort
 rhs = coeff.rhs # right-hand side value
 dual_coefficient = coeff.dual_coeffVector # dual coefficient value
 operator_precedence = coeff.operator_associativity # operator precedence for the expression: _equal_to to 1, _greater_than to -1, _less_than to 1
+
+@show dual_express = @expression(scuc_masterproblem,
+	sum(sum(
+			operator_precedence[(t - 1) * NG + g, 1] * dual_coefficient[(t - 1) * NG + g, 1] * rhs[(t - 1) * NG + g, 1] for g in 1:NG
+		) for t in 1:NT))
+
+nam = 1
+current_model = sub_model_struct.model
+constr = sub_model_struct.constraints.units_upramp_constr
+constr[4]
+rms, x_order = get_x_coeff_vectors_from_constr(nam, current_model, _value, NT, NG)
+
+	coeffs = zeros(NG * NT, 1)
+	sort_order = -1
+	is_included_in_current_constr = true # check current variable is in the constraint or not
+
+t = 1
+g = 1
+
+constr[NG * (t - 1) + g]
+
+				# println("t:", t, "g:", g)
+				target_var = current_model[:x][g, t]
+     			idx = JuMP.index(constr[NG * (t - 1) + g])
+				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+
+
+				target_var = current_model[:x][g, t]
+				idx = JuMP.index(constr[NG * (t - 1) + g])
+				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+
+				im_idx = JuMP.index(constr[NT * (g - 1) + t])
+				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+
+@show				f = get_coeff_from_constr(func, target_var)
+				@show im_f = get_coeff_from_constr(im_func, target_var)
+                # res = (!isnothing(f)) ? f : im_f
+
+				if !isnothing(f) || !isnothing(im_f)
+					res = (!isnothing(f)) ? f : im_f
+					sort_order = (!isnothing(f)) ? 0 : 1
+				else
+					is_included_in_current_constr = false
+				end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# for wind power generation constraints
+@show dual_express = @expression(scuc_masterproblem,
+	sum(sum(
+			operator_precedence[(t - 1) * NW + w, 1] * dual_coefficient[(t - 1) * NW + w, 1] * rhs[(t - 1) * NW + w, 1] for w in 1:NW
+		) for t in 1:NT))
+
+# for load curtailment constraints
+@show dual_express = @expression(scuc_masterproblem,
+	sum(sum(
+			operator_precedence[(t - 1) * ND + d, 1] * dual_coefficient[(t - 1) * ND + d, 1] * rhs[(t - 1) * ND + d, 1] for d in 1:ND
+		) for t in 1:NT))
+
+
+max(x_order, u_order, v_order) < 0
+
+# for unit-related constraints
 @show dual_express = @expression(scuc_masterproblem,
 	sum(sum(
 			(
@@ -78,7 +181,7 @@ operator_precedence = coeff.operator_associativity # operator precedence for the
 				rhs[(t - 1) * NG + g, 1]
 			)
 				:
-				dual_coefficient[(g - 1) * NT + g, 1] * (
+				dual_coefficient[(g - 1) * NT + g, 1] .* (
 				((x_order < 0) ? 0 : operator_precedence[(g - 1) * NT + g, 1] .* x_coefficient[(g - 1) * NT + g, 1] .* scuc_masterproblem[:x][g, t]) +
 				((u_order < 0) ? 0 : operator_precedence[(g - 1) * NT + g, 1] .* u_coefficient[(g - 1) * NT + g, 1] .* scuc_masterproblem[:u][g, t]) +
 				((v_order < 0) ? 0 : operator_precedence[(g - 1) * NT + g, 1] .* v_coefficient[(g - 1) * NT + g, 1] .* scuc_masterproblem[:v][g, t]) +
