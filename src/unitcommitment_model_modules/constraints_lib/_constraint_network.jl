@@ -5,7 +5,7 @@ export add_transmission_constraints!
 # Helper function for transmission line constraints
 
 function add_transmission_constraints!(
-	scuc::Model, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2 = nothing, DataCentras = nothing)
+		scuc::Model, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2 = nothing, DataCentras = nothing)
 	if config_param.is_NetWorkCon == 1 && Gsdf !== nothing && NL > 0
 		transmissionline_powerflow_upbound_constr = []
 		transmissionline_powerflow_downbound_constr = []
@@ -43,11 +43,11 @@ function add_transmission_constraints!(
 						sum(subGsdf_winds[w] * (winds.scenarios_curve[s, t] * winds.p_max[w, 1] -
 												Δpw[(s - 1) * NW + w, t]) for w in 1:NW) -
 						sum(subGsdf_loads[d] * (loads.load_curve[d, t] - Δpd[(s - 1) * ND + d, t])
-							for d in 1:ND) + sum(
-							# Check if NC > 0, storage variables exist, and subGsdf_psses is valid before summing storage contribution
+						for d in 1:ND) + sum(
+						# Check if NC > 0, storage variables exist, and subGsdf_psses is valid before summing storage contribution
 							(NC > 0 && pc⁺ !== nothing && pc⁻ !== nothing && c <= length(subGsdf_psses) ?
 							 subGsdf_psses[c] * (pc⁻[(s - 1) * NC + c, t] - pc⁺[(s - 1) * NC + c, t]) : 0.0)
-							for c in 1:NC) <= lines.p_max[l, 1])
+						for c in 1:NC) <= lines.p_max[l, 1])
 				)
 				push!(
 					transmissionline_powerflow_downbound_constr,
@@ -57,11 +57,11 @@ function add_transmission_constraints!(
 						sum(subGsdf_winds[w] * (winds.scenarios_curve[s, t] * winds.p_max[w, 1] -
 												Δpw[(s - 1) * NW + w, t]) for w in 1:NW) -
 						sum(subGsdf_loads[d] * (loads.load_curve[d, t] - Δpd[(s - 1) * ND + d, t])
-							for d in 1:ND) + sum(
-							# Check if NC > 0, storage variables exist, and subGsdf_psses is valid before summing storage contribution
+						for d in 1:ND) + sum(
+						# Check if NC > 0, storage variables exist, and subGsdf_psses is valid before summing storage contribution
 							(NC > 0 && pc⁺ !== nothing && pc⁻ !== nothing && c <= length(subGsdf_psses) ?
 							 subGsdf_psses[c] * (pc⁻[(s - 1) * NC + c, t] - pc⁺[(s - 1) * NC + c, t]) : 0.0)
-							for c in 1:NC) >= lines.p_min[l, 1])
+						for c in 1:NC) >= lines.p_min[l, 1])
 				)
 				# append!(transmissionline_powerflow_upbound_constr, up_constr)
 				# append!(transmissionline_powerflow_downbound_constr, down_constr)
@@ -90,9 +90,9 @@ function add_transmission_constraints!(
 					sum(subGsdf_dc[c] * dc_p[i + (s - 1) * ND2, t] for c in 1:ND2) +
 					sum((NC > 0 && pc⁺ !== nothing && pc⁻ !== nothing && c <= length(subGsdf_psses) ?
 						 subGsdf_psses[c] * (pc⁻[(s - 1) * NC + c, t] - pc⁺[(s - 1) * NC + c, t]) : 0.0)
-						for c in 1:NC)
-						<=
-						lines.p_max[l, 1])
+					for c in 1:NC)
+					<=
+					lines.p_max[l, 1])
 				down_constr = @constraint(scuc,
 					[s = 1:NS, t = 1:NT],
 					sum(subGsdf_units[i] * pg₀[i + (s - 1) * NG, t] for i in 1:NG) +
@@ -101,9 +101,9 @@ function add_transmission_constraints!(
 					sum(subGsdf_dc[c] * dc_p[i + (s - 1) * ND2, t] for c in 1:ND2) +
 					sum((NC > 0 && pc⁺ !== nothing && pc⁻ !== nothing && c <= length(subGsdf_psses) ?
 						 subGsdf_psses[c] * (pc⁻[(s - 1) * NC + c, t] - pc⁺[(s - 1) * NC + c, t]) : 0.0)
-						for c in 1:NC)
-						>=
-						lines.p_min[l, 1])
+					for c in 1:NC)
+					>=
+					lines.p_min[l, 1])
 				append!(transmissionline_powerflow_upbound_constr, up_constr)
 				append!(transmissionline_powerflow_downbound_constr, down_constr)
 			end

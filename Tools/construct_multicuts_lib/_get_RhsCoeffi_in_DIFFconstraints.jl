@@ -47,49 +47,37 @@ end
 # end
 
 function get_v_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
-	coeffs = zeros(NG * NT, 1)
-	# sort_order = 0
-	# default value for sort_order
-	# NOTE - if sort_order == 0, it means the cureent constraints does not constains x
 
-	sort_order = -1
-	is_included_in_current_constr = true # check current variable is in the constraint or not
+	dec_symbol = "v"
 
 	try
-		for t in 1:NT
-			if is_included_in_current_constr == false
-				break
+		alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+		if !isnothing(alignment_cons)
+			for t in 2:NT, g in 1:NG
+
+				target_var = ((alignment_cons == 0) ? current_model[:v][g, t] : current_model[:v][g, t - 1])
+				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+				suit_term = res
 			end
 
-			for g in 1:NG
-				target_var = current_model[:v][g, t]
-				idx = JuMP.index(constr[NG * (t - 1) + g])
-				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-
-				im_idx = JuMP.index(constr[NT * (g - 1) + t])
-				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-
-				f = get_coeff_from_constr(func, target_var)
-				res = (!isnothing(f)) ? f : get_coeff_from_constr(im_func, target_var)
-
-				if !isnothing(f) || !isnothing(im_f)
-					res = (!isnothing(f)) ? f : im_f
-					sort_order = (!isnothing(f)) ? 0 : 1
-				else
-					is_included_in_current_constr = false
+			t = 1
+			if alignment_cons == 0
+				for g in 1:NG
+					target_var = current_model[:v][g, t]
+					res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+					suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+					suit_term = res
 				end
-
-				# sort_order = (!isnothing(f)) ? 0 : 1
-
-				# println("this is:", res)
-				if sort_order == 0
-					coeffs[NG * (t - 1) + g, 1] = res
-				else
-					coeffs[NT * (g - 1) + t, 1] = res
-				end
+			else
+				res = 0
+				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+				suit_term = res
 			end
 		end
 	catch e
+		coeffs = zeros(NG * NT, 1)
+		sort_order = nothing
 		# println("\t v in not in current constraint\t", nam)
 		# @info "v coeffs = zeros, default"
 	end
@@ -97,69 +85,36 @@ function get_v_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
 end
 
 function get_u_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
-	coeffs = zeros(NG * NT, 1)
-	# sort_order = 0
-	sort_order = -1
-	is_included_in_current_constr = true # check current variable is in the constraint or not
+	dec_symbol = "u"
 
 	try
-		for t in 2:NT
-			if is_included_in_current_constr == false
-				break
+		alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+		if !isnothing(alignment_cons)
+			for t in 2:NT, g in 1:NG
+
+				target_var = ((alignment_cons == 0) ? current_model[:u][g, t] : current_model[:u][g, t - 1])
+				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+				suit_term = res
 			end
 
-			for g in 1:NG
-				target_var = current_model[:u][g, t]
-				idx = JuMP.index(constr[NG * (t - 1) + g])
-				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-
-				im_idx = JuMP.index(constr[NT * (g - 1) + t])
-				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-
-				f = get_coeff_from_constr(func, target_var)
-				im_f = get_coeff_from_constr(im_func, target_var)
-
-				if !isnothing(f) || !isnothing(im_f)
-					res = (!isnothing(f)) ? f : im_f
-					sort_order = (!isnothing(f)) ? 0 : 1
-				else
-					is_included_in_current_constr = false
-				end
-
-				# println("this is:", res)
-				if sort_order == 0
-					coeffs[NG * (t - 1) + g, 1] = res
-				else
-					coeffs[NT * (g - 1) + t, 1] = res
-				end
-			end
-		end
-
-		# initial time constraints
-		if is_included_in_current_constr == true
 			t = 1
-			for g in 1:NG
-				target_var = current_model[:u][g, t]
-				idx = JuMP.index(constr[NG * (t - 1) + g])
-				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-
-				im_idx = JuMP.index(constr[NT * (g - 1) + t])
-				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-
-				f = get_coeff_from_constr(func, target_var)
-				im_f = get_coeff_from_constr(im_func, target_var)
-				res = (!isnothing(f)) ? f : im_f
-
-				# println("this is:", res)
-				if sort_order == 0
-                    coeffs[NG*(t-1)+g, 1] = !isnothing(res) ? res : 0
-				else
-                    coeffs[NT*(g-1)+t, 1] = !isnothing(res) ? res : 0
+			if alignment_cons == 0
+				for g in 1:NG
+					target_var = current_model[:u][g, t]
+					res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+					suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+					suit_term = res
 				end
+			else
+				res = 0
+				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+				suit_term = res
 			end
 		end
-
 	catch e
+		coeffs = zeros(NG * NT, 1)
+		sort_order = nothing
 		# println("\t u in not in current constraint\t", nam)
 		# @info "coeffs = zeros, default"
 	end
@@ -167,73 +122,112 @@ function get_u_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
 end
 
 function get_x_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
-	coeffs = zeros(NG * NT, 1)
-	sort_order = -1
-	is_included_in_current_constr = true # check current variable is in the constraint or not
+	dec_symbol = "x"
 
 	try
-		for t in 2:NT
-			if is_included_in_current_constr == false
-				break
+		alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+		if !isnothing(alignment_cons)
+			for t in 2:NT, g in 1:NG
+
+				target_var = ((alignment_cons == 0) ? current_model[:x][g, t] : current_model[:x][g, t - 1])
+				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+				suit_term = res
 			end
 
-			for g in 1:NG
-				# println("t:", t, "g:", g)
-				target_var = current_model[:x][g, t]
-				idx = JuMP.index(constr[NG * (t - 1) + g])
-				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-
-				im_idx = JuMP.index(constr[NT * (g - 1) + t])
-				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-
-				f = get_coeff_from_constr(func, target_var)
-				im_f = get_coeff_from_constr(im_func, target_var)
-				# res = (!isnothing(f)) ? f : im_f
-
-				if !isnothing(f) || !isnothing(im_f)
-					res = (!isnothing(f)) ? f : im_f
-					sort_order = (!isnothing(f)) ? 0 : 1
-				else
-					is_included_in_current_constr = false
-				end
-
-				# println("this is:", res)
-				if sort_order == 0
-					coeffs[NG * (t - 1) + g, 1] = res
-				else
-					coeffs[NT * (g - 1) + t, 1] = res
-				end
-			end
-		end
-
-		# initial time constraints
-		if is_included_in_current_constr == true
 			t = 1
-			for g in 1:NG
-				target_var = current_model[:x][g, t]
-				idx = JuMP.index(constr[NG * (t - 1) + g])
-				func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
-
-				im_idx = JuMP.index(constr[NT * (g - 1) + t])
-				im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-
-				f = get_coeff_from_constr(func, target_var)
-				im_f = get_coeff_from_constr(im_func, target_var)
-				res = (!isnothing(f)) ? f : im_f
-
-				# println("this is:", res)
-				if sort_order == 0
-                    coeffs[NG*(t-1)+g, 1] = !isnothing(res) ? res : 0
-				else
-                    coeffs[NT*(g-1)+t, 1] = !isnothing(res) ? res : 0
+			if alignment_cons == 0
+				for g in 1:NG
+					target_var = current_model[:x][g, t]
+					res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+					suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+					suit_term = res
 				end
+			else
+				res = 0
+				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+				suit_term = res
 			end
 		end
 	catch e
+		coeffs = zeros(NG * NT, 1)
+		sort_order = nothing
 		# println("\t x in not in current constraint\t", nam)
 		# @info "x coeffs = zeros, default"
 	end
 	return coeffs, sort_order
+end
+
+# TODO
+function check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+	g, t = 2, 2
+	if dec_symbol == "u"
+		target_var = current_model[:u][g, t]
+	elseif dec_symbol == "v"
+		target_var = current_model[:v][g, t]
+	elseif dec_symbol == "x"
+		target_var = current_model[:v][g, t]
+	end
+	_, sort_order_1, is_included_in_current_constr_1 = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, -2)
+
+	if dec_symbol == "u"
+		target_var = current_model[:u][g, t - 1]
+	elseif dec_symbol == "v"
+		target_var = current_model[:v][g, t - 1]
+	elseif dec_symbol == "x"
+		target_var = current_model[:v][g, t - 1]
+	end
+	_, sort_order_2, is_included_in_current_constr_2 = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, -2)
+
+	if is_included_in_current_constr_1 || is_included_in_current_constr_2
+		alignment_cons = (is_included_in_current_constr_1) ? 0 : 1 # check current variable decision including mode
+		# sort_order_1 = 0: (t - 1) *NG + g
+		# sort_order_2 = 1: (g - 1) *NT + g
+		sort_order = (is_included_in_current_constr_1) ? sort_order_1 : sort_order_2
+	else
+		alignment_cons = nothing
+		sort_order = nothing
+	end
+	return alignment_cons, sort_order
+end
+
+function get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, order = -2)
+	if order == -2
+		idx = JuMP.index(constr[NG * (t - 1) + g])
+		func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+		f = get_coeff_from_constr(func, target_var)
+
+		im_idx = JuMP.index(constr[NT * (g - 1) + t])
+		im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+		im_f = get_coeff_from_constr(im_func, target_var)
+
+		if !isnothing(f) || !isnothing(im_f)
+			res = (!isnothing(f)) ? f : im_f
+			sort_order = (!isnothing(f)) ? 0 : 1
+			is_included_in_current_constr = true
+		else
+			is_included_in_current_constr = false
+		end
+
+	elseif order == -1
+		res, sort_order, is_included_in_current_constr = nothing, nothing, false
+
+	elseif order == 0
+		idx = JuMP.index(constr[NG * (t - 1) + g])
+		func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+		res = get_coeff_from_constr(func, target_var)
+		sort_order = 0
+		is_included_in_current_constr = true
+
+	elseif order == 1
+		im_idx = JuMP.index(constr[NT * (g - 1) + t])
+		im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+		res = get_coeff_from_constr(im_func, target_var)
+		sort_order = 1
+		is_included_in_current_constr = true
+	end
+
+	return res, sort_order, is_included_in_current_constr
 end
 
 function get_coeff_from_constr(func, target_var)

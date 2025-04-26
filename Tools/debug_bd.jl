@@ -66,13 +66,79 @@ typeof(ret.dual_coeffs)
 
 # @show coeff = ret.dual_coeffs[:key_units_downramp_constr]
 
-get_cut_expression(scuc_masterproblem::JuMP.Model, sub_model_struct::SCUC_Model, coeff)
+# get_cut_expression(scuc_masterproblem::JuMP.Model, sub_model_struct::SCUC_Model, coeff)
 
 x_coefficient, u_coefficient, v_coefficient = coeff.x, coeff.u, coeff.v # coefficients for x, u, v variables
 x_order, u_order, v_order = coeff.x_sort_order, coeff.u_sort_order, coeff.v_sort_order # sorted order for x, u, v variables
 rhs = coeff.rhs # right-hand side value
 dual_coefficient = coeff.dual_coeffVector # dual coefficient value
 operator_precedence = coeff.operator_associativity # operator precedence for the expression: _equal_to to 1, _greater_than to -1, _less_than to 1
+
+g = 1
+t = 2
+current_model =sub_model_struct.model
+constr = sub_model_struct.constraints.units_upramp_constr
+constr[NG * (t - 1) + g]
+				# println("t:", t, "g:", g)
+target_var = current_model[:x][g, t]
+idx = JuMP.index(constr[NG * (t - 1) + g])
+func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
+
+im_idx = JuMP.index(constr[NT * (g - 1) + t])
+im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+
+@show f = get_coeff_from_constr(func, target_var)
+@show im_f = get_coeff_from_constr(im_func, target_var)
+# res = (!isnothing(f)) ? f : im_f
+
+if !isnothing(f) || !isnothing(im_f)
+	res = (!isnothing(f)) ? f : im_f
+	sort_order = (!isnothing(f)) ? 0 : 1
+else
+	is_included_in_current_constr = false
+end
+
+# println("this is:", res)
+if sort_order == 0
+	coeffs[NG * (t - 1) + g, 1] = res
+else
+	coeffs[NT * (g - 1) + t, 1] = res
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @show dual_express = @expression(scuc_masterproblem,
 	sum(sum(
@@ -153,6 +219,12 @@ constr[NG * (t - 1) + g]
 
 
 
+# for unit-related constraints
+"""
+	alignment type constraints
+	- key_winds_curt_constr # NW * NT
+	- key_loads_curt_constr # NW * NT
+"""
 
 # for wind power generation constraints
 @show dual_express = @expression(scuc_masterproblem,
@@ -169,7 +241,18 @@ constr[NG * (t - 1) + g]
 
 max(x_order, u_order, v_order) < 0
 
-# for unit-related constraints
+# for unit-related constraints with NG * NT
+"""
+	alignment type constraints
+	- key_sys_down_reserve_constr
+	- key_sys_upreserve_constr
+	- key_units_minpower_constr NG * NT
+	- key_units_maxpower_constr NG * NT
+	- key_units_pwlpower_sum_constr NG * NT * NZ
+	- key_balance_constr
+	- key_transmissionline_powerflow_upbound_constr
+	- key_transmissionline_powerflow_downbound_constr
+"""
 @show dual_express = @expression(scuc_masterproblem,
 	sum(sum(
 			(
@@ -188,6 +271,33 @@ max(x_order, u_order, v_order) < 0
 				rhs[(g - 1) * NT + g, 1]
 			)
 			) for g ∈ 1:NG) for t ∈ 1:NT));
+
+
+# for unit-related constraints with NG * NT * NZ
+"""
+	alignment type constraints
+	- key_units_pwlblock_upbound_constr NG * NT * NZ
+	- key_units_pwlblock_dwbound_constr NG * NT * NZ
+"""
+@show dual_express = @expression(scuc_masterproblem,
+	sum(sum(
+			operator_precedence[(t - 1) * ND + d, 1] * dual_coefficient[(t - 1) * ND + d, 1] * rhs[(t - 1) * ND + d, 1] for d in 1:ND
+		) for t in 1:NT))
+
+	# units_pwlblock_upbound_constr = @constraint(scuc,
+	# 	[s = 1:NS, t = 1:NT, i = 1:NG, k = 1:num_segments],
+	# 	pgₖ[i + (s - 1) * NG, t, k] <= eachsegment[i, 1] * x[i, t])
+	# units_pwlblock_dwbound_constr = @constraint(scuc, # Ensure segments are non-negative
+	# 	[s = 1:NS, t = 1:NT, i = 1:NG, k = 1:num_segments],
+	# 	pgₖ[i + (s - 1) * NG, t, k] >= 0)
+
+
+
+
+
+
+
+
 
 operator_precedence
 
