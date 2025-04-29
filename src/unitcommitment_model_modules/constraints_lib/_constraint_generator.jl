@@ -114,6 +114,7 @@ function add_ramp_constraints!(scuc::Model, NT, NG, NS, units, onoffinit)
 		ramp_up[:, 1] .* ((t == 1) ? onoffinit[:, 1] : x[:, t-1]) +
 		shut_up[:, 1] .* ((t == 1) ? ones(NG, 1) : u[:, t-1]) +
 		p_max[:, 1] .* (ones(NG, 1) - ((t == 1) ? onoffinit[:, 1] : x[:, t-1])))
+	
 	units_downramp_constr = @constraint(scuc,
 		[s = 1:NS, t = 1:NT],
 		((t == 1) ? units.p_0[:, 1] : pg₀[(1+(s-1)*NG):(s*NG), t-1]) -

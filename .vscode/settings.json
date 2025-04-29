@@ -51,6 +51,56 @@
             }
         ]
     },
+    "[GitHub Sharp]": {
+        "textMateRules": [
+            {
+                "settings": {
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "keyword",
+                "settings": {
+                    "foreground": "#d73a49",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment",
+                "settings": {
+                    "foreground": "#b4c3d2",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "string",
+                "settings": {
+                    "foreground": "#144989"
+                }
+            },
+            {
+                "scope": "type",
+                "settings": {
+                    "foreground": "#618dbf",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "function",
+                "settings": {
+                    "foreground": "#0a0ae5",
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "number",
+                "settings": {
+                    "foreground": "#c4570e",
+                    "fontStyle": "bold"
+                }
+            }
+        ]
+    },
     "[Dainty – City Lights]": {
         "textMateRules": [
             {
@@ -186,60 +236,10 @@
             }
         ]
     },
-    "[GitHub Sharp]": {
-        "textMateRules": [
-            {
-                "settings": {
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "keyword",
-                "settings": {
-                    "foreground": "#d73a49",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "comment",
-                "settings": {
-                    "foreground": "#b4c3d2",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "string",
-                "settings": {
-                    "foreground": "#144989"
-                }
-            },
-            {
-                "scope": "type",
-                "settings": {
-                    "foreground": "#618dbf",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "function",
-                "settings": {
-                    "foreground": "#0a0ae5",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "number",
-                "settings": {
-                    "foreground": "#c4570e",
-                    "fontStyle": "bold"
-                }
-            }
-        ]
-    },
     "textMateRules": [],
     "comments": ""
 },
-  "editor.fontFamily": "Maple Mono, Hack, Fira Code, Droid Sans Mono, Julia Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontFamily": "Hack, Maple Mono, Fira Code, Droid Sans Mono, Julia Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
   "workbench.tree.indent": 18,
   "material-icon-theme.hidesExplorerArrows": true,
   "workbench.tree.renderIndentGuides": "onHover",
@@ -261,7 +261,7 @@
   "guides.stack.style": "dotted",
   "guides.normal.width": 0.25,
   "guides.stack.width": 0.5,
-  "editor.fontSize": 14,
+  "editor.fontSize": 16,
   "todo-tree.highlights.useColourScheme": true,
   "vim.highlightedyank.enable": true,
   "editor.formatOnPaste": false,
@@ -280,7 +280,7 @@
   "editor.mouseWheelZoom": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminalAllInOne.terminalTheme": "Atelier Cave",
-  "julia.executablePath": "/Applications/Julia-1.11.app/Contents/Resources/julia/bin/julia",
+  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
   "julia.execution.inlineResultsForCellEvaluation": true,
   "julia.execution.codeInREPL": true,
   "vim.autoSwitchInputMethod.enable": true,

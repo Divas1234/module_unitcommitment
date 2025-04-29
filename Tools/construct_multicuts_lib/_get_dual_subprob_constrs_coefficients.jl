@@ -41,13 +41,9 @@ function get_dual_constrs_coefficient(current_model::SCUC_Model, constrs, opti_t
 			operator_ass = ones(length(rhs_constr)) .* -1.0
 		end
 
-		x_coeff, x_sort_order = get_x_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
-		u_coeff, u_sort_order = get_u_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
-		v_coeff, v_sort_order = get_v_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
-
-		x_coeff = x_coeff[:, 1]
-		u_coeff = u_coeff[:, 1]
-		v_coeff = v_coeff[:, 1]
+		x_coeff, x_sort_order, x_alignment_flag = get_x_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
+		u_coeff, u_sort_order, u_alignment_flag = get_u_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
+		v_coeff, v_sort_order, v_alignment_flag = get_v_coeff_vectors_from_constr(key, current_model.model, value, NT, NG)
 
 		#check order is valid
 		# @show x_sort_order, u_sort_order, v_sort_order
@@ -62,12 +58,15 @@ function get_dual_constrs_coefficient(current_model::SCUC_Model, constrs, opti_t
 
 		dual_results[key] = build_dual_cuts_expr_coefficient(
 			rhs = rhs_constr,
-			x = x_coeff,
-			u = u_coeff,
-			v = v_coeff,
-			x_sort_order = Int64(x_sort_order),
-			u_sort_order = Int64(u_sort_order),
-			v_sort_order = Int64(v_sort_order),
+			x = (!isnothing(x_coeff) ? x_coeff = x_coeff[:, 1] : nothing),
+			u = (!isnothing(u_coeff) ? u_coeff = u_coeff[:, 1] : nothing),
+			v = (!isnothing(v_coeff) ? v_coeff = v_coeff[:, 1] : nothing),
+			x_sort_order = (!isnothing(x_sort_order) ? Int64(x_sort_order) : nothing),
+			u_sort_order = (!isnothing(u_sort_order) ? Int64(u_sort_order) : nothing),
+			v_sort_order = (!isnothing(v_sort_order) ? Int64(v_sort_order) : nothing),
+			x_alignment_flag = (!isnothing(x_alignment_flag) ? x_alignment_flag : nothing),
+			u_alignment_flag = (!isnothing(u_alignment_flag) ? u_alignment_flag : nothing),
+			v_alignment_flag = (!isnothing(v_alignment_flag) ? v_alignment_flag : nothing),
 			dual_coeffVector = dual_coeff,
 			operator_associativity = operator_ass
 		)

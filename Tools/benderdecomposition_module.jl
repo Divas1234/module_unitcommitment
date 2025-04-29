@@ -84,10 +84,9 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		# Add appropriate Bender's cut based on subproblem feasibility
 		for (s, ret) in ret_dic
 			if ret.is_feasible == true
-				scuc_masterproblem, add_optimity_cut = add_optimitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
+				scuc_masterproblem, _ = add_optimitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
 			else
-				scuc_masterproblem,
-				add_feasibility_cut = add_feasibilitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
+				scuc_masterproblem, _ = add_feasibilitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
 			end
 		end
 	end
@@ -207,9 +206,12 @@ function solve_subproblem_with_feasibility_cut(scuc_subproblem_dic::SCUC_Model, 
 			dual_coeffs = final_dual_subproblem_coefficient_results,
 
 			# NOTE - additional dual info
-			dual_smaller_than_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
-			dual_greater_than_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
-			dual_equal_to_constr_dic = Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
+			dual_smaller_than_constr_dic =
+			Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._smaller_than),
+			dual_greater_than_constr_dic =
+			Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._greater_than),
+			dual_equal_to_constr_dic =
+			Dict(k => dual.(v) for (k, v) in scuc_subproblem_dic.reformated_constraints._equal_to)
 		)
 	else
 		# Get Farkas certificate (dual rays) for infeasibility

@@ -133,8 +133,8 @@ function bd_subfunction(
 	all_constraints_dict[:key_units_pwlblock_dwbound_constr] = vec(_units_pwlblock_dwbound_constr)
 	all_constraints_dict[:key_balance_constr] = vec((_sys_balance_constr[1]))
 	# all_constraints_dict[:balance_constr] = vec(convert_constraints_type_to_vector(sys_balance_constr))
-	all_constraints_dict[:key_transmissionline_powerflow_upbound_constr] = vec(_transmissionline_powerflow_upbound_constr[1])
-	all_constraints_dict[:key_transmissionline_powerflow_downbound_constr] = vec(_transmissionline_powerflow_downbound_constr[1])
+	all_constraints_dict[:key_transmissionline_powerflow_upbound_constr] = vec(vcat(_transmissionline_powerflow_upbound_constr...))
+	all_constraints_dict[:key_transmissionline_powerflow_downbound_constr] = vec(vcat(_transmissionline_powerflow_downbound_constr...))
 
 	# NOTE - save the constraints in a dictionary for easy access
 	# sub_cons = SCUCModel_constraints(

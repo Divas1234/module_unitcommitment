@@ -47,115 +47,222 @@ end
 # end
 
 function get_v_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
-
 	dec_symbol = "v"
 
-	try
-		alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
-		if !isnothing(alignment_cons)
-			for t in 2:NT, g in 1:NG
+	# try
+	# 	alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+	# 	if !isnothing(alignment_cons)
+	# 		for t in 2:NT, g in 1:NG
 
-				target_var = ((alignment_cons == 0) ? current_model[:v][g, t] : current_model[:v][g, t - 1])
+	# 			target_var = ((alignment_cons == 0) ? current_model[:v][g, t] : current_model[:v][g, t - 1])
+	# 			res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+	# 			suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+	# 			suit_term = res
+	# 		end
+
+	# 		t = 1
+	# 		if alignment_cons == 0
+	# 			for g in 1:NG
+	# 				target_var = current_model[:v][g, t]
+	# 				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+	# 				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+	# 				suit_term = res
+	# 			end
+	# 		else
+	# 			res = 0
+	# 			suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+	# 			suit_term = res
+	# 		end
+	# 	end
+	# catch e
+	# 	coeffs = zeros(NG * NT, 1)
+	# 	sort_order = nothing
+	# 	# println("\t v in not in current constraint\t", nam)
+	# 	# @info "v coeffs = zeros, default"
+	# end
+
+	alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+
+	if !isnothing(alignment_cons)
+		coeffs = zeros(NG * NT, 1)
+
+		for t in 2:NT, g in 1:NG
+
+			target_var = ((alignment_cons == 0) ? current_model[:v][g, t] : current_model[:v][g, t - 1])
+			res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+			idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+			coeffs[idx, 1] = res
+		end
+
+		t = 1
+		if alignment_cons == 0
+			for g in 1:NG
+				target_var = current_model[:v][g, t]
 				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
-				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-				suit_term = res
+				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+				coeffs[idx, 1] = res
 			end
-
-			t = 1
-			if alignment_cons == 0
-				for g in 1:NG
-					target_var = current_model[:v][g, t]
-					res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
-					suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-					suit_term = res
-				end
-			else
-				res = 0
-				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-				suit_term = res
+		else
+			res = 0
+			for g in 1:NG
+				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+				coeffs[idx, 1] = res
 			end
 		end
-	catch e
-		coeffs = zeros(NG * NT, 1)
+	else
+		coeffs = nothing
 		sort_order = nothing
-		# println("\t v in not in current constraint\t", nam)
-		# @info "v coeffs = zeros, default"
 	end
-	return coeffs, sort_order
+
+	return coeffs, sort_order, alignment_cons
 end
 
 function get_u_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
 	dec_symbol = "u"
 
-	try
-		alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
-		if !isnothing(alignment_cons)
-			for t in 2:NT, g in 1:NG
+	# try
+	# 	alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+	# 	if !isnothing(alignment_cons)
+	# 		for t in 2:NT, g in 1:NG
 
-				target_var = ((alignment_cons == 0) ? current_model[:u][g, t] : current_model[:u][g, t - 1])
+	# 			target_var = ((alignment_cons == 0) ? current_model[:u][g, t] : current_model[:u][g, t - 1])
+	# 			res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+	# 			suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+	# 			suit_term = res
+	# 		end
+
+	# 		t = 1
+	# 		if alignment_cons == 0
+	# 			for g in 1:NG
+	# 				target_var = current_model[:u][g, t]
+	# 				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+	# 				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+	# 				suit_term = res
+	# 			end
+	# 		else
+	# 			res = 0
+	# 			suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
+	# 			suit_term = res
+	# 		end
+	# 	end
+	# catch e
+	# 	coeffs = zeros(NG * NT, 1)
+	# 	sort_order = nothing
+	# 	# println("\t u in not in current constraint\t", nam)
+	# 	# @info "coeffs = zeros, default"
+	# end
+
+	alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+
+	if !isnothing(alignment_cons)
+		coeffs = zeros(NG * NT, 1)
+
+		for t in 2:NT, g in 1:NG
+
+			target_var = ((alignment_cons == 0) ? current_model[:u][g, t] : current_model[:u][g, t - 1])
+			res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+			idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+			coeffs[idx, 1] = res
+		end
+
+		t = 1
+		if alignment_cons == 0
+			for g in 1:NG
+				target_var = current_model[:u][g, t]
 				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
-				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-				suit_term = res
+				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+				coeffs[idx, 1] = res
 			end
-
-			t = 1
-			if alignment_cons == 0
-				for g in 1:NG
-					target_var = current_model[:u][g, t]
-					res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
-					suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-					suit_term = res
-				end
-			else
-				res = 0
-				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-				suit_term = res
+		else
+			res = 0
+			for g in 1:NG
+				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+				coeffs[idx, 1] = res
 			end
 		end
-	catch e
-		coeffs = zeros(NG * NT, 1)
+	else
+		coeffs = nothing
 		sort_order = nothing
-		# println("\t u in not in current constraint\t", nam)
-		# @info "coeffs = zeros, default"
 	end
-	return coeffs, sort_order
+
+	return coeffs, sort_order, alignment_cons
 end
 
 function get_x_coeff_vectors_from_constr(nam, current_model, constr, NT, NG)
+
+	# dec_symbol = "x"
+
+	# try
+	# 	coeffs = zeros(NG * NT, 1)
+
+	# 	alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
+
+	# 	if !isnothing(alignment_cons)
+	# 		for t in 2:NT, g in 1:NG
+
+	# 			target_var = ((alignment_cons == 0) ? current_model[:x][g, t] : current_model[:x][g, t - 1])
+	# 			res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+	# 			idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + g)
+	# 			coeffs[idx, 1] = res
+	# 		end
+
+	# 		t = 1
+	# 		if alignment_cons == 0
+	# 			for g in 1:NG
+	# 				target_var = current_model[:x][g, t]
+	# 				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+	# 				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + g)
+	# 				coeffs[idx, 1] = res
+	# 			end
+	# 		else
+	# 			res = 0
+	# 			idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + g)
+	# 			coeffs[idx, 1] = res
+	# 		end
+	# 	end
+	# catch e
+	# 	coeffs = zeros(NG * NT, 1)
+	# 	sort_order = nothing
+	# 	# println("\t x in not in current constraint\t", nam)
+	# 	# @info "x coeffs = zeros, default"
+	# end
+
 	dec_symbol = "x"
 
-	try
-		alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
-		if !isnothing(alignment_cons)
-			for t in 2:NT, g in 1:NG
+	alignment_cons, sort_order = check_var_alignment_with_constraints(current_model, constr, NG, NT, dec_symbol)
 
-				target_var = ((alignment_cons == 0) ? current_model[:x][g, t] : current_model[:x][g, t - 1])
+	if !isnothing(alignment_cons)
+		coeffs = zeros(NG * NT, 1)
+
+		for t in 2:NT, g in 1:NG
+
+			target_var = ((alignment_cons == 0) ? current_model[:x][g, t] : current_model[:x][g, t - 1])
+			res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
+			idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+			coeffs[idx, 1] = res
+		end
+
+		t = 1
+		if alignment_cons == 0
+			for g in 1:NG
+				target_var = current_model[:x][g, t]
 				res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
-				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-				suit_term = res
+				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+				coeffs[idx, 1] = res
 			end
-
-			t = 1
-			if alignment_cons == 0
-				for g in 1:NG
-					target_var = current_model[:x][g, t]
-					res, _, _ = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, sort_order)
-					suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-					suit_term = res
-				end
-			else
-				res = 0
-				suit_term = ((sort_order == 0) ? coeffs[NG * (t - 1) + g, 1] : coeffs[NT * (g - 1) + g, 1])
-				suit_term = res
+		else
+			res = 0
+			for g in 1:NG
+				idx = ((sort_order == 0) ? NG * (t - 1) + g : NT * (g - 1) + t)
+				coeffs[idx, 1] = res
 			end
 		end
-	catch e
-		coeffs = zeros(NG * NT, 1)
+	else
+		coeffs = nothing
 		sort_order = nothing
-		# println("\t x in not in current constraint\t", nam)
-		# @info "x coeffs = zeros, default"
 	end
-	return coeffs, sort_order
+
+	return coeffs, sort_order, alignment_cons
 end
 
 # TODO
@@ -166,7 +273,7 @@ function check_var_alignment_with_constraints(current_model, constr, NG, NT, dec
 	elseif dec_symbol == "v"
 		target_var = current_model[:v][g, t]
 	elseif dec_symbol == "x"
-		target_var = current_model[:v][g, t]
+		target_var = current_model[:x][g, t]
 	end
 	_, sort_order_1, is_included_in_current_constr_1 = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, -2)
 
@@ -175,14 +282,12 @@ function check_var_alignment_with_constraints(current_model, constr, NG, NT, dec
 	elseif dec_symbol == "v"
 		target_var = current_model[:v][g, t - 1]
 	elseif dec_symbol == "x"
-		target_var = current_model[:v][g, t - 1]
+		target_var = current_model[:x][g, t - 1]
 	end
 	_, sort_order_2, is_included_in_current_constr_2 = get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t, -2)
 
 	if is_included_in_current_constr_1 || is_included_in_current_constr_2
 		alignment_cons = (is_included_in_current_constr_1) ? 0 : 1 # check current variable decision including mode
-		# sort_order_1 = 0: (t - 1) *NG + g
-		# sort_order_2 = 1: (g - 1) *NT + g
 		sort_order = (is_included_in_current_constr_1) ? sort_order_1 : sort_order_2
 	else
 		alignment_cons = nothing
@@ -197,15 +302,22 @@ function get_index_in_constraint(target_var, current_model, constr, NG, NT, g, t
 		func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), idx)
 		f = get_coeff_from_constr(func, target_var)
 
-		im_idx = JuMP.index(constr[NT * (g - 1) + t])
-		im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
-		im_f = get_coeff_from_constr(im_func, target_var)
+		if NT * (g - 1) + t < length(constr)
+			im_idx = JuMP.index(constr[NT * (g - 1) + t])
+			im_func = MOI.get(JuMP.backend(current_model), MOI.ConstraintFunction(), im_idx)
+			im_f = get_coeff_from_constr(im_func, target_var)
+		else
+			im_f = nothing
+		end
 
 		if !isnothing(f) || !isnothing(im_f)
+			# NOTE -  1: active order, 1 : inactive order
 			res = (!isnothing(f)) ? f : im_f
 			sort_order = (!isnothing(f)) ? 0 : 1
 			is_included_in_current_constr = true
 		else
+			res = nothing
+			sort_order = nothing
 			is_included_in_current_constr = false
 		end
 

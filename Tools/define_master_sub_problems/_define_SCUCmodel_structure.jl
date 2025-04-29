@@ -249,53 +249,110 @@ mutable struct SCUC_Model
 	reformated_constraints::SCUCModel_reformat_constraints  # Constraints by mathematical form
 end
 
+# mutable struct dual_subprob_expr_coefficient
+# 	rhs::Vector{Float64}
+# 	x::Vector{Float64}
+# 	u::Vector{Float64}
+# 	v::Vector{Float64}
+# 	x_sort_order::Int64
+# 	u_sort_order::Int64
+# 	v_sort_order::Int64
+# 	dual_coeffVector::Vector{Float64}
+# 	operator_associativity::Vector{Float64}
+# end
+
+# function build_dual_cuts_expr_coefficient(; kwargs...)
+# 	fields = fieldnames(dual_subprob_expr_coefficient)
+
+# 	defaults = Dict{Symbol, Any}(
+# 		:rhs => Float64[],
+# 		:x => Float64[],
+# 		:u => Float64[],
+# 		:v => Float64[],
+# 		# FIXME - -1 means the current constraints does not contain x, u, v
+# 		# FIXME -  1 means the current constraints contains x, u, v with the order is valid
+# 		# FIXME -  0 means the current constraints contains x, u, v and the order is not valid
+# 		:x_sort_order => -1,
+# 		:u_sort_order => -1,
+# 		:v_sort_order => -1,
+# 		:dual_coeffVector => Float64[],
+# 		:operator_associativity => Float64[]
+# 	)
+
+# 	for (k, v) in kwargs
+# 		if haskey(defaults, k)
+# 			defaults[k] = v
+# 		else
+# 			error("Invalid field name: $k. Valid fields are: $(join(string.(fields), ", "))")
+# 		end
+# 	end
+
+# 	return dual_subprob_expr_coefficient(
+# 		defaults[:rhs],
+# 		defaults[:x],
+# 		defaults[:u],
+# 		defaults[:v],
+# 		defaults[:x_sort_order],
+# 		defaults[:u_sort_order],
+# 		defaults[:v_sort_order],
+# 		defaults[:dual_coeffVector],
+# 		defaults[:operator_associativity]
+# 	)
+# end
+
 mutable struct dual_subprob_expr_coefficient
-	rhs::Vector{Float64}
-	x::Vector{Float64}
-	u::Vector{Float64}
-	v::Vector{Float64}
-	x_sort_order::Int64
-	u_sort_order::Int64
-	v_sort_order::Int64
-	dual_coeffVector::Vector{Float64}
-	operator_associativity::Vector{Float64}
+    rhs::Vector{Float64}
+    x::Union{Vector{Float64}, Nothing}
+    u::Union{Vector{Float64}, Nothing}
+    v::Union{Vector{Float64}, Nothing}
+    x_sort_order::Union{Int64, Nothing}
+    u_sort_order::Union{Int64, Nothing}
+    v_sort_order::Union{Int64, Nothing}
+    x_alignment_flag::Union{Int64,Nothing}
+    u_alignment_flag::Union{Int64,Nothing}
+    v_alignment_flag::Union{Int64,Nothing}
+    dual_coeffVector::Vector{Float64}
+    operator_associativity::Vector{Float64}
 end
 
 function build_dual_cuts_expr_coefficient(; kwargs...)
-	fields = fieldnames(dual_subprob_expr_coefficient)
+    fields = fieldnames(dual_subprob_expr_coefficient)
 
-	defaults = Dict{Symbol, Any}(
-		:rhs => Float64[],
-		:x => Float64[],
-		:u => Float64[],
-		:v => Float64[],
-		# FIXME - -1 means the current constraints does not contain x, u, v
-		# FIXME -  1 means the current constraints contains x, u, v with the order is valid
-		# FIXME -  0 means the current constraints contains x, u, v and the order is not valid
-		:x_sort_order => -1,
-		:u_sort_order => -1,
-		:v_sort_order => -1,
-		:dual_coeffVector => Float64[],
-		:operator_associativity => Float64[]
-	)
+    defaults = Dict{Symbol, Any}(
+        :rhs => Float64[],
+        :x => nothing,
+        :u => nothing,
+        :v => nothing,
+        :x_sort_order => nothing,
+        :u_sort_order => nothing,
+        :v_sort_order => nothing,
+        :x_alignment_flag => nothing,
+        :u_alignment_flag => nothing,
+        :v_alignment_flag => nothing,
+        :dual_coeffVector => Float64[],
+        :operator_associativity => Float64[]
+    )
 
-	for (k, v) in kwargs
-		if haskey(defaults, k)
-			defaults[k] = v
-		else
-			error("Invalid field name: $k. Valid fields are: $(join(string.(fields), ", "))")
-		end
-	end
+    for (k, v) in kwargs
+        if haskey(defaults, k)
+            defaults[k] = v
+        else
+            error("Invalid field name: $k. Valid fields are: $(join(string.(fields), ", "))")
+        end
+    end
 
-	return dual_subprob_expr_coefficient(
-		defaults[:rhs],
-		defaults[:x],
-		defaults[:u],
-		defaults[:v],
-		defaults[:x_sort_order],
-		defaults[:u_sort_order],
-		defaults[:v_sort_order],
-		defaults[:dual_coeffVector],
-		defaults[:operator_associativity]
-	)
+    return dual_subprob_expr_coefficient(
+        defaults[:rhs],
+        defaults[:x],
+        defaults[:u],
+        defaults[:v],
+        defaults[:x_sort_order],
+        defaults[:u_sort_order],
+        defaults[:v_sort_order],
+        defaults[:x_alignment_flag],
+        defaults[:u_alignment_flag],
+        defaults[:v_alignment_flag],
+        defaults[:dual_coeffVector],
+        defaults[:operator_associativity]
+    )
 end
