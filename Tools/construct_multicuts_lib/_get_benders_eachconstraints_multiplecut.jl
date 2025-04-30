@@ -92,20 +92,20 @@ function get_benders_multicuts_expression(scuc_masterproblem::JuMP.Model, coeff,
 				sum(
 					(isnothing(x_order) ? 0 :
 					 (x_order == 0 ?
-					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * x_coefficient[(t - 1) * NG + g, 1] * (1) * scuc_masterproblem[:x][g, t]) :
-					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * x_coefficient[(g - 1) * NT + t, 1] * (1) * scuc_masterproblem[:x][g, t])
+					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * x_coefficient[(t - 1) * NG + g, 1] * scuc_masterproblem[:x][g, t]) :
+					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * x_coefficient[(g - 1) * NT + t, 1] * scuc_masterproblem[:x][g, t])
 					)
 					) +
 					(isnothing(u_order) ? 0 :
 					 (u_order == 0 ?
-					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * u_coefficient[(t - 1) * NG + g, 1] * (1) * scuc_masterproblem[:u][g, t]) :
-					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * u_coefficient[(g - 1) * NT + t, 1] * (1) * scuc_masterproblem[:u][g, t])
+					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * u_coefficient[(t - 1) * NG + g, 1] * scuc_masterproblem[:u][g, t]) :
+					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * u_coefficient[(g - 1) * NT + t, 1] * scuc_masterproblem[:u][g, t])
 					)
 					) +
 					(isnothing(v_order) ? 0 :
 					 (v_order == 0 ?
-					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * v_coefficient[(t - 1) * NG + g, 1] * (1) * scuc_masterproblem[:v][g, t]) :
-					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * v_coefficient[(g - 1) * NT + t, 1] * (1) * scuc_masterproblem[:v][g, t])
+					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * v_coefficient[(t - 1) * NG + g, 1] * scuc_masterproblem[:v][g, t]) :
+					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * v_coefficient[(g - 1) * NT + t, 1] * scuc_masterproblem[:v][g, t])
 					)
 					) +
 					(
@@ -132,9 +132,9 @@ function get_benders_multicuts_expression(scuc_masterproblem::JuMP.Model, coeff,
 							(operator_precedence[t, 1] * dual_coefficient[t, 1] * rhs[t, 1]) +
 							(x_order == 0 ?
 							 (dual_coefficient[(NG * NT) * (k - 1) + (t - 1) * NG + g, 1] * operator_precedence[(NG * NT) * (k - 1) + (t - 1) * NG + g, 1] *
-							  x_coefficient[(t - 1) * NG + g, 1] * (1) * scuc_masterproblem[:x][g, t]) :
+							  x_coefficient[(t - 1) * NG + g, 1] * scuc_masterproblem[:x][g, t]) :
 							 (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(NG * NT) * (k - 1) + (g - 1) * NT + t, 1] *
-							  x_coefficient[(g - 1) * NT + t, 1] * (1) * scuc_masterproblem[:x][g, t])
+							  x_coefficient[(g - 1) * NT + t, 1] * scuc_masterproblem[:x][g, t])
 							) +
 							(x_order == 0 ?
 							 (dual_coefficient[(NG * NT) * (k - 1) + (t - 1) * NG + g, 1] * operator_precedence[(NG * NT) * (k - 1) + (t - 1) * NG + g, 1] *
@@ -156,25 +156,25 @@ function get_benders_multicuts_expression(scuc_masterproblem::JuMP.Model, coeff,
 				sum(
 					(isnothing(x_order) ? 0 :
 					 (x_order == 0 ?
-					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * x_coefficient[(t - 1) * NG + g, 1] * (-1) *
+					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * x_coefficient[(t - 1) * NG + g, 1] * (1) *
 					   ((t == 1) ? 0 : scuc_masterproblem[:x][g, t - 1])) :
-					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * x_coefficient[(g - 1) * NT + t, 1] * (-1) *
+					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * x_coefficient[(g - 1) * NT + t, 1] * (1) *
 					   ((t == 1) ? 0 : scuc_masterproblem[:x][g, t - 1]))
 					)
 					) +
 					(isnothing(u_order) ? 0 :
 					 (u_order == 0 ?
-					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * u_coefficient[(t - 1) * NG + g, 1] * (-1) *
+					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * u_coefficient[(t - 1) * NG + g, 1] * (1) *
 					   ((t == 1) ? 0 : scuc_masterproblem[:x][g, t - 1])) :
-					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * u_coefficient[(g - 1) * NT + t, 1] * (-1) *
+					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * u_coefficient[(g - 1) * NT + t, 1] * (1) *
 					   ((t == 1) ? 0 : scuc_masterproblem[:x][g, t - 1]))
 					)
 					) +
 					(isnothing(v_order) ? 0 :
 					 (v_order == 0 ?
-					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * v_coefficient[(t - 1) * NG + g, 1] * (-1) *
+					  (dual_coefficient[(t - 1) * NG + g, 1] * operator_precedence[(t - 1) * NG + g, 1] * v_coefficient[(t - 1) * NG + g, 1] * (1) *
 					   ((t == 1) ? 0 : scuc_masterproblem[:x][g, t - 1])) :
-					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * v_coefficient[(g - 1) * NT + t, 1] * (-1) *
+					  (dual_coefficient[(g - 1) * NT + t, 1] * operator_precedence[(g - 1) * NT + t, 1] * v_coefficient[(g - 1) * NT + t, 1] * (1) *
 					   ((t == 1) ? 0 : scuc_masterproblem[:x][g, t - 1]))
 					)
 					) +
