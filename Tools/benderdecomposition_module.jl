@@ -88,6 +88,9 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 			else
 				scuc_masterproblem, _ = add_feasibilitycut_constraints!(scuc_masterproblem, batch_scuc_subproblem_dic[s], ret, iter_value)
 			end
+			is_feasible = ret.is_feasible
+			dual_coeffs = ret.dual_coeffs
+			scuc_masterproblem, _ = add_benders_multicuts_constraints!(scuc_masterproblem, sub_model_struct, is_feasible, dual_coeffs, NG, NT, NW, ND, NL)
 		end
 	end
 end

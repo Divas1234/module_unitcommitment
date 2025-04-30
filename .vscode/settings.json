@@ -261,7 +261,7 @@
   "guides.stack.style": "dotted",
   "guides.normal.width": 0.25,
   "guides.stack.width": 0.5,
-  "editor.fontSize": 14,
+  "editor.fontSize": 16,
   "todo-tree.highlights.useColourScheme": true,
   "vim.highlightedyank.enable": true,
   "editor.formatOnPaste": false,
@@ -280,7 +280,7 @@
   "editor.mouseWheelZoom": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminalAllInOne.terminalTheme": "Atelier Cave",
-  "julia.executablePath": "/Applications/Julia-1.11.app/Contents/Resources/julia/bin/julia",
+  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
   "julia.execution.inlineResultsForCellEvaluation": true,
   "julia.execution.codeInREPL": true,
   "vim.autoSwitchInputMethod.enable": true,
@@ -330,5 +330,6 @@
 "editor.cursorSmoothCaretAnimation": "explicit",
 "terminal.integrated.allowMnemonics": true,
 "editor.lineNumbers": "relative",
-"search.showLineNumbers": true
+"search.showLineNumbers": true,
+"editor.wordWrap": "on"
 }

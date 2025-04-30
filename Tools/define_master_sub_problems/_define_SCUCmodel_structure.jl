@@ -27,6 +27,36 @@ Fields:
 - `β`: Auxiliary variables for linearization (purpose-specific)
 - `θ`: Flexible field for debugging or additional variables
 """
+# mutable struct SCUCModel_decision_variables{T <: VariableRef} # Decision variables for SCUC model
+# 	x::Matrix{T}                # Startup indicator (generators × time periods)
+# 	u::Matrix{T}                # Commitment status (binary) (generators × time periods)
+# 	v::Matrix{T}                # Shutdown indicator (generators × time periods)
+# 	su₀::Matrix{T}              # Initial startup costs
+# 	sd₀::Matrix{T}              # Initial shutdown costs
+# 	pg₀::Matrix{T}              # Base power generation
+# 	pgₖ::Array{T, 3}            # Piecewise linear power generation segments
+# 	sr⁺::Matrix{T}              # Upward spinning reserve
+# 	sr⁻::Matrix{T}              # Downward spinning reserve
+# 	Δpd::Matrix{T}              # Load curtailment
+# 	Δpw::Matrix{T}              # Wind curtailment
+# 	κ⁺::Matrix{T}               # Positive slack variables
+# 	κ⁻::Matrix{T}               # Negative slack variables
+# 	pc⁺::Matrix{T}              # Storage charging power
+# 	pc⁻::Matrix{T}              # Storage discharging power
+# 	qc::Matrix{T}               # Storage state of charge
+# 	pss_sumchargeenergy::Matrix{T} # Cumulative energy charged to storage
+# 	α::Matrix{T}                # Auxiliary variable for linearization
+# 	β::Matrix{T}                # Auxiliary variable for linearization
+# 	θ::Any                                # Flexible field for debugging or additional variables. Consider replacing `Any` with a concrete type or a type parameter.
+
+# 	function SCUCModel_decision_variables(u::Matrix{T}, x::Matrix{T}, v::Matrix{T}, su₀::Matrix{T}, sd₀::Matrix{T}, pg₀::Matrix{T},
+# 			pgₖ::Array{T, 3}, sr⁺::Matrix{T}, sr⁻::Matrix{T}, Δpd::Matrix{T}, Δpw::Matrix{T},
+# 			κ⁺::Matrix{T}, κ⁻::Matrix{T}, pc⁺::Matrix{T}, pc⁻::Matrix{T}, qc::Matrix{T},
+# 			pss_sumchargeenergy::Matrix{T}, α::Matrix{T}, β::Matrix{T}, θ::Any) where {T <: VariableRef}
+# 		new{T}(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
+# 	end
+# end
+
 mutable struct SCUCModel_decision_variables{T <: VariableRef} # Decision variables for SCUC model
 	x::Matrix{T}                # Startup indicator (generators × time periods)
 	u::Matrix{T}                # Commitment status (binary) (generators × time periods)
@@ -56,7 +86,6 @@ mutable struct SCUCModel_decision_variables{T <: VariableRef} # Decision variabl
 		new{T}(u, x, v, su₀, sd₀, pg₀, pgₖ, sr⁺, sr⁻, Δpd, Δpw, κ⁺, κ⁻, pc⁺, pc⁻, qc, pss_sumchargeenergy, α, β, θ)
 	end
 end
-
 """
 	build_decision_variables(; kwargs...)
 

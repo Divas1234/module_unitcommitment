@@ -120,21 +120,21 @@ function bd_subfunction(
 	# all_constraints_dict[:key_units_shutup_cost_constr] = vec(collect(Iterators.flatten(_units_shutup_cost_constr.data)))
 	# all_constraints_dict[:key_units_shutdown_cost_constr] = vec(collect(Iterators.flatten(_units_shutdown_cost_constr.data)))
 
+	# DEBUG - Helper
 	all_constraints_dict[:key_winds_curt_constr] = vec(collect(Iterators.flatten(_winds_curt_constr)))
 	all_constraints_dict[:key_loads_curt_constr] = vec(collect(Iterators.flatten(_loads_curt_const)))
+	all_constraints_dict[:key_transmissionline_powerflow_upbound_constr] = vec(vcat(_transmissionline_powerflow_upbound_constr...))
+	all_constraints_dict[:key_transmissionline_powerflow_downbound_constr] = vec(vcat(_transmissionline_powerflow_downbound_constr...))
+	all_constraints_dict[:key_sys_down_reserve_constr] = vec(_sys_down_reserve_constr)
 	all_constraints_dict[:key_units_minpower_constr] = vec(collect(Iterators.flatten(_units_minpower_constr)))
 	all_constraints_dict[:key_units_maxpower_constr] = vec(collect(Iterators.flatten(_units_maxpower_constr)))
 	all_constraints_dict[:key_sys_upreserve_constr] = vec(_sys_upreserve_constr)
-	all_constraints_dict[:key_sys_down_reserve_constr] = vec(_sys_down_reserve_constr)
-	all_constraints_dict[:key_units_upramp_constr] = vec(collect(Iterators.flatten(_units_upramp_constr)))
 	all_constraints_dict[:key_units_downramp_constr] = vec(collect(Iterators.flatten(_units_downramp_constr)))
-	all_constraints_dict[:key_units_pwlpower_sum_constr] = vec(_units_pwlpower_sum_constr)
+	all_constraints_dict[:key_balance_constr] = vec((_sys_balance_constr[1]))
 	all_constraints_dict[:key_units_pwlblock_upbound_constr] = vec(_units_pwlblock_upbound_constr)
 	all_constraints_dict[:key_units_pwlblock_dwbound_constr] = vec(_units_pwlblock_dwbound_constr)
-	all_constraints_dict[:key_balance_constr] = vec((_sys_balance_constr[1]))
-	# all_constraints_dict[:balance_constr] = vec(convert_constraints_type_to_vector(sys_balance_constr))
-	all_constraints_dict[:key_transmissionline_powerflow_upbound_constr] = vec(vcat(_transmissionline_powerflow_upbound_constr...))
-	all_constraints_dict[:key_transmissionline_powerflow_downbound_constr] = vec(vcat(_transmissionline_powerflow_downbound_constr...))
+	all_constraints_dict[:key_units_pwlpower_sum_constr] = vec(_units_pwlpower_sum_constr)
+	all_constraints_dict[:key_units_upramp_constr] = vec(collect(Iterators.flatten(_units_upramp_constr)))
 
 	# NOTE - save the constraints in a dictionary for easy access
 	# sub_cons = SCUCModel_constraints(
