@@ -1,3 +1,4 @@
+ENV["JULIA_SHOW_ASCII"] = true
 
 include(joinpath(pwd(), "src", "environment_config.jl"));
 include(joinpath(pwd(), "src", "renewableresource_modules", "stochasticsimulation.jl"));

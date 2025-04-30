@@ -2,7 +2,6 @@
 # This module provides a framework for solving stochastic optimization problems using Bender's decomposition.
 include("define_master_sub_problems/construct_rmp_sub_models.jl")
 include("construct_multicuts_lib/construct_multicuts.jl")
-# include("construct_multicuts_lib/_get_dual_subprob_constrs_coefficients.jl")
 
 using Printf
 
@@ -18,7 +17,7 @@ Implements Bender's decomposition algorithm to solve a two-stage stochastic SCUC
 - `sub_re_constr_sets`: The reconstruction sets for the subproblem.
 - `batch_scuc_subproblem_dic::OrderedDict`: The dictionary of batch subproblems for the scenario.
 """
-function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_model_struct::SCUC_Model,
+function multiple_bender_decomposition_scuc(scuc_masterproblem::Model, scuc_subproblem::Model, master_model_struct::SCUC_Model,
 		batch_scuc_subproblem_dic::OrderedDict{Int64, SCUC_Model}, winds::wind, config_param::config)
 
 	# Constants and parameters
