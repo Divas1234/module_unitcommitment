@@ -128,9 +128,9 @@ function check_Bender_convergence(best_upper_bound, best_lower_bound, current_up
 		println("\n")
 		println("====================================================")
 		println("Convergence achieved - Optimal solution found")
-		println("Final upper bound: ", best_upper_bound)
-		println("Final lower bound: ", best_lower_bound)
-		println("Final gap: ", gap)
+		println("FINAL UPPER BOUND: ", best_upper_bound)
+		println("FINAL LOWER BOUND: ", best_lower_bound)
+		println("FINAL GAP:         ", gap)
 		println("====================================================")
 		flag = 1
 	end
