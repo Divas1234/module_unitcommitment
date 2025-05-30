@@ -35,7 +35,7 @@ function get_dual_constrs_coefficient(current_model::SCUC_Model, constrs, opti_t
 			operator_ass = ones(length(rhs_constr)) .* 1.0
 		elseif occursin("LessThan", constr_type_str)
 			rhs_constr = get_smaller_than_constr_rhs(current_model.model, value)
-            operator_ass = ones(length(rhs_constr)) .* -1.0
+			operator_ass = ones(length(rhs_constr)) .* -1.0
 		elseif occursin("GreaterThan", constr_type_str)
 			rhs_constr = get_greater_than_constr_rhs(current_model.model, value)
 			operator_ass = ones(length(rhs_constr)) .* 1.0

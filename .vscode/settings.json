@@ -1,335 +1,337 @@
 {
-  "editor.guides.bracketPairs": "active",
-  "BracketHighlighter.activeInDebugMode": false,
-  "prettier.bracketSameLine": true,
-  "txtsyntax.enableAutoImport": true,
-  "txtsyntax.enableHighlightLine": true,
-  "txtsyntax.showHighlightSidebar": true,
-  "editor.tokenColorCustomizations": {
-    "[GitHub Light Colorblind (Beta)]": {
-        "textMateRules": [
-            {
-                "scope": "keyword",
-                "settings": {
-                    "foreground": "#d73a49",
-                    "fontStyle": "italic"
+    "editor.guides.bracketPairs": "active",
+    "BracketHighlighter.activeInDebugMode": false,
+    "prettier.bracketSameLine": true,
+    "txtsyntax.enableAutoImport": true,
+    "txtsyntax.enableHighlightLine": true,
+    "txtsyntax.showHighlightSidebar": true,
+    "editor.tokenColorCustomizations": {
+        "[GitHub Light Colorblind (Beta)]": {
+            "textMateRules": [
+                {
+                    "scope": "keyword",
+                    "settings": {
+                        "foreground": "#d73a49",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "comment",
+                    "settings": {
+                        "foreground": "#b4c3d2",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "string",
+                    "settings": {
+                        "foreground": "#144989"
+                    }
+                },
+                {
+                    "scope": "type",
+                    "settings": {
+                        "foreground": "#618dbf",
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "function",
+                    "settings": {
+                        "foreground": "#0a0ae5",
+                        "fontStyle": "bold underline"
+                    }
+                },
+                {
+                    "scope": "number",
+                    "settings": {
+                        "foreground": "#c4570e",
+                        "fontStyle": "bold"
+                    }
                 }
-            },
-            {
-                "scope": "comment",
-                "settings": {
-                    "foreground": "#b4c3d2",
-                    "fontStyle": "italic"
+            ]
+        },
+        "[Dainty – City Lights]": {
+            "textMateRules": [
+                {
+                    "scope": "keyword",
+                    "settings": {
+                        "foreground": "#d73a49",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "comment",
+                    "settings": {
+                        "foreground": "#213c56",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "string",
+                    "settings": {
+                        "foreground": "#59708a"
+                    }
+                },
+                {
+                    "scope": "entity.name.type",
+                    "settings": {
+                        "foreground": "#618dbf",
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "entity.name.function",
+                    "settings": {
+                        "foreground": "#0a0ae5",
+                        "fontStyle": "bold underline"
+                    }
+                },
+                {
+                    "scope": "number",
+                    "settings": {
+                        "foreground": "#c4570e",
+                        "fontStyle": "bold"
+                    }
                 }
-            },
-            {
-                "scope": "string",
-                "settings": {
-                    "foreground": "#144989"
+            ]
+        },
+        "[GitHub Sharp]": {
+            "textMateRules": [
+                {
+                    "settings": {
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "keyword",
+                    "settings": {
+                        "foreground": "#d73a49",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "comment",
+                    "settings": {
+                        "foreground": "#b4c3d2",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "string",
+                    "settings": {
+                        "foreground": "#144989"
+                    }
+                },
+                {
+                    "scope": "type",
+                    "settings": {
+                        "foreground": "#618dbf",
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "function",
+                    "settings": {
+                        "foreground": "#0a0ae5",
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "number",
+                    "settings": {
+                        "foreground": "#c4570e",
+                        "fontStyle": "bold"
+                    }
                 }
-            },
-            {
-                "scope": "type",
-                "settings": {
-                    "foreground": "#618dbf",
-                    "fontStyle": "bold"
+            ]
+        },
+        "[Dainty – Ayu Mirage]": {
+            "textMateRules": [
+                {
+                    "scope": "keyword",
+                    "settings": {
+                        "foreground": "#d73a49",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "comment",
+                    "settings": {
+                        "foreground": "#213c56",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "string",
+                    "settings": {
+                        "foreground": "#59708a"
+                    }
+                },
+                {
+                    "scope": "entity.name.type",
+                    "settings": {
+                        "foreground": "#618dbf",
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "entity.name.function",
+                    "settings": {
+                        "foreground": "#7193b0",
+                        "fontStyle": "bold underline"
+                    }
+                },
+                {
+                    "scope": "number",
+                    "settings": {
+                        "foreground": "#c4570e",
+                        "fontStyle": "bold"
+                    }
                 }
-            },
-            {
-                "scope": "function",
-                "settings": {
-                    "foreground": "#0a0ae5",
-                    "fontStyle": "bold underline"
+            ]
+        },
+        "[Dainty – Dark+]": {
+            "textMateRules": [
+                {
+                    "scope": "keyword",
+                    "settings": {
+                        "foreground": "#d73a49",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "comment",
+                    "settings": {
+                        "foreground": "#213c56",
+                        "fontStyle": "italic"
+                    }
+                },
+                {
+                    "scope": "string",
+                    "settings": {
+                        "foreground": "#59708a"
+                    }
+                },
+                {
+                    "scope": "entity.name.type",
+                    "settings": {
+                        "foreground": "#618dbf",
+                        "fontStyle": "bold"
+                    }
+                },
+                {
+                    "scope": "entity.name.function",
+                    "settings": {
+                        "foreground": "#2c679b",
+                        "fontStyle": "bold underline"
+                    }
+                },
+                {
+                    "scope": "number",
+                    "settings": {
+                        "foreground": "#c4570e",
+                        "fontStyle": "bold"
+                    }
                 }
-            },
-            {
-                "scope": "number",
-                "settings": {
-                    "foreground": "#c4570e",
-                    "fontStyle": "bold"
-                }
-            }
-        ]
+            ]
+        },
+        "textMateRules": [],
+        "comments": ""
     },
-    "[GitHub Sharp]": {
-        "textMateRules": [
-            {
-                "settings": {
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "keyword",
-                "settings": {
-                    "foreground": "#d73a49",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "comment",
-                "settings": {
-                    "foreground": "#b4c3d2",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "string",
-                "settings": {
-                    "foreground": "#144989"
-                }
-            },
-            {
-                "scope": "type",
-                "settings": {
-                    "foreground": "#618dbf",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "function",
-                "settings": {
-                    "foreground": "#0a0ae5",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "number",
-                "settings": {
-                    "foreground": "#c4570e",
-                    "fontStyle": "bold"
-                }
-            }
-        ]
+    "editor.fontFamily": "Julia Mono, Droid Sans Mono, Maple Mono, Fira Code, Hack, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+    "workbench.tree.indent": 18,
+    "material-icon-theme.hidesExplorerArrows": true,
+    "workbench.tree.renderIndentGuides": "onHover",
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "path-intellisense.autoTriggerNextSuggestion": true,
+    "editor.inlineSuggest.suppressSuggestions": true,
+    "debug.console.acceptSuggestionOnEnter": "on",
+    "editor.autoIndent": "advanced",
+    "indenticator.inner.showIndentGuide": true,
+    "markdown.extension.tableFormatter.normalizeIndentation": true,
+    "guides.overrideDefault": true,
+    "gitlens.views.scm.grouped.views": {
+        "repositories": true,
+        "searchAndCompare": true,
+        "launchpad": true
     },
-    "[Dainty – City Lights]": {
-        "textMateRules": [
-            {
-                "scope": "keyword",
-                "settings": {
-                    "foreground": "#d73a49",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "comment",
-                "settings": {
-                    "foreground": "#213c56",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "string",
-                "settings": {
-                    "foreground": "#59708a"
-                }
-            },
-            {
-                "scope": "entity.name.type",
-                "settings": {
-                    "foreground": "#618dbf",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "entity.name.function",
-                "settings": {
-                    "foreground": "#0a0ae5",
-                    "fontStyle": "bold underline"
-                }
-            },
-            {
-                "scope": "number",
-                "settings": {
-                    "foreground": "#c4570e",
-                    "fontStyle": "bold"
-                }
-            }
-        ]
+    "guides.active.width": 0.25,
+    "guides.limit.maximum": -1,
+    "guides.stack.style": "dotted",
+    "guides.normal.width": 0.25,
+    "guides.stack.width": 0.5,
+    "editor.fontSize": 14,
+    "todo-tree.highlights.useColourScheme": true,
+    "vim.highlightedyank.enable": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "terminal.integrated.fontLigatures.enabled": true,
+    "terminal.integrated.fontFamily": "Fira Code, Hack Nerd Font, MesloLGS NF, Geist Mono, Maple Mono, Hack Nerd Font",
+    "terminal.integrated.fontSize": 14,
+    "git.terminalGitEditor": true,
+    "terminal.integrated.suggest.enabled": true,
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.stickyScroll.enabled": true,
+    "terminal.integrated.enableImages": true,
+    "terminal.integrated.enableVisualBell": true,
+    "terminal.integrated.mouseWheelZoom": true,
+    "editor.mouseWheelZoom": true,
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminalAllInOne.terminalTheme": "Atelier Cave",
+    "julia.executablePath": "/Applications/Julia-1.11.app/Contents/Resources/julia/bin/julia",
+    "julia.execution.inlineResultsForCellEvaluation": true,
+    "julia.execution.codeInREPL": true,
+    "vim.autoSwitchInputMethod.enable": true,
+    "vim.camelCaseMotion.enable": true,
+    "vim.changeWordIncludesWhitespace": true,
+    "vim.easymotion": true,
+    "vim.statusBarColorControl": true,
+    "vim.enableNeovim": true,
+    "vim.sneak": true,
+    "vim.smartRelativeLine": true,
+    "vim.targets.enable": true,
+    "vim.useSystemClipboard": true,
+    "powershell.buttons.showPanelMovementButtons": true,
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
+    "editor.scrollbar.horizontalScrollbarSize": 88,
+    "editor.scrollbar.verticalScrollbarSize": 5,
+    "editor.wordWrapColumn": 150,
+    "vim.textwidth": 1,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": true,
+        "scminput": false,
+        "julia": true,
+        "python": true
     },
-    "[Dainty – Ayu Mirage]": {
-        "textMateRules": [
-            {
-                "scope": "keyword",
-                "settings": {
-                    "foreground": "#d73a49",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "comment",
-                "settings": {
-                    "foreground": "#213c56",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "string",
-                "settings": {
-                    "foreground": "#59708a"
-                }
-            },
-            {
-                "scope": "entity.name.type",
-                "settings": {
-                    "foreground": "#618dbf",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "entity.name.function",
-                "settings": {
-                    "foreground": "#7193b0",
-                    "fontStyle": "bold underline"
-                }
-            },
-            {
-                "scope": "number",
-                "settings": {
-                    "foreground": "#c4570e",
-                    "fontStyle": "bold"
-                }
-            }
-        ]
-    },
-    "[Dainty – Dark+]": {
-        "textMateRules": [
-            {
-                "scope": "keyword",
-                "settings": {
-                    "foreground": "#d73a49",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "comment",
-                "settings": {
-                    "foreground": "#213c56",
-                    "fontStyle": "italic"
-                }
-            },
-            {
-                "scope": "string",
-                "settings": {
-                    "foreground": "#59708a"
-                }
-            },
-            {
-                "scope": "entity.name.type",
-                "settings": {
-                    "foreground": "#618dbf",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "entity.name.function",
-                "settings": {
-                    "foreground": "#2c679b",
-                    "fontStyle": "bold underline"
-                }
-            },
-            {
-                "scope": "number",
-                "settings": {
-                    "foreground": "#c4570e",
-                    "fontStyle": "bold"
-                }
-            }
-        ]
-    },
-    "textMateRules": [],
-    "comments": ""
-},
-  "editor.fontFamily": "Hack, Maple Mono, Fira Code, Droid Sans Mono, Julia Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
-  "workbench.tree.indent": 18,
-  "material-icon-theme.hidesExplorerArrows": true,
-  "workbench.tree.renderIndentGuides": "onHover",
-  "github.copilot.nextEditSuggestions.enabled": true,
-  "path-intellisense.autoTriggerNextSuggestion": true,
-  "editor.inlineSuggest.suppressSuggestions": true,
-  "debug.console.acceptSuggestionOnEnter": "on",
-  "editor.autoIndent": "advanced",
-  "indenticator.inner.showIndentGuide": true,
-  "markdown.extension.tableFormatter.normalizeIndentation": true,
-  "guides.overrideDefault": true,
-  "gitlens.views.scm.grouped.views": {
-    "repositories": true,
-    "searchAndCompare": true,
-    "launchpad": true
-  },
-  "guides.active.width": 0.25,
-  "guides.limit.maximum": -1,
-  "guides.stack.style": "dotted",
-  "guides.normal.width": 0.25,
-  "guides.stack.width": 0.5,
-  "editor.fontSize": 16,
-  "todo-tree.highlights.useColourScheme": true,
-  "vim.highlightedyank.enable": true,
-  "editor.formatOnPaste": false,
-  "editor.formatOnSave": false,
-  "editor.formatOnType": false,
-  "terminal.integrated.fontLigatures.enabled": false,
-  "terminal.integrated.fontFamily": "Fira Code, Hack Nerd Font, MesloLGS NF, Geist Mono, Maple Mono, Hack Nerd Font",
-  "terminal.integrated.fontSize": 14,
-  "git.terminalGitEditor": true,
-  "terminal.integrated.suggest.enabled": true,
-  "terminal.integrated.smoothScrolling": true,
-  "terminal.integrated.stickyScroll.enabled": true,
-  "terminal.integrated.enableImages": true,
-  "terminal.integrated.enableVisualBell": true,
-  "terminal.integrated.mouseWheelZoom": true,
-  "editor.mouseWheelZoom": true,
-  "terminal.integrated.defaultProfile.windows": "PowerShell",
-  "terminalAllInOne.terminalTheme": "Atelier Cave",
-  "julia.executablePath": "D:\\CommonSoftwares\\ProductiveCodingEditors\\Julia\\bin\\julia.exe",
-  "julia.execution.inlineResultsForCellEvaluation": true,
-  "julia.execution.codeInREPL": true,
-  "vim.autoSwitchInputMethod.enable": true,
-  "vim.camelCaseMotion.enable": true,
-  "vim.changeWordIncludesWhitespace": true,
-  "vim.easymotion": true,
-  "vim.statusBarColorControl": true,
-  "vim.enableNeovim": true,
-  "vim.sneak": true,
-  "vim.smartRelativeLine": true,
-  "vim.targets.enable": true,
-  "vim.useSystemClipboard": true,
-  "powershell.buttons.showPanelMovementButtons": true,
-  "powershell.codeFormatting.autoCorrectAliases": true,
-  "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
-  "editor.scrollbar.horizontalScrollbarSize": 88,
-  "editor.scrollbar.verticalScrollbarSize": 5,
-  "editor.wordWrapColumn": 150,
-  "vim.textwidth": 1,
-  "github.copilot.enable": {
-    "*": true,
-    "plaintext": true,
-    "markdown": true,
-    "scminput": false,
-    "julia": true,
-    "python": true
-},
-"terminal.integrated.tabs.defaultColor": null,
-"window.autoDetectColorScheme": true,
-"bookmarks.saveBookmarksInProject": true,
-"bookmarks.useWorkaroundForFormatters": true,
-"terminal.integrated.gpuAcceleration": "off",
-"editor.inlineSuggest.edits.showCollapsed": true,
-"editor.inlineSuggest.edits.allowCodeShifting": "never",
-"github.copilot.chat.codesearch.enabled": true,
-"github.copilot.chat.agent.thinkingTool": true,
-"github.copilot.chat.editor.temporalContext.enabled": true,
-"github.copilot.chat.scopeSelection": true,
-"github.copilot.chat.followUps": "always",
-"github.copilot.chat.edits.temporalContext.enabled": true,
-"github.copilot.chat.generateTests.codeLens": true,
-"github.copilot.chat.languageContext.fix.typescript.enabled": true,
-"github.copilot.chat.languageContext.inline.typescript.enabled": true,
-"github.copilot.chat.languageContext.typescript.enabled": true,
-"github.copilot.chat.completionContext.typescript.mode": "sidecar",
-"github.copilot.chat.search.keywordSuggestions": true,
-"editor.cursorSmoothCaretAnimation": "explicit",
-"terminal.integrated.allowMnemonics": true,
-"editor.lineNumbers": "relative",
-"search.showLineNumbers": true,
-"editor.wordWrap": "on"
+    "terminal.integrated.tabs.defaultColor": "terminal.ansiCyan",
+    "window.autoDetectColorScheme": true,
+    "bookmarks.saveBookmarksInProject": true,
+    "bookmarks.useWorkaroundForFormatters": true,
+    "terminal.integrated.gpuAcceleration": "off",
+    "editor.inlineSuggest.edits.showCollapsed": true,
+    "editor.inlineSuggest.edits.allowCodeShifting": "never",
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.agent.thinkingTool": true,
+    "github.copilot.chat.editor.temporalContext.enabled": true,
+    "github.copilot.chat.scopeSelection": true,
+    "github.copilot.chat.followUps": "always",
+    "github.copilot.chat.edits.temporalContext.enabled": true,
+    "github.copilot.chat.generateTests.codeLens": true,
+    "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+    "github.copilot.chat.languageContext.inline.typescript.enabled": true,
+    "github.copilot.chat.languageContext.typescript.enabled": true,
+    "github.copilot.chat.completionContext.typescript.mode": "sidecar",
+    "github.copilot.chat.search.keywordSuggestions": true,
+    "editor.cursorSmoothCaretAnimation": "explicit",
+    "terminal.integrated.allowMnemonics": true,
+    "editor.lineNumbers": "relative",
+    "search.showLineNumbers": true,
+    "editor.wordWrap": "on",
+    "editor.fontLigatures": true,
+    "files.autoSave": "onFocusChange"
 }

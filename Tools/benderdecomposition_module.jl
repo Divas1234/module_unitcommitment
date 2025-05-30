@@ -71,8 +71,7 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 		best_upper_bound, best_lower_bound,
 		current_upper_bound,
 		all_subproblems_feasibility_flag = get_upper_lower_bounds(
-			scuc_masterproblem, ret_dic, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob
-		) # NOTE - upper bound from subproblem
+			scuc_masterproblem, ret_dic, best_upper_bound, best_lower_bound, lower_bound, scenarios_prob) # NOTE - upper bound from subproblem
 
 		# Check for convergence
 		if all_subproblems_feasibility_flag &&
@@ -90,7 +89,8 @@ function bd_framework(scuc_masterproblem::Model, scuc_subproblem::Model, master_
 			end
 			is_feasible = ret.is_feasible
 			dual_coeffs = ret.dual_coeffs
-			scuc_masterproblem, _ = add_benders_multicuts_constraints!(scuc_masterproblem, sub_model_struct, is_feasible, dual_coeffs, NG, NT, NW, ND, NL)
+			scuc_masterproblem,
+			_ = add_benders_multicuts_constraints!(scuc_masterproblem, sub_model_struct, is_feasible, dual_coeffs, NG, NT, NW, ND, NL)
 		end
 	end
 end

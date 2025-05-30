@@ -86,20 +86,11 @@ function bd_subfunction(
 	# )# Add unit operation constraints
 	scuc_subproblem, _winds_curt_constr, _loads_curt_const = add_curtailment_constraints!(scuc_subproblem, NT, ND, NW, NS_copy, loads, winds)# Add curtailment constraints for wind and loads
 	scuc_subproblem, _units_minpower_constr, _units_maxpower_constr = add_generator_power_constraints!(scuc_subproblem, NT, NG, NS_copy, units)# Add generator power constraints
-	scuc_subproblem, _sys_upreserve_constr,
-	_sys_down_reserve_constr = add_reserve_constraints!(
-		scuc_subproblem, NT, NG, NC, NS_copy, units, loads, winds, config_param)# Add reserve constraints
-	scuc_subproblem,
-	_sys_balance_constr = add_power_balance_constraints!(
-		scuc_subproblem, NT, NG, ND, NC, NW, NS_copy, loads, winds, config_param, ND2)# Add power balance constraints
+	scuc_subproblem, _sys_upreserve_constr, _sys_down_reserve_constr = add_reserve_constraints!( scuc_subproblem, NT, NG, NC, NS_copy, units, loads, winds, config_param)# Add reserve constraints
+	scuc_subproblem, _sys_balance_constr = add_power_balance_constraints!( scuc_subproblem, NT, NG, ND, NC, NW, NS_copy, loads, winds, config_param, ND2)# Add power balance constraints
 	scuc_subproblem, _units_upramp_constr, _units_downramp_constr = add_ramp_constraints!(scuc_subproblem, NT, NG, NS_copy, units, onoffinit)# Add ramp constraints
-	scuc_subproblem, _units_pwlpower_sum_constr,
-	_units_pwlblock_upbound_constr, _units_pwlblock_dwbound_constr = add_pwl_constraints!(
-		scuc_subproblem, NT, NG, NS_copy, units)# Add piecewise linear constraints
-	scuc_subproblem, _transmissionline_powerflow_upbound_constr,
-	_transmissionline_powerflow_downbound_constr = add_transmission_constraints!(
-		scuc_subproblem, NT, NG, ND, NC, NW, NL, NS_copy, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras
-	)# Add transmission constraints
+	scuc_subproblem, _units_pwlpower_sum_constr, _units_pwlblock_upbound_constr, _units_pwlblock_dwbound_constr = add_pwl_constraints!( scuc_subproblem, NT, NG, NS_copy, units)# Add piecewise linear constraints
+	scuc_subproblem, _transmissionline_powerflow_upbound_constr, _transmissionline_powerflow_downbound_constr = add_transmission_constraints!( scuc_subproblem, NT, NG, ND, NC, NW, NL, NS_copy, units, loads, winds, lines, psses, gsdf, config_param, ND2, DataCentras)# Add transmission constraints
 	# add_storage_constraints!(scuc_subproblem, NT, NC, NS, config_param, psses)
 	# add_datacentra_constraints!(scuc_subproblem, NT, NS, config_param, ND2, DataCentras)
 	# add_frequency_constraints!(scuc_subproblem, NT, NG, NC, NS, units, psses, config_param, contingency_size)

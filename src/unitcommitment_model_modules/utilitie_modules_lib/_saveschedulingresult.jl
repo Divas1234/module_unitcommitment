@@ -9,16 +9,15 @@ function save_details_scheduled_results(config_param, results)
 		bench_pᵩ = results["pᵩ"]
 		bench_seq_sr⁺ = results["seq_sr⁺"]
 		bench_seq_sr⁻ = results["seq_sr⁻"]
+		bench_su_cost = results["su_cost"]
+		bench_sd_cost = results["sd_cost"]
 
 		if config_param.is_ConsiderBESS == 1
 			bench_pss_charge_p⁺ = results["pss_charge_p⁺"]
 			bench_pss_charge_p⁻ = results["pss_charge_p⁻"]
-			bench_su_cost = results["su_cost"]
-			bench_sd_cost = results["sd_cost"]
-			# bench_prod_cost = results["prod_cost"]
-			# bench_cost_sr⁺ = results["cr⁺"]
-			# bench_cost_sr⁻ = results["cr⁻"]
-
+		else
+			bench_pss_charge_p⁺ = nothing
+			bench_pss_charge_p⁻ = nothing
 		end
 
 		if config_param.is_ConsiderDataCentra == 1
@@ -29,6 +28,13 @@ function save_details_scheduled_results(config_param, results)
 			dc_λ = get(results, "dc_λ", nothing)
 			dc_Δu1 = get(results, "dc_Δu1", nothing)
 			dc_Δu2 = get(results, "dc_Δu2", nothing)
+		else
+			dc_p = nothing
+			dc_f = nothing
+			dc_v² = nothing
+			dc_λ = nothing
+			dc_Δu1 = nothing
+			dc_Δu2 = nothing
 		end
 	else
 		println("Optimization failed. Cannot proceed with saving results.")
@@ -40,8 +46,7 @@ function save_details_scheduled_results(config_param, results)
 	# Save the balance results
 	# Save the balance results (only if optimization succeeded)
 	if results !== nothing && bench_p₀ !== nothing # Check if variables are valid
-		savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺,
-			bench_pss_charge_p⁻, 1)
+		savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺, bench_pss_charge_p⁻, 1)
 	else
 		println("Skipping saving results due to optimization failure.")
 	end
@@ -154,11 +159,13 @@ function savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge
 	# Plots.plot(forceloadcurtailment)
 	# @show bench_pss_charge_p⁺[1,:]
 	BESScharging_output, BESSdischarging_output = zeros(24, 1), zeros(24, 1)
-	for i in 1:24
-		BESScharging_output[i, 1] = sum(bench_pss_charge_p⁺[1, i])
-	end
-	for i in 1:24
-		BESSdischarging_output[i, 1] = sum(bench_pss_charge_p⁻[1, i])
+	if config_param.is_ConsiderBESS == 1
+		for i in 1:24
+			BESScharging_output[i, 1] = sum(bench_pss_charge_p⁺[1, i])
+		end
+		for i in 1:24
+			BESSdischarging_output[i, 1] = sum(bench_pss_charge_p⁻[1, i])
+		end
 	end
 	# Plots.plot(-bench_pss_charge_p⁺[1,:])
 	# Plots.plot!(bench_pss_charge_p⁻[1,:])
