@@ -9,8 +9,8 @@ UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCu
 
 # Form input data for the model
 config_param, units, lines, loads, stroges, NB, NG, NL, ND, NT, NC,
-ND2, DataCentras = forminputdata(
-	DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam, StrogeData, datacentra_Data);
+ND2, DataCentras = forminputdata(DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam, StrogeData,
+	datacentra_Data);
 
 # Generate wind scenarios
 winds, NW = genscenario(WindsFreqParam, 1);

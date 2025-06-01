@@ -3,12 +3,30 @@ using JuMP, Gurobi # Add Gurobi here if not implicitly loaded via JuMP
 export solve_and_extract_results
 
 # Helper function to solve the model and extract results
-function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, scenarios_prob, eachslope, refcost, config_param, interval_scheduling_id = 0)
-	println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+function solve_and_extract_results(
+	scuc::Model,
+	NT,
+	NG,
+	ND,
+	NC,
+	NW,
+	NS,
+	ND2,
+	scenarios_prob,
+	eachslope,
+	refcost,
+	config_param,
+	interval_scheduling_id = 0,
+)
+	println(
+		"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+	)
 	println("Step-4: starting Gurobi solver")
 	optimize!(scuc)
 	println("Step-5: Gurobi solver finished")
-	println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+	println(
+		"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n",
+	)
 
 	# Check termination status
 	@show assert_is_solved_and_feasible(scuc)
@@ -22,39 +40,45 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		println("Acceptable solution found (Status: $status).")
 
 		# Extract values
-		x₀      = JuMP.value.(scuc[:x])
-		u₀      = JuMP.value.(scuc[:u])
-		v₀      = JuMP.value.(scuc[:v])
-		pg₀     = JuMP.value.(scuc[:pg₀])
-		pgₖ     = JuMP.value.(scuc[:pgₖ])
-		su_cost   = JuMP.value.(scuc[:su₀])
-		sd_cost   = JuMP.value.(scuc[:sd₀])
+		x₀ = JuMP.value.(scuc[:x])
+		u₀ = JuMP.value.(scuc[:u])
+		v₀ = JuMP.value.(scuc[:v])
+		pg₀ = JuMP.value.(scuc[:pg₀])
+		pgₖ = JuMP.value.(scuc[:pgₖ])
+		su_cost = JuMP.value.(scuc[:su₀])
+		sd_cost = JuMP.value.(scuc[:sd₀])
 		seq_sr⁺ = JuMP.value.(scuc[:sr⁺])
 		seq_sr⁻ = JuMP.value.(scuc[:sr⁻])
-		pᵨ      = JuMP.value.(scuc[:Δpd])
-		pᵩ      = JuMP.value.(scuc[:Δpw])
+		pᵨ = JuMP.value.(scuc[:Δpd])
+		pᵩ = JuMP.value.(scuc[:Δpw])
 		# α       = JuMP.value.(α)
 		# β       = JuMP.value.(β)
 
 		# Storage results (check if NC > 0)
-		pss_charge_p⁺, pss_charge_p⁻, pss_charge_state⁺, pss_charge_state⁻, pss_charge_cycle⁺, pss_charge_cycle⁻, pss_Qc = ntuple(_ -> nothing, 7)
+		pss_charge_p⁺,
+		pss_charge_p⁻,
+		pss_charge_state⁺,
+		pss_charge_state⁻,
+		pss_charge_cycle⁺,
+		pss_charge_cycle⁻,
+		pss_Qc = ntuple(_ -> nothing, 7)
 		if NC > 0 && config_param.is_ConsiderBESS == 1
-			pss_charge_p⁺     = JuMP.value.(scuc[:pc⁺])
-			pss_charge_p⁻     = JuMP.value.(scuc[:pc⁻])
+			pss_charge_p⁺ = JuMP.value.(scuc[:pc⁺])
+			pss_charge_p⁻ = JuMP.value.(scuc[:pc⁻])
 			pss_charge_state⁺ = JuMP.value.(scuc[:κ⁺])
 			pss_charge_state⁻ = JuMP.value.(scuc[:κ⁻])
 			pss_charge_cycle⁺ = JuMP.value.(scuc[:α])
 			pss_charge_cycle⁻ = JuMP.value.(scuc[:β])
-			pss_Qc              = JuMP.value.(scuc[:qc])
+			pss_Qc = JuMP.value.(scuc[:qc])
 		end
 
 		# Data centra results
 		dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res = ntuple(_ -> nothing, 6) # Initialize as nothing
 		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
-			dc_p_res    = JuMP.value.(scuc[:dc_p])
-			dc_f_res    = JuMP.value.(scuc[:dc_f])
-			dc_v²_res  = JuMP.value.(scuc[:dc_v²])
-			dc_λ_res   = JuMP.value.(scuc[:dc_λ])
+			dc_p_res = JuMP.value.(scuc[:dc_p])
+			dc_f_res = JuMP.value.(scuc[:dc_f])
+			dc_v²_res = JuMP.value.(scuc[:dc_v²])
+			dc_λ_res = JuMP.value.(scuc[:dc_λ])
 			dc_Δu1_res = JuMP.value.(scuc[:dc_Δu1])
 			dc_Δu2_res = JuMP.value.(scuc[:dc_Δu2])
 		end
@@ -69,36 +93,36 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 			"solve_time" => solve_time(scuc),
 			"status" => status)
 
-		results = Dict("x₀"      => x₀,
-			"u₀"      => u₀,
-			"v₀"      => v₀,
-			"p₀"      => pg₀,
-			"pₖ"      => pgₖ,
-			"su_cost"   => su_cost,
-			"sd_cost"   => sd_cost,
+		results = Dict("x₀" => x₀,
+			"u₀" => u₀,
+			"v₀" => v₀,
+			"p₀" => pg₀,
+			"pₖ" => pgₖ,
+			"su_cost" => su_cost,
+			"sd_cost" => sd_cost,
 			"seq_sr⁺" => seq_sr⁺,
 			"seq_sr⁻" => seq_sr⁻,
-			"pᵨ"      => pᵨ,
-			"pᵩ"      => pᵩ)
+			"pᵨ" => pᵨ,
+			"pᵩ" => pᵩ)
 
 		if NC > 0 && config_param.is_ConsiderBESS == 1
 			push!(results,
-				"pss_charge_p⁺"     => pss_charge_p⁺,
-				"pss_charge_p⁻"     => pss_charge_p⁻,
+				"pss_charge_p⁺" => pss_charge_p⁺,
+				"pss_charge_p⁻" => pss_charge_p⁻,
 				"pss_charge_state⁺" => pss_charge_state⁺,
 				"pss_charge_state⁻" => pss_charge_state⁻,
 				"pss_charge_cycle⁺" => pss_charge_cycle⁺,
 				"pss_charge_cycle⁻" => pss_charge_cycle⁻,
-				"pss_Qc"              => pss_Qc)
+				"pss_Qc" => pss_Qc)
 		end
 
 		# Add data centra results to dictionary
 		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
 			push!(results,
-				"dc_p"    => dc_p_res,
-				"dc_f"    => dc_f_res,
-				"dc_v²"  => dc_v²_res,
-				"dc_λ"   => dc_λ_res,
+				"dc_p" => dc_p_res,
+				"dc_f" => dc_f_res,
+				"dc_v²" => dc_v²_res,
+				"dc_λ" => dc_λ_res,
 				"dc_Δu1" => dc_Δu1_res,
 				"dc_Δu2" => dc_Δu2_res)
 		end
@@ -108,10 +132,14 @@ function solve_and_extract_results(scuc::Model, NT, NG, ND, NC, NW, NS, ND2, sce
 		# "cr⁻"       => cr⁻,       # Removed as they are not calculated here anymore
 
 		# NOTE - save ResultStatusCode
-		exported_scheduling_cost(NS, NT, NB, NG, ND, NC, ND2, units, loads,
-			winds, lines, DataCentras, config_param, interval_scheduling_id, su_cost, sd_cost, pgₖ, pg₀, x₀,
-			seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost, pss_charge_state⁺, pss_charge_state⁻, pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
-			dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res )
+		str = exported_scheduling_cost(NS, NT, NB, NG, ND, NC, ND2, units, loads,
+			winds, lines, DataCentras, config_param, interval_scheduling_id, su_cost, sd_cost,
+			pgₖ, pg₀, x₀,
+			seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost, pss_charge_state⁺, pss_charge_state⁻,
+			pss_charge_p⁺, pss_charge_p⁻, pss_Qc,
+			dc_p_res, dc_f_res, dc_v²_res, dc_λ_res, dc_Δu1_res, dc_Δu2_res)
+
+		push!(results, "res_scheduled_costs" => str)
 
 		return results
 
