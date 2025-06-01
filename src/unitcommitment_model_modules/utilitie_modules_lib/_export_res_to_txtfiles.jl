@@ -1,5 +1,5 @@
 function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, units::unit, loads::load,
-		winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, su_cost, sd_cost, pgₖ, pg₀, x₀,
+		winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config, interval_scheduling_id, su_cost, sd_cost, pgₖ, pg₀, x₀,
 		seq_sr⁺, seq_sr⁻, pᵨ, pᵩ, eachslope, refcost,
 		pss_charge_state⁺ = nothing, pss_charge_state⁻ = nothing,
 		pss_charge_p⁺ = nothing, pss_charge_p⁻ = nothing, pss_Qc = nothing,
@@ -12,7 +12,9 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 	wind_curtailment_penalty = config_param.is_WindsCuttingCoefficient * 1e0
 
 	ρ⁺ = c₀ * 2
-	ρ⁻ = c₀ * 2
+    ρ⁻ = c₀ * 2
+
+    rounded_x₀ = map(x -> x >= 0.5 ? Int64(1) : Int64(0), round.(x₀, digits=0))
 
 	prod_cost = pₛ * c₀ *
 				(sum(sum(sum(sum(pgₖ[i + (s - 1) * NG, t, :] .* eachslope[:, i] for t in 1:NT)) for s in 1:NS) for i in 1:NG) +
@@ -39,21 +41,32 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 	elseif Sys.isapple()
 		output_dir = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/"
 	end
+
+	if interval_scheduling_id != 0
+		# output_dir = joinpath(output_dir, "pcm_simulation_results")
+		# output_dir = output_dir * "<interval_$interval_scheduling_id>"
+        output_dir = output_dir * "details_schedule_results/pcm_simulation_results/intervels_[$interval_scheduling_id]/"
+        mkpath(dirname(output_dir))
+	end
 	# Create directory if it doesn't exist
 	try
-		if !isdir(output_dir)
-			mkdir(output_dir)
-		end
 
+        if interval_scheduling_id == 0
+            output_file = joinpath(output_dir, "Bench_schedule_commitment_result.txt")
+        else
+            # output_dir = joinpath(output_dir, "pcm_simulation_results")
+            # output_dir = output_dir * "<interval_$interval_scheduling_id>"
+            output_file = joinpath(output_dir, "res_schedule_commitment_result.txt")
+        end
 		# Open output file for writing results
-		output_file = joinpath(output_dir, "Bench_schedule_commitment_result.txt")
+		
 		open(output_file, "w") do io
 			writedlm(io, [" "])
 			writedlm(io, ["su_cost" "sd_cost" "prod_cost" "cr⁺" "cr⁻" "𝜟pd" "𝜟pw"], '\t')
 			writedlm(io, str, '\t')
 			writedlm(io, [" "])
 			writedlm(io, ["list 1: units stutup/down states"])
-			writedlm(io, x₀, '\t')
+            writedlm(io, rounded_x₀, '\t')
 			writedlm(io, [" "])
 			writedlm(io, ["list 2: units dispatching power in scenario NO.1"])
 			writedlm(io, pg₀[1:NG, 1:NT], '\t')
@@ -96,7 +109,14 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 
 		if config_param.is_ConsiderBESS == 1 && NC > 0
 			# Open output file for writing results
-			output_file = joinpath(output_dir, "Bench_bess_scheduling_result.txt")
+            
+            if interval_scheduling_id == 0
+                output_file = joinpath(output_dir, "Bench_bess_scheduling_result.txt")
+            else
+                # output_dir = joinpath(output_dir, "pcm_simulation_results")
+                # output_dir = output_dir * "<interval_$interval_scheduling_id>"
+                output_file = joinpath(output_dir, "res__bess_scheduling_result.txt")
+            end
 			open(output_file, "w") do io
 				writedlm(io, [" "])
 				writedlm(io, ["list 5: pss charge state"])
@@ -130,7 +150,14 @@ function exported_scheduling_cost(NS::Int64, NT::Int64, NB::Int64, NG::Int64, ND
 		end
 
 		if config_param.is_ConsiderDataCentra == 1 && ND2 > 0
-			output_file = joinpath(output_dir, "Bench_datacentra_result.txt")
+            
+            if interval_scheduling_id == 0
+                output_file = joinpath(output_dir, "Bench_datacentra_result.txt")
+            else
+                # output_dir = joinpath(output_dir, "pcm_simulation_results")
+                # output_dir = output_dir * "<interval_$interval_scheduling_id>"
+                output_file = joinpath(output_dir, "res_datacentra_scheduling_result.txt")
+            end
 			open(output_file, "w") do io
 				writedlm(io, [" "])
 				writedlm(io, ["list 1: dc_p"], '\t')

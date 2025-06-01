@@ -1,5 +1,5 @@
 #LINK -  exported details scheduled results as a .csv file
-function save_details_scheduled_results(config_param, results)
+function save_powerbalance_scheduled_results(units, winds, config_param, results, pcm_scheduling_intervels_id = 0)
 	# Check if optimization was successful and extract results
 	if results !== nothing
 		println("Extracting results from dictionary...")
@@ -46,7 +46,9 @@ function save_details_scheduled_results(config_param, results)
 	# Save the balance results
 	# Save the balance results (only if optimization succeeded)
 	if results !== nothing && bench_p₀ !== nothing # Check if variables are valid
-		savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺, bench_pss_charge_p⁻, 1)
+		flag = 1 # mac path identification
+		savebalance_result(
+			units, winds, bench_x₀, bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺, bench_pss_charge_p⁻, flag, pcm_scheduling_intervels_id)
 	else
 		println("Skipping saving results due to optimization failure.")
 	end
@@ -138,32 +140,45 @@ function read_UCresults()
 	bench_prod_cost, bench_cost_sr⁺, bench_cost_sr⁻, NT, NG, ND, NW, units, winds
 end
 
-function savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺, bench_pss_charge_p⁻, flag)
+function savebalance_result(
+		units, winds, bench_x₀, bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge_p⁺, bench_pss_charge_p⁻, flag, pcm_scheduling_intervels_id)
 	# @show DataFrame(bench_p₀[1:3,:],:auto)
-	thermalunits_output = zeros(24, 1)
-	for i in 1:24
-		thermalunits_output[i, 1] = sum(bench_p₀[1:3, i])
+	tem_NG, tem_NT = size(bench_p₀)
+	thermalunits_output = zeros(tem_NT, 1)
+	for i in 1:tem_NT
+		thermalunits_output[i, 1] = sum(bench_p₀[1:tem_NG, i])
 	end
+
 	# Plots.plot(thermalunits_output)
 	# @show DataFrame(bench_pᵩ[1:3,:],:auto)
-	windunits_output = zeros(24, 1)
-	for i in 1:24
+
+	tem_NW = size(bench_pᵩ, 1)
+	windunits_output = zeros(tem_NT, 1)
+	for i in 1:tem_NT
 		windunits_output[i, 1] = sum(winds.p_max) * winds.scenarios_curve[1, i] -
-								 sum(bench_pᵩ[1:2, i])
+								 sum(bench_pᵩ[1:tem_NW, i])
 	end
+
+	details_windunits_output, details_windunits_wasted_output = zeros(tem_NW, tem_NT), zeros(tem_NW, tem_NT)
+	for i in 1:tem_NW
+		details_windunits_wasted_output[i, :] = bench_pᵩ[i, :]
+		details_windunits_output[i, :] = (winds.p_max[i]) .* winds.scenarios_curve[1, :] - bench_pᵩ[i, :]
+	end
+
 	# Plots.plot(windunits_output)
-	forceloadcurtailment = zeros(24, 1)
-	for i in 1:24
+	forceloadcurtailment = zeros(tem_NT, 1)
+	for i in 1:tem_NT
 		forceloadcurtailment[i, 1] = sum(bench_pᵨ[1:ND, i])
 	end
+
 	# Plots.plot(forceloadcurtailment)
 	# @show bench_pss_charge_p⁺[1,:]
-	BESScharging_output, BESSdischarging_output = zeros(24, 1), zeros(24, 1)
+	BESScharging_output, BESSdischarging_output = zeros(tem_NT, 1), zeros(tem_NT, 1)
 	if config_param.is_ConsiderBESS == 1
-		for i in 1:24
+		for i in 1:tem_NT
 			BESScharging_output[i, 1] = sum(bench_pss_charge_p⁺[1, i])
 		end
-		for i in 1:24
+		for i in 1:tem_NT
 			BESSdischarging_output[i, 1] = sum(bench_pss_charge_p⁻[1, i])
 		end
 	end
@@ -182,26 +197,60 @@ function savebalance_result(bench_p₀, bench_pᵨ, bench_pᵩ, bench_pss_charge
 		end
 	else
 		filepath = "/Users/yuanyiping/Documents/GitHub/module_unitcommitment/output/details_schedule_results/"
+		mkpath(dirname(filepath))
 	end
-	open(filepath * "res_thermalunits.csv", "w") do io
-		# writedlm(io, [" "])
-		return writedlm(io, thermalunits_output, '\t')
+
+	# Determine output directory and file prefix
+	if pcm_scheduling_intervels_id == 0
+		outdir = filepath
+	else
+		outdir = filepath * "pcm_simulation_results/intervels_[$pcm_scheduling_intervels_id]/"
+		mkpath(outdir)
 	end
-	open(filepath * "res_windunits.csv", "w") do io
-		# writedlm(io, [" "])
-		return writedlm(io, windunits_output, '\t')
+
+	# Helper to write a result array to CSV
+	function write_result(filename, data)
+		open(outdir * filename, "w") do io
+			writedlm(io, data, '\t')
+		end
 	end
-	open(filepath * "res_forcedloadcurtailment.csv", "w") do io
-		# writedlm(io, [" "])
-		return writedlm(io, forceloadcurtailment, '\t')
+
+    write_result("sum_thermalunits.csv", round.(thermalunits_output, digits=5))
+	write_result("sum_windunits.csv", round.(windunits_output, digits=5))
+	write_result("sum_forcedloadcurtailment.csv", round.(forceloadcurtailment, digits=5))
+	write_result("sum_bess_charging.csv", round.(BESScharging_output, digits=5))
+	write_result("sum_bess_discharging.csv", round.(BESSdischarging_output, digits=5))
+
+	write_result("details_thermalunits_output.csv", round.(bench_p₀, digits=5))
+	rounded_bench_x₀ = map(x -> x >= 0.5 ? Int64(1) : Int64(0), round.(bench_x₀, digits=0))
+	write_result("details_thermalunits_statues.csv", rounded_bench_x₀)
+	write_result("details_forced_load_curtailment.csv", round.(bench_pᵨ, digits=5))
+	write_result("details_windunits_output.csv", round.(details_windunits_output, digits=5))
+	write_result("details_windunits_wasted_output.csv", round.(details_windunits_wasted_output, digits=5))
+	if config_param.is_ConsiderBESS == 1
+		write_result("details_bess_charging_output.csv", round.(bench_pss_charge_p⁺, digits=5))
+		write_result("details_bess_discharging_output.csv", round.(bench_pss_charge_p⁻, digits=5))
 	end
-	open(filepath * "res_BESS_charging.csv", "w") do io
-		# writedlm(io, [" "])
-		return writedlm(io, BESScharging_output, '\t')
-	end
-	open(filepath * "res_BESS_discharging.csv", "w") do io
-		# writedlm(io, [" "])
-		return writedlm(io, BESSdischarging_output, '\t')
-	end
+
+	# open(filepath * "res_thermalunits.csv", "w") do io
+	# 	# writedlm(io, [" "])
+	# 	return writedlm(io, thermalunits_output, '\t')
+	# end
+	# open(filepath * "res_windunits.csv", "w") do io
+	# 	# writedlm(io, [" "])
+	# 	return writedlm(io, windunits_output, '\t')
+	# end
+	# open(filepath * "res_forcedloadcurtailment.csv", "w") do io
+	# 	# writedlm(io, [" "])
+	# 	return writedlm(io, forceloadcurtailment, '\t')
+	# end
+	# open(filepath * "res_BESS_charging.csv", "w") do io
+	# 	# writedlm(io, [" "])
+	# 	return writedlm(io, BESScharging_output, '\t')
+	# end
+	# open(filepath * "res_BESS_discharging.csv", "w") do io
+	# 	# writedlm(io, [" "])
+	# 	return writedlm(io, BESSdischarging_output, '\t')
+	# end
 	return println("details [unit_commtiemnt] scheduling results have been saved!")
 end

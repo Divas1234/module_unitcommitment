@@ -239,7 +239,7 @@
         "textMateRules": [],
         "comments": ""
     },
-    "editor.fontFamily": "Julia Mono, Droid Sans Mono, Maple Mono, Fira Code, Hack, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontFamily": "Maple Mono, Droid Sans Mono, Fira Code, Hack, Julia Mono, Geist Mono, DejaVu Code, mononoki, Inconsolata, Geist Mono, JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
     "workbench.tree.indent": 18,
     "material-icon-theme.hidesExplorerArrows": true,
     "workbench.tree.renderIndentGuides": "onHover",
@@ -265,11 +265,11 @@
     "todo-tree.highlights.useColourScheme": true,
     "vim.highlightedyank.enable": true,
     "editor.formatOnPaste": false,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.formatOnType": false,
     "terminal.integrated.fontLigatures.enabled": true,
-    "terminal.integrated.fontFamily": "Fira Code, Hack Nerd Font, MesloLGS NF, Geist Mono, Maple Mono, Hack Nerd Font",
-    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontFamily": "Geist Mono, Maple Mono, Fira Code, Hack Nerd Font, MesloLGS NF, Hack Nerd Font",
+    "terminal.integrated.fontSize": 12,
     "git.terminalGitEditor": true,
     "terminal.integrated.suggest.enabled": true,
     "terminal.integrated.smoothScrolling": true,
@@ -333,5 +333,11 @@
     "search.showLineNumbers": true,
     "editor.wordWrap": "on",
     "editor.fontLigatures": true,
-    "files.autoSave": "onFocusChange"
+    "files.autoSave": "onFocusChange",
+    "Codegeex.RepoIndex": true,
+    "bookmarks.keepBookmarksOnLineDelete": true,
+    "commentAnchors.tagHighlights.enabled": false,
+    "commentAnchors.tags.sortAlphabetically": true,
+    "errorLens.gutterIconsEnabled": true,
+    "errorLens.statusBarIconsEnabled": true
 }

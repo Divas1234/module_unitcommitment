@@ -25,5 +25,5 @@ scenarios_prob = 1.0 / winds.scenarios_nums;
 # Call the refactored function
 results = SUC_scucmodel(NT, NB, NG, ND, NC, ND2, units, loads, winds, lines, DataCentras, config_param, stroges, scenarios_prob, NL) # Added stroges, scenarios_prob, NL
 
-save_details_scheduled_results(config_param, results)
+save_powerbalance_scheduled_results(units, winds, config_param, results)
 println("Simulation completed successfully.")

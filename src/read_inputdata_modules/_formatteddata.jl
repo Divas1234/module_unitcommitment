@@ -1,5 +1,5 @@
 # reformat data
-struct config
+mutable struct config # could change
 	# member variables
 	is_NetWorkCon::Int64
 	is_ThermalUnitCon::Int64
@@ -59,7 +59,7 @@ struct config
 	# end
 end
 
-struct unit
+mutable struct unit
 	index::Vector{Int64}
 	locatebus::Vector{Int64}
 	p_max::Vector{Float64}
@@ -72,6 +72,7 @@ struct unit
 	min_shutdown_time::Vector{Float64}
 	x_0::Vector{Float64}
 	t_0::Vector{Float64}
+	t_1::Vector{Float64}
 	p_0::Vector{Float64}
 	coffi_a::Vector{Float64}
 	coffi_b::Vector{Float64}
@@ -94,31 +95,32 @@ struct unit
 	Rg::Vector{Float64} # Droop grain of conventional units
 
 	function unit(index,
-		locatebus,
-		p_max,
-		p_min,
-		ramp_up,
-		ramp_down,
-		shut_up,
-		shut_down,
-		min_shutup_time,
-		min_shutdown_time,
-		x_0,
-		t_0,
-		p_0,
-		coffi_a,
-		coffi_b,
-		coffi_c,
-		coffi_cold_shutup_1,
-		coffi_cold_shutup_2,
-		coffi_cold_shutdown_1,
-		coffi_cold_shutdown_2,
-		Hg,
-		Dg,
-		Kg,
-		Fg,
-		Tg,
-		Rg)
+			locatebus,
+			p_max,
+			p_min,
+			ramp_up,
+			ramp_down,
+			shut_up,
+			shut_down,
+			min_shutup_time,
+			min_shutdown_time,
+			x_0,
+			t_0,
+			t_1,
+			p_0,
+			coffi_a,
+			coffi_b,
+			coffi_c,
+			coffi_cold_shutup_1,
+			coffi_cold_shutup_2,
+			coffi_cold_shutdown_1,
+			coffi_cold_shutdown_2,
+			Hg,
+			Dg,
+			Kg,
+			Fg,
+			Tg,
+			Rg)
 		return new(index,
 			locatebus,
 			p_max,
@@ -131,6 +133,7 @@ struct unit
 			min_shutdown_time,
 			x_0,
 			t_0,
+			t_1,
 			p_0,
 			coffi_a,
 			coffi_b,
@@ -155,7 +158,7 @@ struct unit
 	# end
 end
 
-struct transmissionline
+mutable struct transmissionline
 	index::Vector{Int64}
 	from::Vector{Int64}
 	to::Vector{Int64}
@@ -170,7 +173,7 @@ struct transmissionline
 	end
 end
 
-struct load
+mutable struct load
 	index::Vector{Int64}
 	locatebus::Vector{Int64}
 	load_curve::Array{Float64}
@@ -179,7 +182,7 @@ struct load
 	end
 end
 
-struct pss
+mutable struct pss
 	index::Vector{Int64}
 	locatebus::Vector{Int64}
 	Q_max::Vector{Float64}
@@ -197,7 +200,7 @@ struct pss
 	end
 end
 
-struct data_centra
+mutable struct data_centra
 	index::Vector{Int64}
 	locatebus::Vector{Int64}
 	p_max::Vector{Float64}
@@ -209,7 +212,7 @@ struct data_centra
 	μ::Vector{Float64}
 	computational_power_tasks::Matrix{Float64}
 	function data_centra(index, locatebus, p_max, p_min, voltage_regulation,
-		idale, sv_constant, λ, μ, computational_power_tasks)
+			idale, sv_constant, λ, μ, computational_power_tasks)
 		return new(index, locatebus, p_max, p_min, voltage_regulation,
 			idale, sv_constant, λ, μ, computational_power_tasks)
 	end
