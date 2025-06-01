@@ -5,7 +5,7 @@ export add_transmission_constraints!
 # Helper function for transmission line constraints
 
 function add_transmission_constraints!(
-		scuc::Model, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2 = nothing, DataCentras = nothing)
+		scuc::Model, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2 = nothing, DataCentras = nothing, hydros = nothing)
 	if config_param.is_NetWorkCon == 1 && Gsdf !== nothing && NL > 0
 		transmissionline_powerflow_upbound_constr = []
 		transmissionline_powerflow_downbound_constr = []
@@ -20,13 +20,16 @@ function add_transmission_constraints!(
 		Δpd = scuc[:Δpd]
 		Δpw = scuc[:Δpw]
 
+		ph = check_var_exists(scuc, "ph") ? scuc[:ph] : nothing
+		tem_NH = ph !== nothing ? size(ph, 1) : 0
+
 		# Check if storage variables exist before accessing them
 		# pc⁺ = scuc[:pc⁺]
 		# pc⁻ = scuc[:pc⁻]
 		pc⁺ = check_var_exists(scuc, "pc⁺") ? scuc[:pc⁺] : nothing # Storage might not exist
 		pc⁻ = check_var_exists(scuc, "pc⁻") ? scuc[:pc⁻] : nothing # Storage might not exist
 
-		if config_param.is_NetWorkCon == 1 && Gsdf !== nothing && NL > 0 && DataCentras !== nothing
+		if config_param.is_ConsiderDataCentra == 0
 			# This function assumes Gsdf is pre-calculated and passed
 			for l in 1:NL
 				subGsdf_units = Gsdf[l, units.locatebus]
@@ -34,12 +37,14 @@ function add_transmission_constraints!(
 				subGsdf_loads = Gsdf[l, loads.locatebus]
 				# Ensure stroges.locatebus is valid and Gsdf has correct dimensions
 				subGsdf_psses = (NC > 0 && isempty(stroges.locatebus)) ? Gsdf[l, stroges.locatebus] : [] # Handle NC=0 or missing locatebus
+				subGsdf_hydros = (tem_NH > 0) ? Gsdf[l, hydros.locatebus] : []
 
 				push!(
 					transmissionline_powerflow_upbound_constr,
 					@constraint(scuc,
 						[s = 1:NS, t = 1:NT],
 						sum(subGsdf_units[i] * pg₀[i + (s - 1) * NG, t] for i in 1:NG) +
+						((isnothing(ph) && tem_NH == 0) ? 0 : sum(subGsdf_hydros[h] * ph[h, t] for h in 1:tem_NH)) +
 						sum(subGsdf_winds[w] * (winds.scenarios_curve[s, t] * winds.p_max[w, 1] -
 												Δpw[(s - 1) * NW + w, t]) for w in 1:NW) -
 						sum(subGsdf_loads[d] * (loads.load_curve[d, t] - Δpd[(s - 1) * ND + d, t])
@@ -54,6 +59,7 @@ function add_transmission_constraints!(
 					@constraint(scuc,
 						[s = 1:NS, t = 1:NT],
 						sum(subGsdf_units[i] * pg₀[i + (s - 1) * NG, t] for i in 1:NG) +
+						((isnothing(ph) && tem_NH == 0) ? 0 : sum(subGsdf_hydros[h] * ph[h, t] for h in 1:tem_NH)) +
 						sum(subGsdf_winds[w] * (winds.scenarios_curve[s, t] * winds.p_max[w, 1] -
 												Δpw[(s - 1) * NW + w, t]) for w in 1:NW) -
 						sum(subGsdf_loads[d] * (loads.load_curve[d, t] - Δpd[(s - 1) * ND + d, t])
@@ -88,7 +94,8 @@ function add_transmission_constraints!(
 				# 		 Gsdf[l, stroges.locatebus][c] * (pc⁻[(s - 1) * NC + c, t] - pc⁺[(s - 1) * NC + c, t]) : 0.0)
 				# 	for c in 1:NC) >= lines.p_min[l, 1])
 			end
-
+			println("\t constraints: 10) transmissionline limits for baseline\t\t\t done")
+			return scuc, transmissionline_powerflow_upbound_constr, transmissionline_powerflow_downbound_constr
 		else
 			subGsdf_dc = (NC > 0 && isempty(DataCentras[:locatebus])) ? Gsdf[l, DataCentras.locatebus] : [] # Handle NC=0 or missing locatebus
 
@@ -97,6 +104,8 @@ function add_transmission_constraints!(
 				return nothing # Skip if no data centers or variables missing
 			end
 			dc_p = scuc[:dc_p]
+			ph = check_var_exists(scuc, "ph") ? scuc[:ph] : nothing
+			tem_NH = ph !== nothing ? size(ph, 1) : 0
 
 			for l in 1:NL
 				subGsdf_units = Gsdf[l, units.locatebus]
@@ -108,6 +117,7 @@ function add_transmission_constraints!(
 				up_constr = @constraint(scuc,
 					[s = 1:NS, t = 1:NT],
 					sum(subGsdf_units[i] * pg₀[i + (s - 1) * NG, t] for i in 1:NG) +
+					((isnothing(ph) && tem_NH == 0) ? 0 : sum(subGsdf_hydros[h] * ph[h, t] for h in 1:tem_NH)) +
 					sum(subGsdf_winds[w] * (winds.scenarios_curve[s, t] * winds.p_max[w, 1] - Δpw[(s - 1) * NW + w, t]) for w in 1:NW) -
 					sum(subGsdf_loads[d] * (loads.load_curve[d, t] - Δpd[(s - 1) * ND + d, t]) for d in 1:ND) -
 					sum(subGsdf_dc[c] * dc_p[i + (s - 1) * ND2, t] for c in 1:ND2) +
@@ -119,6 +129,7 @@ function add_transmission_constraints!(
 				down_constr = @constraint(scuc,
 					[s = 1:NS, t = 1:NT],
 					sum(subGsdf_units[i] * pg₀[i + (s - 1) * NG, t] for i in 1:NG) +
+					((isnothing(ph) && tem_NH == 0) ? 0 : sum(subGsdf_hydros[h] * ph[h, t] for h in 1:tem_NH)) +
 					sum(subGsdf_winds[w] * (winds.scenarios_curve[s, t] * winds.p_max[w, 1] - Δpw[(s - 1) * NW + w, t]) for w in 1:NW) -
 					sum(subGsdf_loads[d] * (loads.load_curve[d, t] - Δpd[(s - 1) * ND + d, t]) for d in 1:ND) -
 					sum(subGsdf_dc[c] * dc_p[i + (s - 1) * ND2, t] for c in 1:ND2) +

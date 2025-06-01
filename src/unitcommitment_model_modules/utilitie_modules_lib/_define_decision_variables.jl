@@ -3,7 +3,7 @@ using JuMP
 export define_decision_variables!
 
 # Helper function to define model variables
-function define_decision_variables!(scuc::Model, NT, NG, ND, NC, ND2, NS, NW, config_param)
+function define_decision_variables!(scuc::Model, NT, NG, ND, NC, ND2, NS, NW, NH, config_param)
 	# binary variables
 	@variable(scuc, x[1:NG, 1:NT], Bin)
 	@variable(scuc, u[1:NG, 1:NT], Bin)
@@ -47,6 +47,11 @@ function define_decision_variables!(scuc::Model, NT, NG, ND, NC, ND2, NS, NW, co
 		@variable(scuc, Δf_nadir[1:NS] >= 0)
 		@variable(scuc, Δf_qss[1:NS] >= 0)
 		@variable(scuc, Δp_imbalance[1:NS] >= 0) # Placeholder, adjust as needed based on full constraints
+	end
+
+	if config_param.is_HydroUnitCon == 1
+		@variable(scuc, ph[1:(NH * NS), 1:NT] >= 0) # hydro power
+		# @variable(scuc, sh[1:(NH * NS), 1:NT] >= 0) # hydro storage
 	end
 
 	println("\t Variables defined.")

@@ -4,6 +4,7 @@ mutable struct config # could change
 	is_NetWorkCon::Int64
 	is_ThermalUnitCon::Int64
 	is_WindUnitCon::Int64
+	is_HydroUnitCon::Int64
 	is_SysticalCon::Int64
 	is_PieceLinear::Int64
 	is_NumSeg::Int64
@@ -215,5 +216,18 @@ mutable struct data_centra
 			idale, sv_constant, λ, μ, computational_power_tasks)
 		return new(index, locatebus, p_max, p_min, voltage_regulation,
 			idale, sv_constant, λ, μ, computational_power_tasks)
+	end
+end
+
+mutable struct hydro
+	index::Vector{Int64}
+	locatebus::Vector{Int64}
+	p_max::Vector{Float64}
+	p_min::Vector{Float64}
+	q_max::Vector{Float64}
+	q_0::Vector{Float64}
+	reservoircurve::Array{Float64}
+	function hydro(index, locatebus, p_max, p_min, q_max, q_0, reservoircurve) # Using consistent constructor syntax
+		return new(index, locatebus, p_max, p_min, q_max, q_0, reservoircurve)
 	end
 end

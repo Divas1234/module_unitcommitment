@@ -1,6 +1,7 @@
 include("_formatteddata.jl")
 include("_readdatafromexcel.jl")
 include("_showboundrycase.jl")
+include("_get_totalboundarydata.jl")
 
 export readxlssheet, forminputdata, boundrycondition
 

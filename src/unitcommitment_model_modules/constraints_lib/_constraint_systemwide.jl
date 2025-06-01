@@ -28,7 +28,7 @@ function add_curtailment_constraints!(scuc::Model, NT, ND, NW, NS, loads, winds)
 end
 
 # Helper function for system reserve limits
-function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, winds, config_param)
+function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, winds, config_param, hydros = nothing)
 	# Check if variables exist
 	if isempty(scuc[:sr⁺])
 		return println("\t constraints: 6) Reserves skipped (sr⁺ not defined)")
@@ -39,6 +39,8 @@ function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, win
 	sr⁻ = scuc[:sr⁻]
 	pc⁺ = check_var_exists(scuc, "pc⁺") ? scuc[:pc⁺] : nothing # Storage might not exist
 	pc⁻ = check_var_exists(scuc, "pc⁻") ? scuc[:pc⁻] : nothing # Storage might not exist
+	ph = check_var_exists(scuc, "ph") ? scuc[:ph] : nothing
+	tem_NH = ph !== nothing ? size(ph, 1) : 0
 
 	wind_pmax = winds.p_max
 	alpha_res = config_param.is_Alpha
@@ -54,6 +56,7 @@ function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, win
 	sys_upreserve_constr = @constraint(scuc,
 		[s = 1:NS, t = 1:NT, i = 1:NG],
 		sum(sr⁺[(1 + (s - 1) * NG):(s * NG), t]) +
+		(ph !== nothing ? sum.(hydros.p_max, hydros.reservoircurve[t, 1] * ones(tem_NH, 1)) - sum(ph[(tem_NH * (s - 1) + 1):(s * tem_NH), t]) : 0.0) +
 		(NC > 0 && pc⁻ !== nothing ? sum(pc⁻[(NC * (s - 1) + 1):(s * NC), t]) : 0.0) >=
 		0.5 * unit_pmax[i, 1] * x[i, t]) # max constraints reformulation
 	#  Original formulation used 0.5, keeping it
@@ -64,8 +67,8 @@ function add_reserve_constraints!(scuc::Model, NT, NG, NC, NS, units, loads, win
 	sys_down_reserve_constr = @constraint(scuc,
 		[s = 1:NS, t = 1:NT],
 		sum(sr⁻[(1 + (s - 1) * NG):(s * NG), t]) +
-		(NC > 0 && pc⁺ !== nothing ? sum(pc⁺[(NC * (s - 1) + 1):(s * NC), t]) :
-		 0.0) >=
+		(ph !== nothing ? sum(ph[(tem_NH * (s - 1) + 1):(s * tem_NH), t] - hydros.p_min) : 0.0) +
+		(NC > 0 && pc⁺ !== nothing ? sum(pc⁺[(NC * (s - 1) + 1):(s * NC), t]) : 0.0) >=
 		1.0 * (alpha_res * forcast_reserve[s, t] + beta_res * sum(load_curve[:, t])))
 	println("\t constraints: 6) system reserves limits\t\t\t\t\t done")
 	return scuc, sys_upreserve_constr, sys_down_reserve_constr
@@ -83,6 +86,8 @@ function add_power_balance_constraints!(scuc::Model, NT, NG, ND, NC, NW, NS, loa
 	Δpw = scuc[:Δpw]
 	pc⁺ = check_var_exists(scuc, "pc⁺") ? scuc[:pc⁺] : nothing # Storage might not exist
 	pc⁻ = check_var_exists(scuc, "pc⁻") ? scuc[:pc⁻] : nothing # Storage might not exist
+	ph = check_var_exists(scuc, "ph") ? scuc[:ph] : nothing
+	tem_NH = ph !== nothing ? size(ph, 1) : 0
 	# pc⁺ = scuc[:pc⁺]
 	# pc⁻ = scuc[:pc⁻]
 
@@ -104,6 +109,12 @@ function add_power_balance_constraints!(scuc::Model, NT, NG, ND, NC, NW, NS, loa
 			(NC > 0 && pc⁻ !== nothing ? sum(pc⁻[((s - 1) * NC + 1):(s * NC), t]) :
 			 0.0) -
 			(NC > 0 && pc⁺ !== nothing ? sum(pc⁺[((s - 1) * NC + 1):(s * NC), t]) : 0.0))
+	end
+
+	if config_param.is_HydroUnitCon == 1 && ph !== nothing
+		common_balance = @expression(scuc, [s = 1:NS, t = 1:NT],
+			common_balance[s, t] +
+			sum(ph[(tem_NH * (s - 1) + 1):(s * tem_NH), t]))
 	end
 
 	sys_balance_constr = []

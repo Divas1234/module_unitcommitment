@@ -39,7 +39,7 @@ Stochastic Unit Commitment (SUC) model for power system optimization (Refactored
 
 function SUC_scucmodel(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND2::Int64, units::unit, loads::load,
 		winds::wind, lines::transmissionline, DataCentras::data_centra, config_param::config,
-		stroges::Any, scenarios_prob::Float64, NL::Int64)
+		stroges::Any, scenarios_prob::Float64, NL::Int64, hydros::hydro, NH::Int64)
 	println("Step-3: Creating dispatching model (Refactored & Modularized)")
 
 	# --- Input Validation ---
@@ -64,7 +64,7 @@ function SUC_scucmodel(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND
 	# set_silent(scuc)
 	# --- Define Variables ---
 	# Define decision variables for the optimization model
-	define_decision_variables!(scuc, NT, NG, ND, NC, ND2, NS, NW, config_param)
+	define_decision_variables!(scuc, NT, NG, ND, NC, ND2, NS, NW, NH, config_param)
 
 	# --- Set Objective ---
 	# Set the objective function to be minimized
@@ -77,14 +77,15 @@ function SUC_scucmodel(NT::Int64, NB::Int64, NG::Int64, ND::Int64, NC::Int64, ND
 	add_unit_operation_constraints!(scuc, NT, NG, units, onoffinit)
 	add_curtailment_constraints!(scuc, NT, ND, NW, NS, loads, winds)
 	add_generator_power_constraints!(scuc, NT, NG, NS, units)
-	add_reserve_constraints!(scuc, NT, NG, NC, NS, units, loads, winds, config_param)
+	add_reserve_constraints!(scuc, NT, NG, NC, NS, units, loads, winds, config_param, hydros)
 	add_power_balance_constraints!(scuc, NT, NG, ND, NC, NW, NS, loads, winds, config_param, ND2)
 	add_ramp_constraints!(scuc, NT, NG, NS, units, onoffinit)
 	add_pwl_constraints!(scuc, NT, NG, NS, units)
-	add_transmission_constraints!(scuc, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2, DataCentras)
+	add_transmission_constraints!(scuc, NT, NG, ND, NC, NW, NL, NS, units, loads, winds, lines, stroges, Gsdf, config_param, ND2, DataCentras, hydros)
 	add_storage_constraints!(scuc, NT, NC, NS, config_param, stroges)
 	add_datacentra_constraints!(scuc, NT, NS, config_param, ND2, DataCentras)
 	add_frequency_constraints!(scuc, NT, NG, NC, NS, units, stroges, config_param, Δp_contingency)
+	add_hydros_constraints!(scuc::Model, NT, NH, NS, hydros)
 
 	# --- Solve and Extract Results ---
 	# Solve the optimization model and extract the results

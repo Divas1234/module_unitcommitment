@@ -166,3 +166,41 @@ function add_pwl_constraints!(scuc::Model, NT, NG, NS, units)
 	println("\t constraints: 9) piece linearization constraints\t\t\t done")
 	return scuc, units_pwlpower_sum_constr, units_pwlblock_upbound_constr, units_pwlblock_dwbound_constr
 end
+
+# if config_param.is_HydroUnitCon == 1
+# 	@variable(scuc, ph[1:(NH * NS), 1:NT] >= 0) # hydro power
+# 	@variable(scuc, sh[1:(NH * NS), 1:NT] >= 0) # hydro storage
+# end
+function add_hydros_constraints!(scuc::Model, NT, NH, NS, hydros)
+	# Check if PWL variables exist
+	if isempty(scuc[:ph])
+		return println("\t constraints: 9) hydro decision variables skipped (pgₖ not defined)")
+	end
+
+	ph = scuc[:ph]
+	# sh = scuc[:sh]
+
+	p_max = hydros.p_max
+	p_min = hydros.p_min
+	qmax = hydros.q_max
+	q0 = hydros.q_0
+	cumsum_resvoir = hydros.reservoircurve
+
+	hydros_minpower_constr = @constraint(scuc,
+		[s = 1:NS, t = 1:NT],
+		ph[((s - 1) * NH + 1):(s * NH), t] .>= p_min[:, 1])
+	hydros_maxpower_constr = @constraint(scuc,
+		[s = 1:NS, t = 1:NT],
+		ph[((s - 1) * NH + 1):(s * NH), t] .<= p_max[:, 1])
+	hydros_resvoir_constr = @constraint(scuc,
+		[s = 1:NS, t = 1:NT],
+		ph[((s - 1) * NH + 1):(s * NH), t] .<= cumsum_resvoir[t, 1])
+
+	hydros_cumsum_reservoir_constr = @constraint(scuc,
+		[s = 1:NS],
+		q0[:, 1] .+ sum(ones(NH, 1) * cumsum_resvoir[t, 1] .- ph[((s - 1) * NH + 1):(s * NH), t] for t in 1:NT) .<= qmax[:, 1])
+
+	println("\t constraints: 14) hydro power limits\t\t\t\t\t done")
+
+	return scuc, hydros_minpower_constr, hydros_maxpower_constr, hydros_resvoir_constr, hydros_cumsum_reservoir_constr
+end

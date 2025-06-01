@@ -5,16 +5,13 @@ include("period_scuc_modules.jl")
 
 # Destructure directly from function call for clarity
 # Read data from Excel sheet
-# UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve, DataLoad, datacentra_Data = readxlssheet();
-UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve, DataLoad, Datacentra_Data, HydroData, HydroCurve = readxlssheet();
+UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve, DataLoad, datacentra_Data = readxlssheet();
+
 # Form input data for the model
-# config_param, units, lines, loads, stroges, NB, NG, NL, ND, NT, NC,
-# ND2, DataCentras = forminputdata(
-# 	DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam, StrogeData,
-# 	datacentra_Data);
 config_param, units, lines, loads, stroges, NB, NG, NL, ND, NT, NC,
-ND2, NH, DataCentras, hydros = forminputdata(DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam, StrogeData,
-	Datacentra_Data, HydroData, HydroCurve);
+ND2, DataCentras = forminputdata(
+	DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam, StrogeData,
+	datacentra_Data);
 
 # Generate wind scenarios
 winds, NW = genscenario(WindsFreqParam, 0);
@@ -48,7 +45,7 @@ for interval_scheduling_id in 1:patch_scheduling_ids_numssets
 	# Run the SCUC model for the current interval with updated data
 	poster_scheduling_results = each_period_scucmodel_modules(
 		mini_NT, NB, NG, ND, NC, ND2, mini_units, mini_loads, mini_winds, lines, DataCentras,
-		config_param, stroges, scenarios_prob, NL, interval_scheduling_id, hydros, NH)
+		config_param, stroges, scenarios_prob, NL, interval_scheduling_id)
 
 	total_scheduled_cost[interval_scheduling_id, :] = poster_scheduling_results["res_scheduled_costs"]
 
