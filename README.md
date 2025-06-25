@@ -1,4 +1,4 @@
-# Datacenter Unit Commitment Model
+# Module Unit Commitment Model
 
 ## Table of Contents
 
