@@ -134,6 +134,16 @@
 					"label": ""
 				}
 			]
+		},
+		{
+			"path": "src/unit_commitment/clustered_pcm/disaggregation.jl",
+			"bookmarks": [
+				{
+					"line": 190,
+					"column": 35,
+					"label": ""
+				}
+			]
 		}
 	]
 }

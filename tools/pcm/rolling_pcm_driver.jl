@@ -10,9 +10,9 @@
 """
 
 isdefined(@__MODULE__, :PCM_WINDOW_SOLVER) ||
-    error("PCM_WINDOW_SOLVER is not configured; run a method-specific PCM entrypoint")
+	error("PCM_WINDOW_SOLVER is not configured; run a method-specific PCM entrypoint")
 isdefined(@__MODULE__, :PCM_FORMULATION_NAME) ||
-    error("PCM_FORMULATION_NAME is not configured; run a method-specific PCM entrypoint")
+	error("PCM_FORMULATION_NAME is not configured; run a method-specific PCM entrypoint")
 
 include("../../src/renewableresource_modules/stochasticsimulation.jl")
 include("../../src/read_inputdata_modules/readdatas.jl")
@@ -29,15 +29,15 @@ println("\n" * "="^80)
 println("Step 1: Reading input data from Excel file...")
 println("="^80)
 UnitsFreqParam, WindsFreqParam, StrogeData, DataGen, GenCost, DataBranch, LoadCurve,
-    DataLoad, Datacentra_Data, HydroData, HydroCurve = readxlssheet()
+DataLoad, Datacentra_Data, HydroData, HydroCurve = readxlssheet()
 
 println("\n" * "="^80)
 println("Step 2: Formatting input data for optimization model...")
 println("="^80)
 config_param, units, lines, loads, stroges, NB, NG, NL, ND, NT, NC, ND2, NH,
-    DataCentras, hydros = forminputdata(
-        DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam,
-        StrogeData, Datacentra_Data, HydroData, HydroCurve)
+DataCentras, hydros = forminputdata(
+	DataGen, DataBranch, DataLoad, LoadCurve, GenCost, UnitsFreqParam,
+	StrogeData, Datacentra_Data, HydroData, HydroCurve)
 config_param.is_NetWorkCon = parse(Int, get(ENV, "PCM_NETWORK_CONSTRAINTS", "0"))
 apply_pcm_load_profile!(loads, get(ENV, "PCM_LOAD_PROFILE", "baseline"))
 println("  PCM load profile: $(get(ENV, "PCM_LOAD_PROFILE", "baseline"))")
@@ -68,39 +68,36 @@ println("="^80)
 pcm_simulation_start = time()
 
 for interval_scheduling_id in 1:patch_scheduling_ids_numssets
-    global pre_scheduling_results
-    println("\n" * "-"^80)
-    println("Processing scheduling interval $interval_scheduling_id of $patch_scheduling_ids_numssets...")
-    println("-"^80)
+	global pre_scheduling_results
+	println("\n" * "-"^80)
+	println("Processing scheduling interval $interval_scheduling_id of $patch_scheduling_ids_numssets...")
+	println("-"^80)
 
-    mini_units, mini_loads, mini_winds = update_boundary_conditions(
-        interval_scheduling_id, NG, mini_NT, units, loads, winds, pre_scheduling_results)
-    poster_scheduling_results = PCM_WINDOW_SOLVER(
-        mini_NT, NB, NG, ND, NC, ND2, mini_units, mini_loads, mini_winds, lines,
-        DataCentras, config_param, stroges, scenarios_prob, NL,
-        interval_scheduling_id, hydros, NH)
-    poster_scheduling_results === nothing &&
-        error("Optimization failed for interval $interval_scheduling_id")
+	mini_units, mini_loads, mini_winds = update_boundary_conditions(
+		interval_scheduling_id, NG, mini_NT, units, loads, winds, pre_scheduling_results)
+	poster_scheduling_results = PCM_WINDOW_SOLVER(
+		mini_NT, NB, NG, ND, NC, ND2, mini_units, mini_loads, mini_winds, lines,
+		DataCentras, config_param, stroges, scenarios_prob, NL,
+		interval_scheduling_id, hydros, NH)
+	poster_scheduling_results === nothing &&
+		error("Optimization failed for interval $interval_scheduling_id")
 
-    if haskey(poster_scheduling_results, "res_scheduled_costs")
-        total_scheduled_cost[interval_scheduling_id, :] =
-            poster_scheduling_results["res_scheduled_costs"]
-        println("  ✓ Interval $interval_scheduling_id optimization completed successfully")
-    else
-        println("  ⚠ Warning: No cost data found for interval $interval_scheduling_id")
-    end
+	if haskey(poster_scheduling_results, "res_scheduled_costs")
+		total_scheduled_cost[interval_scheduling_id, :] = poster_scheduling_results["res_scheduled_costs"]
+		println("  ✓ Interval $interval_scheduling_id optimization completed successfully")
+	else
+		println("  ⚠ Warning: No cost data found for interval $interval_scheduling_id")
+	end
 
-    save_powerbalance_scheduled_results(
-        mini_units, mini_winds, config_param, poster_scheduling_results,
-        interval_scheduling_id)
-    pre_scheduling_results = poster_scheduling_results
+	save_powerbalance_scheduled_results(
+		mini_units, mini_winds, config_param, poster_scheduling_results,
+		interval_scheduling_id)
+	pre_scheduling_results = poster_scheduling_results
 end
 
-PCM_OFFLINE_PREPROCESS_TIME_SEC =
-    isdefined(@__MODULE__, :PCM_CLUSTER_PREPROCESS_TIME_SEC) ?
-    PCM_CLUSTER_PREPROCESS_TIME_SEC[] : 0.0
-PCM_SIMULATION_TIME_SEC =
-    max(0.0, time() - pcm_simulation_start - PCM_OFFLINE_PREPROCESS_TIME_SEC)
+PCM_OFFLINE_PREPROCESS_TIME_SEC = isdefined(@__MODULE__, :PCM_CLUSTER_PREPROCESS_TIME_SEC) ?
+								  PCM_CLUSTER_PREPROCESS_TIME_SEC[] : 0.0
+PCM_SIMULATION_TIME_SEC = max(0.0, time() - pcm_simulation_start - PCM_OFFLINE_PREPROCESS_TIME_SEC)
 PCM_ML_TRAINING_TIME_SEC = 0.0
 
 println("\n" * "="^80)
