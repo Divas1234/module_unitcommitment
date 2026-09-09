@@ -327,10 +327,15 @@ def collect_all_tasks():
     if d1080_72 and d1080_72.exists():
         tasks.append(parse_task_details("118母线 / 1080机组 (10x规模) 72h 算例", d1080_72, "超大规模 1080 台机组全时域 MILP 滚动调度 (3×24h)", 3))
 
-    # 4. 1080 机组 168h (Worktree 进行中)
-    d1080_168 = select_best_dir(str(PROJECT_ROOT / ".worktrees" / "1080_168h" / "output" / "pcm_com4_loadall_h168_*"))
-    if d1080_168 and d1080_168.exists():
-        tasks.append(parse_task_details("118母线 / 1080机组 (10x规模) 168h (周级) 算例", d1080_168, "7个滚动区间 (7×24h=168h)，超大规模1080机组周级全周期调度", 7))
+    # 4. 1080 机组 168h (平滑负荷专属聚焦算例)
+    d1080_168_smooth = select_best_dir(str(PROJECT_ROOT / "output" / "pcm_com4_loadall_h168_1080u_smooth*"))
+    if d1080_168_smooth and d1080_168_smooth.exists():
+        tasks.append(parse_task_details("118母线 / 1080机组 168h (平滑负荷专属) 算例", d1080_168_smooth, "7个滚动区间 (7×24h=168h)，平滑负荷下 4 类 PCM 方案全景求解", 7))
+    else:
+        # 兜底旧工作区目录
+        d1080_168 = select_best_dir(str(PROJECT_ROOT / ".worktrees" / "1080_168h" / "output" / "pcm_com4_loadall_h168_*"))
+        if d1080_168 and d1080_168.exists():
+            tasks.append(parse_task_details("118母线 / 1080机组 (10x规模) 168h (周级) 算例", d1080_168, "7个滚动区间 (7×24h=168h)，超大规模1080机组周级全周期调度", 7))
 
     return tasks
 
