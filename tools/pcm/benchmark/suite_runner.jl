@@ -346,7 +346,7 @@ function run_one(; project_root = PROJECT_ROOT, julia_project = joinpath(project
 		"PCM_RANDOM_SEED" => random_seed,
 		"PCM_OVERLAP_MODE" => overlap_mode,
 		"PCM_SOLVER" => solver,
-		"PCM_SOLVER_THREADS" => get(ENV, "PCM_SOLVER_THREADS", "16"),
+		"PCM_SOLVER_THREADS" => get(ENV, "PCM_SOLVER_THREADS", "24"),
 		"PCM_TRAINING_MODE" => get(ENV, "PCM_TRAINING_MODE", "sweep"),
 		"MODULE_UC_OUTPUT_DIR" => joinpath(run_dir, "output"),
 		"PCM_BENCHMARK_METRICS" => metrics_path)

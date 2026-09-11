@@ -355,7 +355,7 @@ if !isdefined(@__MODULE__, :_TRUE_CLUSTERED_PCM_SOLVER_INCLUDED)
 		pcm_solver_name() == "gurobi" && set_optimizer_attribute(
 			m, "MIPGap", parse(Float64, get(ENV, "PCM_MIP_GAP", "0.015")))
 		pcm_solver_name() == "gurobi" && set_optimizer_attribute(
-			m, "Threads", max(1, parse(Int, get(ENV, "PCM_SOLVER_THREADS", "16"))))
+			m, "Threads", max(1, parse(Int, get(ENV, "PCM_SOLVER_THREADS", "24"))))
 		solver_limit=tryparse(Float64, get(ENV, "PCM_SOLVER_TIME_LIMIT_SECONDS", ""))
 		if solver_limit !== nothing && solver_limit > 0
 			# 与单机 PCM 使用相同的单窗时限，保证大规模性能对比公平。

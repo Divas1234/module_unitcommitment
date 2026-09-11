@@ -164,7 +164,7 @@ if !isdefined(@__MODULE__, :_PERIOD_SCUC_MODULES_INCLUDED)
         end
         if pcm_solver_name() == "gurobi"
             set_optimizer_attribute(scuc, "MIPGap", parse(Float64, get(ENV, "PCM_MIP_GAP", "0.015")))
-            solver_threads = max(1, parse(Int, get(ENV, "PCM_SOLVER_THREADS", "16")))
+            solver_threads = max(1, parse(Int, get(ENV, "PCM_SOLVER_THREADS", "24")))
             set_optimizer_attribute(scuc, "Threads", solver_threads)
             # 大规模算例可通过环境变量统一限制单个滚动窗口的求解时间。
             # 默认不设上限，以保持既有小规模算例的对外行为不变。

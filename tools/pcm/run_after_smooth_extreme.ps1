@@ -34,7 +34,7 @@ $env:PCM_BENCHMARK_METHODS = 'standard,clustered_pcm,adaptive_overlap,clustered_
 $env:PCM_SUITE_OUTPUT = $extremeDir
 $env:PCM_BENCHMARK_RESUME = 'false'
 $env:PCM_OVERLAP_MODE = 'ml_prediction'
-$env:PCM_SOLVER_THREADS = '16'
+$env:PCM_SOLVER_THREADS = '24'
 $env:PCM_TRAINING_MODE = 'fast_max_overlap'
 
 Set-Location "D:\GithubClonefiles\module_unitcommitment"
