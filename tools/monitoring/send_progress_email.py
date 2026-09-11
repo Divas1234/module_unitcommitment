@@ -337,6 +337,11 @@ def collect_all_tasks():
         if d1080_168 and d1080_168.exists():
             tasks.append(parse_task_details("118母线 / 1080机组 (10x规模) 168h (周级) 算例", d1080_168, "7个滚动区间 (7×24h=168h)，超大规模1080机组周级全周期调度", 7))
 
+    # 5. 1080 机组 168h (极限爬坡负荷专属聚焦算例)
+    d1080_168_extreme = select_best_dir(str(PROJECT_ROOT / "output" / "pcm_com4_loadall_h168_1080u_extreme*"))
+    if d1080_168_extreme and d1080_168_extreme.exists():
+        tasks.append(parse_task_details("118母线 / 1080机组 168h (极限爬坡专属) 算例", d1080_168_extreme, "7个滚动区间 (7×24h=168h)，极限爬坡下 4 类 PCM 方案全景求解", 7))
+
     return tasks
 
 
