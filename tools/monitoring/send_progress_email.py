@@ -327,7 +327,12 @@ def collect_all_tasks():
     if d1080_72 and d1080_72.exists():
         tasks.append(parse_task_details("118母线 / 1080机组 (10x规模) 72h 算例", d1080_72, "超大规模 1080 台机组全时域 MILP 滚动调度 (3×24h)", 3))
 
-    # 4. 1080 机组 168h (平滑负荷专属聚焦算例)
+    # 4. 1080 机组 168h (基准负荷专属聚焦算例)
+    d1080_168_baseline = select_best_dir(str(PROJECT_ROOT / "output" / "pcm_com4_loadall_h168_1080u_baseline*"))
+    if d1080_168_baseline and d1080_168_baseline.exists():
+        tasks.append(parse_task_details("118母线 / 1080机组 168h (基准负荷专属) 算例", d1080_168_baseline, "7个滚动区间 (7×24h=168h)，基准负荷下 4 类 PCM 方案全景求解", 7))
+
+    # 5. 1080 机组 168h (平滑负荷专属聚焦算例)
     d1080_168_smooth = select_best_dir(str(PROJECT_ROOT / "output" / "pcm_com4_loadall_h168_1080u_smooth*"))
     if d1080_168_smooth and d1080_168_smooth.exists():
         tasks.append(parse_task_details("118母线 / 1080机组 168h (平滑负荷专属) 算例", d1080_168_smooth, "7个滚动区间 (7×24h=168h)，平滑负荷下 4 类 PCM 方案全景求解", 7))
@@ -337,7 +342,7 @@ def collect_all_tasks():
         if d1080_168 and d1080_168.exists():
             tasks.append(parse_task_details("118母线 / 1080机组 (10x规模) 168h (周级) 算例", d1080_168, "7个滚动区间 (7×24h=168h)，超大规模1080机组周级全周期调度", 7))
 
-    # 5. 1080 机组 168h (极限爬坡负荷专属聚焦算例)
+    # 6. 1080 机组 168h (极限爬坡负荷专属聚焦算例)
     d1080_168_extreme = select_best_dir(str(PROJECT_ROOT / "output" / "pcm_com4_loadall_h168_1080u_extreme*"))
     if d1080_168_extreme and d1080_168_extreme.exists():
         tasks.append(parse_task_details("118母线 / 1080机组 168h (极限爬坡专属) 算例", d1080_168_extreme, "7个滚动区间 (7×24h=168h)，极限爬坡下 4 类 PCM 方案全景求解", 7))
